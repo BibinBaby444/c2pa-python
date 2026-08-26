@@ -16,6 +16,11 @@ on:
         description: "Optional central release workflow correlation id"
         required: false
         type: string
+      build_windows_wheel:
+        description: "Also build and publish a windows-x86_64 wheel bundle"
+        required: false
+        default: "false"
+        type: string
       allow_unprotected_ref:
         description: "Allow building from a non-default, unprotected ref. Use only for forked dependency release branches."
         required: false
@@ -34,12 +39,17 @@ env:
   MANYLINUX_PYTHON: /opt/python/cp311-cp311/bin/python
   RUST_TOOLCHAIN: "1.88.0"
   WHEEL_PLAT_NAME: manylinux_2_28_x86_64
+  WHEEL_PLAT_NAME_WINDOWS: win_amd64
+  PYTHON_VERSION_WINDOWS: "3.11"
 
 jobs:
   build-wheel:
     name: Build and publish release wheel
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    outputs:
+      release_version: ${{ steps.inputs.outputs.release_version }}
+      release_tag: ${{ steps.inputs.outputs.release_tag }}
 
     steps:
       - name: Checkout
@@ -237,3 +247,165 @@ jobs:
               --notes-file "$notes_file" \
               --target "$GITHUB_SHA"
           fi
+
+  # windows-x86_64 leg. Opt-in via build_windows_wheel so a Linux-only release
+  # runs exactly as before, and `needs: build-wheel` so it reuses the validated
+  # version/tag and uploads into a release that already exists.
+  #
+  # Runs under bash throughout: Git Bash on windows-latest provides GNU tar
+  # (--sort/--mtime/--numeric-owner), gzip -n and sha256sum, so the bundle is
+  # packed with the same flags as the manylinux leg and stays reproducible.
+  build-wheel-windows:
+    name: Build and publish release wheel (windows-x86_64)
+    needs: build-wheel
+    if: inputs.build_windows_wheel == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: ${{ env.PYTHON_VERSION_WINDOWS }}
+
+      - name: Pin the Rust toolchain
+        run: |
+          set -euo pipefail
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          rustup default "$RUST_TOOLCHAIN"
+          rustc -vV
+
+      - name: Build wheel
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install "wheel==0.45.1" "setuptools==80.9.0" "toml==0.10.2"
+          python setup.py bdist_wheel --plat-name "$WHEEL_PLAT_NAME_WINDOWS"
+
+          mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' | sort)
+          if [ "${#wheels[@]}" -ne 1 ]; then
+            echo "::error::Expected exactly one wheel in dist/, got ${#wheels[@]}"
+            exit 1
+          fi
+
+          # There is no auditwheel equivalent on Windows, so record the wheel's
+          # contents instead: the native c2pa_c.dll has to be inside it, or the
+          # wheel imports only on a machine that happens to have one.
+          python - "${wheels[0]}" > dist/wheel-contents.txt <<'PY'
+          import sys
+          import zipfile
+
+          names = sorted(zipfile.ZipFile(sys.argv[1]).namelist())
+          print("\n".join(names))
+          if not any(name.endswith("c2pa_c.dll") for name in names):
+              raise SystemExit("wheel does not contain c2pa_c.dll")
+          PY
+
+          python -m venv "$RUNNER_TEMP/c2pa-wheel-smoke"
+          "$RUNNER_TEMP/c2pa-wheel-smoke/Scripts/python.exe" -m pip install "${wheels[0]}"
+          "$RUNNER_TEMP/c2pa-wheel-smoke/Scripts/python.exe" -c "import c2pa; print(c2pa.__file__)" \
+            | tee dist/import-smoke.txt
+
+      - name: Validate wheel and write evidence
+        id: evidence
+        env:
+          RELEASE_VERSION: ${{ needs.build-wheel.outputs.release_version }}
+          RELEASE_TAG: ${{ needs.build-wheel.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' | sort)
+          wheel_path="${wheels[0]}"
+          wheel_name="$(basename "$wheel_path")"
+          if [[ "$wheel_name" != *"$WHEEL_PLAT_NAME_WINDOWS"* ]]; then
+            echo "::error::Expected a $WHEEL_PLAT_NAME_WINDOWS wheel, got $wheel_name"
+            exit 1
+          fi
+          wheel_sha256="$(sha256sum "$wheel_path" | cut -d' ' -f1)"
+          printf '%s  %s\n' "$wheel_sha256" "$wheel_name" | tee "dist/${wheel_name}.sha256"
+          safe_release_version="${RELEASE_VERSION//+/-}"
+          bundle_name="c2pa-python-${safe_release_version}-wheel-bundle-windows-x86_64.tar.gz"
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            -cf - \
+            -C dist "$wheel_name" "${wheel_name}.sha256" wheel-contents.txt import-smoke.txt \
+            | gzip -n > "dist/${bundle_name}"
+          bundle_sha256="$(sha256sum "dist/${bundle_name}" | cut -d' ' -f1)"
+          printf '%s  %s\n' "$bundle_sha256" "$bundle_name" | tee "dist/${bundle_name}.sha256"
+          c2pa_rs_commit="$(git -C c2pa-rs rev-parse HEAD)"
+          c2pa_rs_status="$(git submodule status --recursive c2pa-rs)"
+          generated_at="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          python_version="$(python -VV)"
+          rustc_version="$(rustc -vV | tr '\n' ' ')"
+          export wheel_name wheel_sha256 bundle_name bundle_sha256 c2pa_rs_commit c2pa_rs_status generated_at python_version rustc_version
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          evidence = {
+              "artifact_type": "c2pa_python_release_wheel_evidence",
+              "package_name": "c2pa-python",
+              "platform": "windows-x86_64",
+              "release_version": os.environ["RELEASE_VERSION"],
+              "release_tag": os.environ["RELEASE_TAG"],
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "source_url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}",
+              "source_ref": os.environ["GITHUB_REF_NAME"],
+              "source_sha": os.environ["GITHUB_SHA"],
+              "github_run_id": os.environ["GITHUB_RUN_ID"],
+              "github_run_number": os.environ["GITHUB_RUN_NUMBER"],
+              "generated_at": os.environ["generated_at"],
+              "runner_os": os.environ["RUNNER_OS"],
+              "runner_arch": os.environ["RUNNER_ARCH"],
+              "python_version": os.environ["python_version"],
+              "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
+              "rustc_version": os.environ["rustc_version"],
+              "wheel_plat_name": os.environ["WHEEL_PLAT_NAME_WINDOWS"],
+              "c2pa_rs_submodule_commit": os.environ["c2pa_rs_commit"],
+              "c2pa_rs_submodule_status": os.environ["c2pa_rs_status"],
+              "wheel_file": os.environ["wheel_name"],
+              "wheel_sha256": os.environ["wheel_sha256"],
+              "wheel_bundle_file": os.environ["bundle_name"],
+              "wheel_bundle_sha256": os.environ["bundle_sha256"],
+          }
+          Path("dist/c2pa-python-wheel-evidence-windows-x86_64.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          echo "wheel_sha256=${wheel_sha256}" >> "$GITHUB_OUTPUT"
+          echo "bundle_name=${bundle_name}" >> "$GITHUB_OUTPUT"
+          echo "bundle_sha256=${bundle_sha256}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload wheel evidence artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: c2pa-python-release-wheel-windows
+          path: |
+            dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz
+            dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz.sha256
+            dist/c2pa-python-wheel-evidence-windows-x86_64.json
+            dist/wheel-contents.txt
+            dist/import-smoke.txt
+
+      - name: Publish GitHub release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.build-wheel.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          # build-wheel has already created the release for this tag.
+          gh release upload "$RELEASE_TAG" \
+            dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz \
+            dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz.sha256 \
+            dist/c2pa-python-wheel-evidence-windows-x86_64.json \
+            --clobber
