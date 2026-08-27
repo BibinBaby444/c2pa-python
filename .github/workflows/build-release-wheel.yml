@@ -47,6 +47,9 @@ jobs:
     name: Build and publish release wheel
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+
+    env:
+      NATIVE_TRIPLE: x86_64-unknown-linux-gnu
     outputs:
       release_version: ${{ steps.inputs.outputs.release_version }}
       release_tag: ${{ steps.inputs.outputs.release_tag }}
@@ -95,6 +98,32 @@ jobs:
           echo "release_version=${release_version}" >> "$GITHUB_OUTPUT"
           echo "release_tag=${release_tag}" >> "$GITHUB_OUTPUT"
 
+      - name: Download and verify the native library
+        id: native
+        run: |
+          set -euo pipefail
+          # setup.py copies a prebuilt library out of artifacts/<triple> and
+          # raises if it is absent; nothing here built or fetched one. Same
+          # download build-wheel.yml performs. $PWD is bind-mounted into the
+          # container below, so this can run on the host.
+          tag="$(tr -d '[:space:]' < c2pa-native-version.txt)"
+          [ -n "$tag" ] || { echo "::error::c2pa-native-version.txt is empty"; exit 1; }
+          echo "native_tag=${tag}" >> "$GITHUB_OUTPUT"
+
+          mkdir -p artifacts src/c2pa/libs
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+          C2PA_LIBS_PLATFORM="$NATIVE_TRIPLE" python3 scripts/download_artifacts.py "$tag"
+
+          lib="artifacts/$NATIVE_TRIPLE/libc2pa_c.so"
+          if [ ! -s "$lib" ]; then
+            echo "::error::$lib missing after downloading $tag -- the release asset layout changed"
+            exit 1
+          fi
+          sha="$(sha256sum "$lib" | cut -d' ' -f1)"
+          echo "native_lib_sha256=${sha}" >> "$GITHUB_OUTPUT"
+          echo "downloaded $tag -> $lib ($sha)"
+
       - name: Build wheel in manylinux container
         run: |
           set -euo pipefail
@@ -131,6 +160,8 @@ jobs:
         env:
           RELEASE_VERSION: ${{ steps.inputs.outputs.release_version }}
           RELEASE_TAG: ${{ steps.inputs.outputs.release_tag }}
+          NATIVE_TAG: ${{ steps.native.outputs.native_tag }}
+          NATIVE_LIB_SHA256: ${{ steps.native.outputs.native_lib_sha256 }}
         run: |
           set -euo pipefail
           mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' | sort)
@@ -150,8 +181,15 @@ jobs:
             | gzip -n > "dist/${bundle_name}"
           bundle_sha256="$(sha256sum "dist/${bundle_name}" | cut -d' ' -f1)"
           printf '%s  %s\n' "$bundle_sha256" "$bundle_name" | tee "dist/${bundle_name}.sha256"
-          c2pa_rs_commit="$(git -C c2pa-rs rev-parse HEAD)"
-          c2pa_rs_status="$(git submodule status --recursive c2pa-rs)"
+          # Conditional: there is no c2pa-rs checkout on this branch, but there
+          # is on the submodule lineage, and consumers read these fields.
+          if [ -d c2pa-rs ]; then
+            c2pa_rs_commit="$(git -C c2pa-rs rev-parse HEAD)"
+            c2pa_rs_status="$(git submodule status --recursive c2pa-rs || true)"
+          else
+            c2pa_rs_commit=""
+            c2pa_rs_status=""
+          fi
           generated_at="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           python_version="$(docker run --rm "$MANYLINUX_IMAGE_REF" "$MANYLINUX_PYTHON" -VV)"
           export wheel_name wheel_sha256 bundle_name bundle_sha256 c2pa_rs_commit c2pa_rs_status generated_at python_version
@@ -179,13 +217,21 @@ jobs:
               "manylinux_image": os.environ["MANYLINUX_IMAGE"],
               "manylinux_image_ref": os.environ["MANYLINUX_IMAGE_REF"],
               "wheel_plat_name": os.environ["WHEEL_PLAT_NAME"],
-              "c2pa_rs_submodule_commit": os.environ["c2pa_rs_commit"],
-              "c2pa_rs_submodule_status": os.environ["c2pa_rs_status"],
+              "c2pa_native_source_repository": "contentauth/c2pa-rs",
+              "c2pa_native_release_tag": os.environ["NATIVE_TAG"],
+              "c2pa_native_library_file": "libc2pa_c.so",
+              "c2pa_native_library_sha256": os.environ["NATIVE_LIB_SHA256"],
+              "c2pa_native_triple": os.environ["NATIVE_TRIPLE"],
               "wheel_file": os.environ["wheel_name"],
               "wheel_sha256": os.environ["wheel_sha256"],
               "wheel_bundle_file": os.environ["bundle_name"],
               "wheel_bundle_sha256": os.environ["bundle_sha256"],
           }
+          for key, env_name in (("c2pa_rs_submodule_commit", "c2pa_rs_commit"),
+                                ("c2pa_rs_submodule_status", "c2pa_rs_status")):
+              if os.environ.get(env_name):
+                  evidence[key] = os.environ[env_name]
+
           Path("dist/c2pa-python-wheel-evidence.json").write_text(
               json.dumps(evidence, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
@@ -266,29 +312,53 @@ jobs:
       run:
         shell: bash
 
+    env:
+      NATIVE_TRIPLE: x86_64-pc-windows-msvc
+
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
-          submodules: recursive
 
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: ${{ env.PYTHON_VERSION_WINDOWS }}
 
-      - name: Pin the Rust toolchain
+      - name: Download and verify the native library
+        id: native
         run: |
           set -euo pipefail
-          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
-          rustup default "$RUST_TOOLCHAIN"
-          rustc -vV
+          # setup.py does not build anything -- copy_platform_libraries() lifts a
+          # prebuilt library out of artifacts/<triple> and raises if it is not
+          # there. This is the same download build-wheel.yml performs, with the
+          # version taken from the in-repo pin rather than restated here.
+          tag="$(tr -d '[:space:]' < c2pa-native-version.txt)"
+          [ -n "$tag" ] || { echo "::error::c2pa-native-version.txt is empty"; exit 1; }
+          echo "native_tag=${tag}" >> "$GITHUB_OUTPUT"
+
+          mkdir -p artifacts src/c2pa/libs
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          C2PA_LIBS_PLATFORM="$NATIVE_TRIPLE" python scripts/download_artifacts.py "$tag"
+
+          lib="artifacts/$NATIVE_TRIPLE/c2pa_c.dll"
+          if [ ! -s "$lib" ]; then
+            echo "::error::$lib missing after downloading $tag -- the release asset layout changed"
+            exit 1
+          fi
+          sha="$(sha256sum "$lib" | cut -d' ' -f1)"
+          echo "native_lib_sha256=${sha}" >> "$GITHUB_OUTPUT"
+          echo "downloaded $tag -> $lib ($sha)"
 
       - name: Build wheel
         run: |
           set -euo pipefail
-          python -m pip install --upgrade pip
+          # SOURCE_DATE_EPOCH, as the manylinux leg sets: without it the wheel's
+          # ZIP timestamps come from the clock and the bundle digest is not
+          # reproducible for identical inputs.
+          export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
           python -m pip install "wheel==0.45.1" "setuptools==80.9.0" "toml==0.10.2"
           python setup.py bdist_wheel --plat-name "$WHEEL_PLAT_NAME_WINDOWS"
 
@@ -321,6 +391,8 @@ jobs:
         env:
           RELEASE_VERSION: ${{ needs.build-wheel.outputs.release_version }}
           RELEASE_TAG: ${{ needs.build-wheel.outputs.release_tag }}
+          NATIVE_TAG: ${{ steps.native.outputs.native_tag }}
+          NATIVE_LIB_SHA256: ${{ steps.native.outputs.native_lib_sha256 }}
         run: |
           set -euo pipefail
           mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' | sort)
@@ -340,12 +412,21 @@ jobs:
             | gzip -n > "dist/${bundle_name}"
           bundle_sha256="$(sha256sum "dist/${bundle_name}" | cut -d' ' -f1)"
           printf '%s  %s\n' "$bundle_sha256" "$bundle_name" | tee "dist/${bundle_name}.sha256"
-          c2pa_rs_commit="$(git -C c2pa-rs rev-parse HEAD)"
-          c2pa_rs_status="$(git submodule status --recursive c2pa-rs)"
+          # There is no c2pa-rs checkout on this branch and no .gitmodules entry:
+          # the native library is a *release artifact*, so provenance is the
+          # release it came from and the digest of the library itself. Kept
+          # conditional because a checkout does exist on the submodule lineage,
+          # and consumers of the existing schema read c2pa_rs_submodule_commit.
+          if [ -d c2pa-rs ]; then
+            c2pa_rs_commit="$(git -C c2pa-rs rev-parse HEAD)"
+            c2pa_rs_status="$(git submodule status --recursive c2pa-rs || true)"
+          else
+            c2pa_rs_commit=""
+            c2pa_rs_status=""
+          fi
           generated_at="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           python_version="$(python -VV)"
-          rustc_version="$(rustc -vV | tr '\n' ' ')"
-          export wheel_name wheel_sha256 bundle_name bundle_sha256 c2pa_rs_commit c2pa_rs_status generated_at python_version rustc_version
+          export wheel_name wheel_sha256 bundle_name bundle_sha256 c2pa_rs_commit c2pa_rs_status generated_at python_version
           python - <<'PY'
           import json
           import os
@@ -367,16 +448,27 @@ jobs:
               "runner_os": os.environ["RUNNER_OS"],
               "runner_arch": os.environ["RUNNER_ARCH"],
               "python_version": os.environ["python_version"],
-              "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
-              "rustc_version": os.environ["rustc_version"],
               "wheel_plat_name": os.environ["WHEEL_PLAT_NAME_WINDOWS"],
-              "c2pa_rs_submodule_commit": os.environ["c2pa_rs_commit"],
-              "c2pa_rs_submodule_status": os.environ["c2pa_rs_status"],
+              # Where the prebuilt native library came from, and its digest, so
+              # the wheel's contents can be traced without a source checkout.
+              "c2pa_native_source_repository": "contentauth/c2pa-rs",
+              "c2pa_native_release_tag": os.environ["NATIVE_TAG"],
+              "c2pa_native_library_file": "c2pa_c.dll",
+              "c2pa_native_library_sha256": os.environ["NATIVE_LIB_SHA256"],
+              "c2pa_native_triple": os.environ["NATIVE_TRIPLE"],
               "wheel_file": os.environ["wheel_name"],
               "wheel_sha256": os.environ["wheel_sha256"],
               "wheel_bundle_file": os.environ["bundle_name"],
               "wheel_bundle_sha256": os.environ["bundle_sha256"],
           }
+          # Present only on the submodule lineage; omitted rather than recorded
+          # as an empty string, so a consumer can tell "not applicable" from
+          # "unknown".
+          for key, env_name in (("c2pa_rs_submodule_commit", "c2pa_rs_commit"),
+                                ("c2pa_rs_submodule_status", "c2pa_rs_status")):
+              if os.environ.get(env_name):
+                  evidence[key] = os.environ[env_name]
+
           Path("dist/c2pa-python-wheel-evidence-windows-x86_64.json").write_text(
               json.dumps(evidence, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
