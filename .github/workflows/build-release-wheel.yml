@@ -100,6 +100,11 @@ jobs:
 
       - name: Download and verify the native library
         id: native
+        env:
+          # download_artifacts.py sends this as an Authorization header when
+          # set; unauthenticated release lookups share the runner's IP rate
+          # limit and can 403 in the middle of a release.
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           # setup.py copies a prebuilt library out of artifacts/<triple> and
@@ -112,7 +117,9 @@ jobs:
 
           mkdir -p artifacts src/c2pa/libs
           python3 -m pip install --upgrade pip
-          python3 -m pip install -r requirements.txt
+          # requests is declared in requirements-dev.txt, not requirements.txt,
+          # and download_artifacts.py imports it.
+          python3 -m pip install -r requirements.txt -r requirements-dev.txt
           C2PA_LIBS_PLATFORM="$NATIVE_TRIPLE" python3 scripts/download_artifacts.py "$tag"
 
           lib="artifacts/$NATIVE_TRIPLE/libc2pa_c.so"
@@ -122,6 +129,13 @@ jobs:
           fi
           sha="$(sha256sum "$lib" | cut -d' ' -f1)"
           echo "native_lib_sha256=${sha}" >> "$GITHUB_OUTPUT"
+
+          # setup.py's copy_platform_libraries() globs the whole platform
+          # directory into the wheel, and the release asset carries link-time
+          # and debug files nothing loads at runtime (c2pa_c.lib alone is 245 MB, plus a 7.8 MB .pdb).
+          # The published v0.31.0+stardustproof.1 wheel contains only the
+          # runtime library, so keep that shape.
+          find "artifacts/$NATIVE_TRIPLE" -type f ! -name 'c2pa_c.dll' -print -delete
           echo "downloaded $tag -> $lib ($sha)"
 
       - name: Build wheel in manylinux container
@@ -183,7 +197,10 @@ jobs:
           printf '%s  %s\n' "$bundle_sha256" "$bundle_name" | tee "dist/${bundle_name}.sha256"
           # Conditional: there is no c2pa-rs checkout on this branch, but there
           # is on the submodule lineage, and consumers read these fields.
-          if [ -d c2pa-rs ]; then
+          # -e c2pa-rs/.git, not -d c2pa-rs: for an empty directory git walks
+          # up and rev-parse returns this repository's own HEAD, which would be
+          # recorded as the c2pa-rs commit.
+          if [ -e c2pa-rs/.git ]; then
             c2pa_rs_commit="$(git -C c2pa-rs rev-parse HEAD)"
             c2pa_rs_status="$(git submodule status --recursive c2pa-rs || true)"
           else
@@ -259,14 +276,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.inputs.outputs.release_tag }}
           RELEASE_VERSION: ${{ steps.inputs.outputs.release_version }}
+          NATIVE_TAG: ${{ steps.native.outputs.native_tag }}
         run: |
           set -euo pipefail
           notes_file="dist/release-notes.md"
+          # Resolved before the heredoc: a failing $( ) inside one does not
+          # abort under `set -e`, it just publishes an empty line -- and there
+          # is no c2pa-rs checkout on this branch.
+          if [ -e c2pa-rs/.git ]; then
+            native_source="c2pa-rs submodule: $(git -C c2pa-rs rev-parse HEAD)"
+          else
+            native_source="c2pa-rs native library: ${NATIVE_TAG} (contentauth/c2pa-rs)"
+          fi
           cat > "$notes_file" <<EOF
           c2pa-python ${RELEASE_VERSION} StardustProof fork wheel.
 
           Source commit: ${GITHUB_SHA}
-          c2pa-rs submodule: $(git -C c2pa-rs rev-parse HEAD)
+          ${native_source}
           Wheel SHA-256: ${{ steps.evidence.outputs.wheel_sha256 }}
           Bundle SHA-256: ${{ steps.evidence.outputs.bundle_sha256 }}
           GitHub Actions run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
@@ -328,6 +354,11 @@ jobs:
 
       - name: Download and verify the native library
         id: native
+        env:
+          # download_artifacts.py sends this as an Authorization header when
+          # set; unauthenticated release lookups share the runner's IP rate
+          # limit and can 403 in the middle of a release.
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           # setup.py does not build anything -- copy_platform_libraries() lifts a
@@ -340,7 +371,9 @@ jobs:
 
           mkdir -p artifacts src/c2pa/libs
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          # requests is declared in requirements-dev.txt, not requirements.txt,
+          # and download_artifacts.py imports it.
+          python -m pip install -r requirements.txt -r requirements-dev.txt
           C2PA_LIBS_PLATFORM="$NATIVE_TRIPLE" python scripts/download_artifacts.py "$tag"
 
           lib="artifacts/$NATIVE_TRIPLE/c2pa_c.dll"
@@ -350,6 +383,13 @@ jobs:
           fi
           sha="$(sha256sum "$lib" | cut -d' ' -f1)"
           echo "native_lib_sha256=${sha}" >> "$GITHUB_OUTPUT"
+
+          # setup.py's copy_platform_libraries() globs the whole platform
+          # directory into the wheel, and the release asset carries link-time
+          # and debug files nothing loads at runtime (libc2pa_c.rlib alone is 26 MB).
+          # The published v0.31.0+stardustproof.1 wheel contains only the
+          # runtime library, so keep that shape.
+          find "artifacts/$NATIVE_TRIPLE" -type f ! -name 'libc2pa_c.so' -print -delete
           echo "downloaded $tag -> $lib ($sha)"
 
       - name: Build wheel
@@ -417,7 +457,10 @@ jobs:
           # release it came from and the digest of the library itself. Kept
           # conditional because a checkout does exist on the submodule lineage,
           # and consumers of the existing schema read c2pa_rs_submodule_commit.
-          if [ -d c2pa-rs ]; then
+          # -e c2pa-rs/.git, not -d c2pa-rs: for an empty directory git walks
+          # up and rev-parse returns this repository's own HEAD, which would be
+          # recorded as the c2pa-rs commit.
+          if [ -e c2pa-rs/.git ]; then
             c2pa_rs_commit="$(git -C c2pa-rs rev-parse HEAD)"
             c2pa_rs_status="$(git submodule status --recursive c2pa-rs || true)"
           else

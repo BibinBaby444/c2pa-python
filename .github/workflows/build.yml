@@ -267,7 +267,7 @@ jobs:
       - name: Run tests with pytest (venv)
         run: |
           source venv/bin/activate
-          venv/bin/pytest tests/test_unit_tests.py -v
+          venv/bin/pytest tests/test_unit_tests.py tests/test_release_workflow.py -v
 
   build-windows-wheel:
     name: Build Windows wheel
@@ -435,7 +435,7 @@ jobs:
       - name: Run tests with pytest (venv)
         run: |
           source venv/bin/activate
-          venv/bin/pytest tests/test_unit_tests.py -v
+          venv/bin/pytest tests/test_unit_tests.py tests/test_release_workflow.py -v
 
   sdist:
     runs-on: ubuntu-latest

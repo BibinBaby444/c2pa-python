@@ -26,6 +26,21 @@ def _workflow() -> dict:
     return yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
 
 
+def _steps() -> list[tuple[str, str, str]]:
+    """Every (job id, step name, script) in the workflow.
+
+    Steps are kept separate on purpose: an earlier version of this file joined
+    a job's scripts together, so a guard in one step satisfied an unguarded
+    call in another and the test passed while the defect was still there.
+    """
+    out = []
+    for job_id, spec in _workflow()["jobs"].items():
+        for step in spec.get("steps", []):
+            if "run" in step:
+                out.append((job_id, step.get("name", "?"), step["run"]))
+    return out
+
+
 def _wheel_building_jobs() -> dict:
     """Jobs that invoke `setup.py bdist_wheel`, keyed by job id."""
     jobs = {}
@@ -87,19 +102,79 @@ def test_wheel_build_sets_source_date_epoch(job_id):
     assert "SOURCE_DATE_EPOCH" in runs, f"{job_id} does not set SOURCE_DATE_EPOCH"
 
 
-@pytest.mark.parametrize("job_id", sorted(_wheel_building_jobs()))
-def test_evidence_does_not_assume_a_c2pa_rs_checkout(job_id):
-    """This repository has no c2pa-rs directory and no .gitmodules entry.
+def test_every_c2pa_rs_call_is_guarded_in_its_own_step():
+    """No unguarded `git -C c2pa-rs` anywhere.
 
-    An unconditional `git -C c2pa-rs ...` fails under `set -e`, so any such
-    call has to be guarded by a directory test.
+    This repository has no c2pa-rs checkout, so an unguarded call either fails
+    under `set -e` or -- inside a heredoc, where the status is discarded --
+    silently publishes an empty value.
     """
-    runs = _wheel_building_jobs()[job_id]["runs"]
-    for match in re.finditer(r"git (?:-C c2pa-rs|submodule status)", runs):
-        preceding = runs[: match.start()]
-        assert "if [ -d c2pa-rs ]" in preceding, (
-            f"{job_id} reads a c2pa-rs checkout without checking it exists"
-        )
+    calls = 0
+    for job_id, name, run in _steps():
+        for match in re.finditer(r"git (?:-C c2pa-rs|submodule status)", run):
+            calls += 1
+            assert "if [ -e c2pa-rs/.git ]" in run[: match.start()], (
+                f"{job_id} / {name}: c2pa-rs read without a guard in the same step"
+            )
+    assert calls, "no c2pa-rs calls found -- has the evidence shape changed?"
+
+
+def test_the_guard_tests_for_a_repository_not_a_directory():
+    """`-d c2pa-rs` is not good enough.
+
+    With an empty c2pa-rs/ directory git walks up and `rev-parse HEAD` returns
+    *this* repository's HEAD, which would then be recorded as the c2pa-rs
+    commit -- false provenance, silently.
+    """
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert "if [ -e c2pa-rs/.git ]" in text
+    assert "if [ -d c2pa-rs ]" not in text
+
+
+def test_download_steps_install_whichever_requirements_declare_requests():
+    # download_artifacts.py imports requests; installing the wrong requirements
+    # file fails at import time on a clean runner.
+    declaring = [
+        f.name
+        for f in (REPO_ROOT / "requirements.txt", REPO_ROOT / "requirements-dev.txt")
+        if f.exists() and re.search(r"^requests\b", f.read_text(encoding="utf-8"), re.M)
+    ]
+    assert declaring, "no requirements file declares requests"
+
+    for job_id, name, run in _steps():
+        if "download_artifacts.py" not in run:
+            continue
+        for f in declaring:
+            assert f in run, f"{job_id} / {name} does not install {f}"
+
+
+def test_download_steps_authenticate_the_release_lookup():
+    # Unauthenticated GitHub API calls share the runner's IP rate limit and can
+    # 403 in the middle of a release; the script sends the header when set.
+    for job_id, spec in _workflow()["jobs"].items():
+        for step in spec.get("steps", []):
+            if "download_artifacts.py" in step.get("run", ""):
+                assert "GITHUB_TOKEN" in (step.get("env") or {}), (
+                    f"{job_id} / {step.get('name')} fetches releases unauthenticated"
+                )
+
+
+def test_only_the_runtime_library_reaches_the_wheel():
+    """setup.py globs the whole platform directory into the wheel.
+
+    The release asset also carries link-time and debug files -- c2pa_c.lib is
+    245 MB -- and the published v0.31.0+stardustproof.1 wheel contains only the
+    runtime library, so the extras are pruned before the build.
+    """
+    pruning = [
+        (job_id, name)
+        for job_id, name, run in _steps()
+        if "download_artifacts.py" in run and re.search(r"find \"artifacts.*-delete", run)
+    ]
+    downloads = [(j, n) for j, n, r in _steps() if "download_artifacts.py" in r]
+    assert len(pruning) == len(downloads), (
+        f"{len(downloads) - len(pruning)} download step(s) do not prune non-runtime files"
+    )
 
 
 def test_repository_really_has_no_c2pa_rs_checkout():
