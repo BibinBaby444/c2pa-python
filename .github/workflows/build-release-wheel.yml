@@ -132,10 +132,13 @@ jobs:
 
           # setup.py's copy_platform_libraries() globs the whole platform
           # directory into the wheel, and the release asset carries link-time
-          # and debug files nothing loads at runtime (c2pa_c.lib alone is 245 MB, plus a 7.8 MB .pdb).
+          # and debug files nothing loads at runtime (libc2pa_c.rlib alone is 26 MB).
           # The published v0.31.0+stardustproof.1 wheel contains only the
           # runtime library, so keep that shape.
-          find "artifacts/$NATIVE_TRIPLE" -type f ! -name 'c2pa_c.dll' -print -delete
+          #
+          # The kept name comes from "$lib" -- the file verified above -- rather
+          # than being restated, so the two can never disagree.
+          find "artifacts/$NATIVE_TRIPLE" -type f ! -name "$(basename "$lib")" -print -delete
           echo "downloaded $tag -> $lib ($sha)"
 
       - name: Build wheel in manylinux container
@@ -386,10 +389,13 @@ jobs:
 
           # setup.py's copy_platform_libraries() globs the whole platform
           # directory into the wheel, and the release asset carries link-time
-          # and debug files nothing loads at runtime (libc2pa_c.rlib alone is 26 MB).
+          # and debug files nothing loads at runtime (c2pa_c.lib alone is 245 MB, plus a 7.8 MB .pdb).
           # The published v0.31.0+stardustproof.1 wheel contains only the
           # runtime library, so keep that shape.
-          find "artifacts/$NATIVE_TRIPLE" -type f ! -name 'libc2pa_c.so' -print -delete
+          #
+          # The kept name comes from "$lib" -- the file verified above -- rather
+          # than being restated, so the two can never disagree.
+          find "artifacts/$NATIVE_TRIPLE" -type f ! -name "$(basename "$lib")" -print -delete
           echo "downloaded $tag -> $lib ($sha)"
 
       - name: Build wheel

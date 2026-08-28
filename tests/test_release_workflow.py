@@ -14,8 +14,7 @@ import re
 from pathlib import Path
 
 import pytest
-
-yaml = pytest.importorskip("yaml")
+import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = REPO_ROOT / ".github" / "workflows" / "build-release-wheel.yml"
@@ -157,6 +156,61 @@ def test_download_steps_authenticate_the_release_lookup():
                 assert "GITHUB_TOKEN" in (step.get("env") or {}), (
                     f"{job_id} / {step.get('name')} fetches releases unauthenticated"
                 )
+
+
+# The runtime library each platform's wheel must contain.
+RUNTIME_LIBRARY = {
+    "x86_64-unknown-linux-gnu": "libc2pa_c.so",
+    "x86_64-pc-windows-msvc": "c2pa_c.dll",
+}
+
+
+def _download_steps() -> list[tuple[str, str, str]]:
+    """(job id, NATIVE_TRIPLE, script) for every step that fetches the library."""
+    out = []
+    for job_id, spec in _workflow()["jobs"].items():
+        triple = (spec.get("env") or {}).get("NATIVE_TRIPLE")
+        for step in spec.get("steps", []):
+            if "download_artifacts.py" in step.get("run", ""):
+                assert triple, f"{job_id} downloads a library without declaring NATIVE_TRIPLE"
+                out.append((job_id, triple, step["run"]))
+    assert out, "no download step found"
+    return out
+
+
+@pytest.mark.parametrize(
+    "job_id,triple,run", _download_steps(), ids=[j for j, _, _ in _download_steps()]
+)
+def test_each_leg_verifies_its_own_platform_library(job_id, triple, run):
+    # build-wheel must handle libc2pa_c.so and build-wheel-windows c2pa_c.dll;
+    # a swap leaves the wheel without a runtime library.
+    expected = RUNTIME_LIBRARY[triple]
+    match = re.search(r'lib="artifacts/\$NATIVE_TRIPLE/([^"]+)"', run)
+    assert match, f"{job_id} does not define the library path"
+    assert match.group(1) == expected, (
+        f"{job_id} targets {triple} but verifies {match.group(1)}, expected {expected}"
+    )
+
+
+@pytest.mark.parametrize(
+    "job_id,triple,run", _download_steps(), ids=[j for j, _, _ in _download_steps()]
+)
+def test_pruning_keeps_exactly_the_verified_library(job_id, triple, run):
+    """The kept name must derive from the verified library, not be restated.
+
+    Restating it is how the two came apart: a patch matched text identical in
+    both legs and the pruning patterns ended up swapped, so each leg deleted
+    its own runtime library and kept the other platform's.
+    """
+    prune = re.search(r"find \"artifacts/\$NATIVE_TRIPLE\" -type f ! -name (\S+)", run)
+    assert prune, f"{job_id} does not prune non-runtime files"
+    kept = prune.group(1)
+    assert "$lib" in kept or "basename" in kept, (
+        f"{job_id} prunes against the literal {kept}; derive it from \"$lib\" so the "
+        f"kept file cannot diverge from the verified one"
+    )
+    for other in set(RUNTIME_LIBRARY.values()) - {RUNTIME_LIBRARY[triple]}:
+        assert other not in kept, f"{job_id} ({triple}) keeps another platform's {other}"
 
 
 def test_only_the_runtime_library_reaches_the_wheel():
