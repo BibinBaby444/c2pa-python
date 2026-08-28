@@ -332,7 +332,6 @@ jobs:
   # packed with the same flags as the manylinux leg and stays reproducible.
   build-wheel-windows:
     name: Build and publish release wheel (windows-x86_64)
-    needs: build-wheel
     if: inputs.build_windows_wheel == 'true'
     runs-on: windows-latest
     timeout-minutes: 60
@@ -354,6 +353,18 @@ jobs:
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: ${{ env.PYTHON_VERSION_WINDOWS }}
+
+      - name: Resolve the release version
+        id: resolve
+        env:
+          INPUT_RELEASE_VERSION: ${{ inputs.release_version }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        run: |
+          set -euo pipefail
+          release_version="${INPUT_RELEASE_VERSION#v}"
+          release_tag="${INPUT_RELEASE_TAG:-v${release_version}}"
+          echo "release_version=${release_version}" >> "$GITHUB_OUTPUT"
+          echo "release_tag=${release_tag}" >> "$GITHUB_OUTPUT"
 
       - name: Download and verify the native library
         id: native
@@ -435,8 +446,8 @@ jobs:
       - name: Validate wheel and write evidence
         id: evidence
         env:
-          RELEASE_VERSION: ${{ needs.build-wheel.outputs.release_version }}
-          RELEASE_TAG: ${{ needs.build-wheel.outputs.release_tag }}
+          RELEASE_VERSION: ${{ steps.resolve.outputs.release_version }}
+          RELEASE_TAG: ${{ steps.resolve.outputs.release_tag }}
           NATIVE_TAG: ${{ steps.native.outputs.native_tag }}
           NATIVE_LIB_SHA256: ${{ steps.native.outputs.native_lib_sha256 }}
         run: |
@@ -541,10 +552,15 @@ jobs:
       - name: Publish GitHub release assets
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.build-wheel.outputs.release_tag }}
+          RELEASE_TAG: ${{ steps.resolve.outputs.release_tag }}
         run: |
           set -euo pipefail
-          # build-wheel has already created the release for this tag.
+          # build-wheel normally creates the release first; on this test branch
+          # its leg cannot pass, so create it if absent.
+          gh release view "$RELEASE_TAG" >/dev/null 2>&1 || \
+            gh release create "$RELEASE_TAG" --prerelease \
+              --title "$RELEASE_TAG (windows test)" \
+              --notes "Throwaway windows-x86_64 test build." --target "$GITHUB_SHA"
           gh release upload "$RELEASE_TAG" \
             dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz \
             dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz.sha256 \
