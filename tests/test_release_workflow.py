@@ -1,16 +1,24 @@
 """Invariants for the release-wheel workflow.
 
-These exist because a review of the windows leg found three defects that no
-test could have caught: the job installed Rust but never obtained the native
-library (`setup.py` only *copies* one out of `artifacts/<triple>` and raises
-otherwise), the evidence read a `c2pa-rs` checkout this repository does not
-have, and the wheel build omitted `SOURCE_DATE_EPOCH` while the bundle claimed
-byte-reproducibility. Each assertion below corresponds to one of those.
+These exist because building the windows leg on a real Windows host found
+defects no inspection caught: a wheel built from an unpatched native library
+signs successfully while silently omitting the cawg.identity assertion, and
+`setup.py` falls back to prebuilt libraries from `artifacts/` when the source
+build fails -- the same silent degradation, one layer down. Each assertion
+below pins one of the invariants that prevent a recurrence:
+
+- both wheels are built from the `c2pa-rs` submodule (the patched fork), and
+  nothing in the release workflow downloads a prebuilt native library;
+- the windows leg refuses to run where the `artifacts/` fallback is possible,
+  and its smoke test resolves the patched APIs, not just `import c2pa`;
+- evidence records the submodule commit unconditionally, because the signer's
+  windows release leg requires it;
+- wheel builds set SOURCE_DATE_EPOCH, or the bundle digest is not
+  reproducible for identical inputs.
 """
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import pytest
@@ -18,7 +26,14 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = REPO_ROOT / ".github" / "workflows" / "build-release-wheel.yml"
-NATIVE_VERSION_FILE = REPO_ROOT / "c2pa-native-version.txt"
+
+# The APIs the StardustProof signer calls that exist only on the patched
+# fork: an unpatched build lacks all three, and signing degrades silently.
+PATCHED_APIS = (
+    "add_dynamic_assertion",
+    "from_fragmented_files",
+    "sign_fragmented",
+)
 
 
 def _workflow() -> dict:
@@ -57,207 +72,139 @@ def test_the_workflow_builds_both_platforms():
     assert "build-wheel-windows" in jobs
 
 
-@pytest.mark.parametrize("job_id", sorted(_wheel_building_jobs()))
-def test_native_library_is_obtained_before_the_wheel_is_built(job_id):
-    """setup.py never builds; it copies from artifacts/<triple>.
+def test_repository_carries_the_patched_submodule():
+    """The wheel is only correct when built from the patched fork.
 
-    Without a download the build fails inside copy_platform_libraries() with
-    "Platform directory not found", so every wheel-building job has to fetch
-    the library first.
+    v0.31.0+stardustproof.2 (test-only) shipped upstream's prebuilt DLL: it
+    signed successfully and verified Trusted while omitting cawg.identity from
+    every asset. The submodule is the mechanism that prevents that, so its
+    presence and origin are release invariants, not implementation details.
     """
-    runs = _wheel_building_jobs()[job_id]["runs"]
-    assert "download_artifacts.py" in runs, (
-        f"{job_id} builds a wheel without populating artifacts/"
-    )
-    assert runs.index("download_artifacts.py") < runs.index("setup.py bdist_wheel"), (
-        f"{job_id} downloads the native library after building the wheel"
-    )
+    gitmodules = (REPO_ROOT / ".gitmodules").read_text(encoding="utf-8")
+    assert "mstattma/c2pa-rs" in gitmodules
+    assert "path = c2pa-rs" in gitmodules
+    assert (REPO_ROOT / "c2pa-rs").exists()
+
+
+def test_nothing_in_the_release_workflow_downloads_a_native_library():
+    """download_artifacts.py exists for development, not for releases.
+
+    A downloaded library is upstream's build: correct C2PA, no StardustProof
+    patches. The release workflow must never reference the download path, the
+    version pin file it reads, or upstream's repository.
+    """
+    text = WORKFLOW.read_text(encoding="utf-8")
+    for needle in ("download_artifacts", "c2pa-native-version.txt", "contentauth/c2pa-rs"):
+        assert needle not in text, f"release workflow references {needle}"
 
 
 @pytest.mark.parametrize("job_id", sorted(_wheel_building_jobs()))
-def test_native_version_comes_from_the_pin_file(job_id):
-    # Restating the tag in the workflow would let it drift from the pin the
-    # rest of the repo builds against.
-    runs = _wheel_building_jobs()[job_id]["runs"]
-    assert "c2pa-native-version.txt" in runs, (
-        f"{job_id} does not read the native version from the pin file"
+def test_wheel_jobs_check_out_the_submodule(job_id):
+    spec = _wheel_building_jobs()[job_id]["spec"]
+    checkout = next(
+        (s for s in spec["steps"] if str(s.get("uses", "")).startswith("actions/checkout")),
+        None,
     )
-    assert not re.search(r"c2pa-v\d+\.\d+\.\d+", runs), (
-        f"{job_id} hard-codes a c2pa-rs tag instead of reading the pin file"
+    assert checkout is not None, f"{job_id} has no checkout step"
+    assert checkout.get("with", {}).get("submodules") == "recursive", (
+        f"{job_id} checks out without submodules -- setup.py would fall back "
+        f"to prebuilt artifacts or fail"
     )
-
-
-def test_pin_file_holds_a_single_usable_tag():
-    tag = NATIVE_VERSION_FILE.read_text(encoding="utf-8").strip()
-    assert re.fullmatch(r"c2pa-v\d+\.\d+\.\d+", tag), tag
 
 
 @pytest.mark.parametrize("job_id", sorted(_wheel_building_jobs()))
 def test_wheel_build_sets_source_date_epoch(job_id):
-    # The bundles are packed with `tar --mtime` and `gzip -n` and their digests
-    # are recorded as evidence; a wheel whose ZIP timestamps come from the
-    # clock makes that digest unreproducible.
     runs = _wheel_building_jobs()[job_id]["runs"]
-    assert "SOURCE_DATE_EPOCH" in runs, f"{job_id} does not set SOURCE_DATE_EPOCH"
-
-
-def test_every_c2pa_rs_call_is_guarded_in_its_own_step():
-    """No unguarded `git -C c2pa-rs` anywhere.
-
-    This repository has no c2pa-rs checkout, so an unguarded call either fails
-    under `set -e` or -- inside a heredoc, where the status is discarded --
-    silently publishes an empty value.
-    """
-    calls = 0
-    for job_id, name, run in _steps():
-        for match in re.finditer(r"git (?:-C c2pa-rs|submodule status)", run):
-            calls += 1
-            assert "if [ -e c2pa-rs/.git ]" in run[: match.start()], (
-                f"{job_id} / {name}: c2pa-rs read without a guard in the same step"
-            )
-    assert calls, "no c2pa-rs calls found -- has the evidence shape changed?"
-
-
-def test_the_guard_tests_for_a_repository_not_a_directory():
-    """`-d c2pa-rs` is not good enough.
-
-    With an empty c2pa-rs/ directory git walks up and `rev-parse HEAD` returns
-    *this* repository's HEAD, which would then be recorded as the c2pa-rs
-    commit -- false provenance, silently.
-    """
-    text = WORKFLOW.read_text(encoding="utf-8")
-    assert "if [ -e c2pa-rs/.git ]" in text
-    assert "if [ -d c2pa-rs ]" not in text
-
-
-def test_download_steps_install_whichever_requirements_declare_requests():
-    # download_artifacts.py imports requests; installing the wrong requirements
-    # file fails at import time on a clean runner.
-    declaring = [
-        f.name
-        for f in (REPO_ROOT / "requirements.txt", REPO_ROOT / "requirements-dev.txt")
-        if f.exists() and re.search(r"^requests\b", f.read_text(encoding="utf-8"), re.M)
-    ]
-    assert declaring, "no requirements file declares requests"
-
-    for job_id, name, run in _steps():
-        if "download_artifacts.py" not in run:
-            continue
-        for f in declaring:
-            assert f in run, f"{job_id} / {name} does not install {f}"
-
-
-def test_download_steps_authenticate_the_release_lookup():
-    # Unauthenticated GitHub API calls share the runner's IP rate limit and can
-    # 403 in the middle of a release; the script sends the header when set.
-    for job_id, spec in _workflow()["jobs"].items():
-        for step in spec.get("steps", []):
-            if "download_artifacts.py" in step.get("run", ""):
-                assert "GITHUB_TOKEN" in (step.get("env") or {}), (
-                    f"{job_id} / {step.get('name')} fetches releases unauthenticated"
-                )
-
-
-# The runtime library each platform's wheel must contain.
-RUNTIME_LIBRARY = {
-    "x86_64-unknown-linux-gnu": "libc2pa_c.so",
-    "x86_64-pc-windows-msvc": "c2pa_c.dll",
-}
-
-
-def _download_steps() -> list[tuple[str, str, str]]:
-    """(job id, NATIVE_TRIPLE, script) for every step that fetches the library."""
-    out = []
-    for job_id, spec in _workflow()["jobs"].items():
-        triple = (spec.get("env") or {}).get("NATIVE_TRIPLE")
-        for step in spec.get("steps", []):
-            if "download_artifacts.py" in step.get("run", ""):
-                assert triple, f"{job_id} downloads a library without declaring NATIVE_TRIPLE"
-                out.append((job_id, triple, step["run"]))
-    assert out, "no download step found"
-    return out
-
-
-@pytest.mark.parametrize(
-    "job_id,triple,run", _download_steps(), ids=[j for j, _, _ in _download_steps()]
-)
-def test_each_leg_verifies_its_own_platform_library(job_id, triple, run):
-    # build-wheel must handle libc2pa_c.so and build-wheel-windows c2pa_c.dll;
-    # a swap leaves the wheel without a runtime library.
-    expected = RUNTIME_LIBRARY[triple]
-    match = re.search(r'lib="artifacts/\$NATIVE_TRIPLE/([^"]+)"', run)
-    assert match, f"{job_id} does not define the library path"
-    assert match.group(1) == expected, (
-        f"{job_id} targets {triple} but verifies {match.group(1)}, expected {expected}"
+    assert "SOURCE_DATE_EPOCH" in runs, (
+        f"{job_id} builds a wheel without SOURCE_DATE_EPOCH -- the bundle "
+        f"digest depends on the clock"
     )
-
-
-@pytest.mark.parametrize(
-    "job_id,triple,run", _download_steps(), ids=[j for j, _, _ in _download_steps()]
-)
-def test_pruning_keeps_exactly_the_verified_library(job_id, triple, run):
-    """The kept name must derive from the verified library, not be restated.
-
-    Restating it is how the two came apart: a patch matched text identical in
-    both legs and the pruning patterns ended up swapped, so each leg deleted
-    its own runtime library and kept the other platform's.
-    """
-    prune = re.search(r"find \"artifacts/\$NATIVE_TRIPLE\" -type f ! -name (\S+)", run)
-    assert prune, f"{job_id} does not prune non-runtime files"
-    kept = prune.group(1)
-    assert "$lib" in kept or "basename" in kept, (
-        f"{job_id} prunes against the literal {kept}; derive it from \"$lib\" so the "
-        f"kept file cannot diverge from the verified one"
-    )
-    for other in set(RUNTIME_LIBRARY.values()) - {RUNTIME_LIBRARY[triple]}:
-        assert other not in kept, f"{job_id} ({triple}) keeps another platform's {other}"
-
-
-def test_only_the_runtime_library_reaches_the_wheel():
-    """setup.py globs the whole platform directory into the wheel.
-
-    The release asset also carries link-time and debug files -- c2pa_c.lib is
-    245 MB -- and the published v0.31.0+stardustproof.1 wheel contains only the
-    runtime library, so the extras are pruned before the build.
-    """
-    pruning = [
-        (job_id, name)
-        for job_id, name, run in _steps()
-        if "download_artifacts.py" in run and re.search(r"find \"artifacts.*-delete", run)
-    ]
-    downloads = [(j, n) for j, n, r in _steps() if "download_artifacts.py" in r]
-    assert len(pruning) == len(downloads), (
-        f"{len(downloads) - len(pruning)} download step(s) do not prune non-runtime files"
-    )
-
-
-def test_repository_really_has_no_c2pa_rs_checkout():
-    # If this ever becomes false the guard above is still correct, but the
-    # reasoning behind it has changed and the evidence shape should be revisited.
-    assert not (REPO_ROOT / ".gitmodules").exists()
-    assert not (REPO_ROOT / "c2pa-rs").exists()
 
 
 @pytest.mark.parametrize("job_id", sorted(_wheel_building_jobs()))
-def test_evidence_records_the_native_artifact_provenance(job_id):
-    # With no source checkout, the library's release tag and digest are the
-    # only provenance there is -- downstream consumers verify against them.
+def test_wheel_build_raises_the_cargo_timeout(job_id):
+    """setup.py's default cargo timeout is 600s; the release build takes ~16
+    minutes on a 4-vcpu runner. Without the override the build dies mid-way
+    and setup.py reaches for the artifacts/ fallback."""
+    spec = _wheel_building_jobs()[job_id]
+    text = spec["runs"] + yaml.safe_dump(spec["spec"])
+    assert "C2PA_CARGO_BUILD_TIMEOUT_SECONDS" in text, (
+        f"{job_id} builds with setup.py's 600s default cargo timeout"
+    )
+
+
+def test_windows_build_refuses_the_prebuilt_fallback():
+    """setup.py silently prefers artifacts/<triple> when the source build
+    fails. The windows job must fail closed instead: refuse to run at all if
+    that directory exists."""
+    runs = _wheel_building_jobs()["build-wheel-windows"]["runs"]
+    assert "artifacts" in runs and "refusing" in runs, (
+        "windows build no longer guards against the artifacts/ fallback"
+    )
+
+
+def test_windows_smoke_asserts_the_patched_apis():
+    """`import c2pa` succeeds on an unpatched build; the wheel is only usable
+    when the fork's APIs resolve. All three are called by the signer."""
+    runs = _wheel_building_jobs()["build-wheel-windows"]["runs"]
+    for api in PATCHED_APIS:
+        assert api in runs, f"windows smoke test does not assert {api}"
+
+
+def test_windows_wheel_contents_are_recorded_with_the_dll_present():
+    """There is no auditwheel on Windows; the recorded contents listing is the
+    substitute, and it must hard-fail when the native library is missing."""
+    runs = _wheel_building_jobs()["build-wheel-windows"]["runs"]
+    assert "wheel-contents.txt" in runs
+    assert "c2pa_c.dll" in runs
+
+
+@pytest.mark.parametrize("job_id,step_name,run", _steps(),
+                         ids=[f"{j}:{n}" for j, n, _ in _steps()])
+def test_no_step_guards_the_submodule_conditionally(job_id, step_name, run):
+    """On this lineage the submodule always exists, and the signer's windows
+    release leg refuses evidence without c2pa_rs_submodule_commit. A
+    conditional guard would let a broken checkout produce evidence that
+    silently omits the field instead of failing the release."""
+    if "c2pa-rs" not in run:
+        pytest.skip("step does not touch the submodule")
+    assert "if [ -e c2pa-rs/.git ]" not in run, (
+        f"{job_id}/{step_name} guards the submodule -- on this lineage a "
+        f"missing checkout is an error, not a variant"
+    )
+
+
+@pytest.mark.parametrize("job_id", sorted(_wheel_building_jobs()))
+def test_evidence_records_the_submodule_commit(job_id):
     runs = _wheel_building_jobs()[job_id]["runs"]
-    for field in (
-        "c2pa_native_source_repository",
-        "c2pa_native_release_tag",
-        "c2pa_native_library_sha256",
-    ):
-        assert field in runs, f"{job_id} evidence omits {field}"
+    assert "c2pa_rs_submodule_commit" in runs, (
+        f"{job_id} evidence omits c2pa_rs_submodule_commit -- the signer's "
+        f"windows release leg requires it"
+    )
+    assert "rev-parse HEAD" in runs
+
+
+def test_windows_evidence_names_the_fork_as_the_native_source():
+    runs = _wheel_building_jobs()["build-wheel-windows"]["runs"]
+    assert "mstattma/c2pa-rs" in runs
+    assert "c2pa_native_library_sha256" in runs
 
 
 def test_windows_leg_is_opt_in():
-    # A Linux-only release must behave exactly as before, and the dispatch API
-    # rejects an undeclared input, so the caller opts in explicitly.
+    """An accidental windows build on a tag that only expects a linux asset
+    would race the release upload; the leg runs only when asked."""
+    spec = _workflow()["jobs"]["build-wheel-windows"]
+    assert spec.get("if") == "inputs.build_windows_wheel == 'true'"
+    assert spec.get("needs") == "build-wheel"
+
+
+def test_windows_leg_pins_the_shared_rust_toolchain():
+    """Both legs must compile the same submodule with the same toolchain, or
+    the two wheels' native libraries drift for reasons no evidence records."""
     workflow = _workflow()
-    inputs = workflow[True]["workflow_dispatch"]["inputs"]
-    assert "build_windows_wheel" in inputs
-    assert workflow["jobs"]["build-wheel-windows"]["if"] == "inputs.build_windows_wheel == 'true'"
-    # GitHub caps workflow_dispatch at 10 inputs; exceeding it invalidates the
-    # whole file, including the pre-existing Linux path.
-    assert len(inputs) <= 10, f"{len(inputs)} inputs, limit is 10"
+    toolchain = workflow.get("env", {}).get("RUST_TOOLCHAIN")
+    assert toolchain, "workflow no longer pins RUST_TOOLCHAIN at the top level"
+    win_runs = "\n".join(
+        s.get("run", "") for s in workflow["jobs"]["build-wheel-windows"]["steps"]
+    )
+    assert "rustup toolchain install" in win_runs and "RUST_TOOLCHAIN" in win_runs

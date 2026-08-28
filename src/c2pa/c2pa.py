@@ -53,6 +53,7 @@ _REQUIRED_FUNCTIONS = [
     'c2pa_reader_with_stream',
     'c2pa_reader_with_fragment',
     'c2pa_reader_with_manifest_data_and_stream',
+    'c2pa_reader_from_fragmented_files',
     'c2pa_reader_is_embedded',
     'c2pa_reader_remote_url',
     'c2pa_reader_supported_mime_types',
@@ -68,6 +69,7 @@ _REQUIRED_FUNCTIONS = [
     'c2pa_builder_to_archive',
     'c2pa_builder_sign',
     'c2pa_builder_sign_context',
+    'c2pa_builder_sign_fragmented',
     'c2pa_builder_from_context',
     'c2pa_builder_with_definition',
     'c2pa_builder_with_archive',
@@ -359,6 +361,19 @@ SignerCallback = ctypes.CFUNCTYPE(
         ctypes.c_ubyte), ctypes.c_size_t, ctypes.POINTER(
             ctypes.c_ubyte), ctypes.c_size_t)
 
+# Callback type for DynamicAssertion content generation (FFI).
+# Signature: (context, label, reserve_size, partial_claim_json,
+#             out_data, out_data_max_len) -> bytes_written or -1
+DynamicAssertionCallback = ctypes.CFUNCTYPE(
+    ctypes.c_ssize_t,                      # return
+    ctypes.c_void_p,                       # context
+    ctypes.c_char_p,                       # label
+    ctypes.c_size_t,                       # reserve_size
+    ctypes.c_char_p,                       # partial_claim_json
+    ctypes.POINTER(ctypes.c_ubyte),        # out_data
+    ctypes.c_size_t,                       # out_data_max_len
+)
+
 
 class StreamContext(ctypes.Structure):
     """Opaque structure for stream context."""
@@ -577,6 +592,13 @@ _setup_function(
     [ctypes.POINTER(C2paReader)],
     ctypes.c_void_p
 )
+_setup_function(
+    _lib.c2pa_reader_from_fragmented_files,
+    [ctypes.c_char_p,                    # asset_path
+     ctypes.POINTER(ctypes.c_char_p),    # fragments
+     ctypes.c_size_t],                   # fragments_count
+    ctypes.POINTER(C2paReader)
+)
 
 # Set up Builder function prototypes
 _setup_function(
@@ -660,6 +682,15 @@ _setup_function(
     _lib.c2pa_signature_free, [
         ctypes.POINTER(
             ctypes.c_ubyte)], None)
+# DynamicAssertion FFI
+_setup_function(
+    _lib.c2pa_signer_add_dynamic_assertion,
+    [ctypes.POINTER(C2paSigner),     # signer_ptr
+     ctypes.c_void_p,                # context
+     DynamicAssertionCallback,       # callback
+     ctypes.c_char_p,               # label
+     ctypes.c_size_t],              # reserve_size
+    ctypes.c_int)
 _setup_function(
     _lib.c2pa_builder_supported_mime_types,
     [ctypes.POINTER(ctypes.c_size_t)],
@@ -745,6 +776,16 @@ _setup_function(
      ctypes.c_char_p,
      ctypes.POINTER(C2paStream),
      ctypes.POINTER(C2paStream),
+     ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte))],
+    ctypes.c_int64
+)
+_setup_function(
+    _lib.c2pa_builder_sign_fragmented,
+    [ctypes.POINTER(C2paBuilder),
+     ctypes.POINTER(C2paSigner),
+     ctypes.c_char_p,  # asset_path
+     ctypes.c_char_p,  # fragments_glob
+     ctypes.c_char_p,  # output_dir
      ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte))],
     ctypes.c_int64
 )
@@ -2230,6 +2271,78 @@ class Reader(ManagedResource):
         except C2paError.ManifestNotFound:
             return None
 
+    @classmethod
+    def from_fragmented_files(
+        cls,
+        asset_path: Union[str, Path],
+        fragments: list[Union[str, Path]],
+    ) -> "Reader":
+        """Create a Reader for a fragmented BMFF asset set.
+
+        Read-side counterpart to :py:meth:`Builder.sign_fragmented`.
+        Wraps the ``c2pa_reader_from_fragmented_files`` FFI (which in
+        turn calls ``c2pa::Reader::with_fragmented_files``) so DASH/HLS
+        segmented asset sets (init segment + media fragments, typically
+        ``.m4s`` / ``.cmfv``) can be validated as a single unit.
+
+        Args:
+            asset_path: Filesystem path to the init segment
+                (e.g. ``init.m4s``).
+            fragments: List of filesystem paths to the media fragments
+                that belong to this init segment. Order does not matter;
+                c2pa-rs resolves fragment ordering from the BMFF box
+                tree internally. May be empty if the init segment alone
+                carries the manifest (rare).
+
+        Returns:
+            A ready-to-use ``Reader`` whose ``json()``/``detailed_json()``
+            describe the signed fragmented asset.
+
+        Raises:
+            C2paError: If the asset could not be opened or validated.
+            C2paError.ManifestNotFound: If no JUMBF/C2PA manifest was
+                found in the asset.
+        """
+        asset_path_bytes = os.fspath(asset_path).encode("utf-8")
+
+        fragments_count = len(fragments)
+        if fragments_count == 0:
+            frag_array = None
+            frag_array_ptr = None
+        else:
+            frag_bytes_list = [
+                os.fspath(p).encode("utf-8") for p in fragments
+            ]
+            frag_array = (ctypes.c_char_p * fragments_count)(*frag_bytes_list)
+            frag_array_ptr = ctypes.cast(
+                frag_array, ctypes.POINTER(ctypes.c_char_p)
+            )
+
+        reader_ptr = _lib.c2pa_reader_from_fragmented_files(
+            asset_path_bytes,
+            frag_array_ptr,
+            fragments_count,
+        )
+        _check_ffi_operation_result(
+            reader_ptr,
+            Reader._ERROR_MESSAGES['reader_error'].format(
+                "from_fragmented_files returned null"
+            ),
+        )
+
+        # Skip __init__ (file/stream setup it does doesn't apply here)
+        # and construct a minimal Reader object directly.
+        reader = cls.__new__(cls)
+        ManagedResource.__init__(reader)
+        reader._own_stream = None
+        reader._backing_file = None
+        reader._manifest_json_str_cache = None
+        reader._manifest_data_cache = None
+        reader._context = None
+        reader._handle = reader_ptr
+        reader._lifecycle_state = LifecycleState.ACTIVE
+        return reader
+
     @overload
     def __init__(
         self,
@@ -2978,6 +3091,7 @@ class Signer(ManagedResource):
         super().__init__()
 
         self._callback_cb = None
+        self._dynamic_assertion_cbs = []  # prevent GC of ctypes callbacks
 
         if not signer_ptr:
             raise C2paError("Invalid signer pointer: pointer is null")
@@ -3007,6 +3121,61 @@ class Signer(ManagedResource):
             "Failed to get reserve size", check=lambda r: r < 0)
 
         return result
+
+    def add_dynamic_assertion(
+        self,
+        callback,
+        label="cawg.identity",
+        reserve_size=8192,
+    ):
+        """Register a dynamic assertion callback on this signer.
+
+        During signing the callback is invoked with the partial claim
+        (all assertion hashed URIs) so it can produce assertion content
+        that references real assertion hashes.
+
+        Args:
+            callback: ``(label: str, reserve_size: int,
+                partial_claim: list[dict]) -> bytes``
+                Must return CBOR-encoded assertion content.
+                Each dict in *partial_claim* has keys
+                ``url``, ``alg``, ``hash`` (base64).
+            label: Assertion label (default ``"cawg.identity"``).
+            reserve_size: Bytes to reserve for the placeholder.
+
+        Raises:
+            C2paError: If registration fails.
+        """
+        self._ensure_valid_state()
+
+        def _wrapped(ctx, c_label, c_reserve, c_json, out_ptr, out_max):
+            try:
+                py_label = c_label.decode("utf-8") if c_label else label
+                py_reserve = int(c_reserve)
+                py_json = c_json.decode("utf-8") if c_json else "[]"
+                partial_claim = json.loads(py_json)
+                result_bytes = callback(py_label, py_reserve, partial_claim)
+                n = len(result_bytes)
+                if n > out_max:
+                    return -1
+                ctypes.memmove(out_ptr, result_bytes, n)
+                return n
+            except Exception:
+                return -1
+
+        cb = DynamicAssertionCallback(_wrapped)
+        self._dynamic_assertion_cbs.append(cb)
+
+        label_bytes = label.encode("utf-8") if isinstance(label, str) else label
+        result = _lib.c2pa_signer_add_dynamic_assertion(
+            self._handle,
+            None,  # context
+            cb,
+            label_bytes,
+            reserve_size,
+        )
+        if result != 0:
+            _parse_operation_result_for_error(None)
 
 
 class Builder(ManagedResource):
@@ -3608,7 +3777,10 @@ class Builder(ManagedResource):
                         format, source_stream, dest_stream,
                         signer=signer,
                     )
-                elif self._has_context_signer:
+                elif self._has_context_signer or self._context is not None:
+                    # Try context-based signing.  The Rust side may have a
+                    # signer from Settings (e.g. cawg_x509_signer) even when
+                    # _has_context_signer is False.  Let the FFI report errors.
                     manifest_bytes = self._sign_internal(format, source_stream, dest_stream)
                 else:
                     raise C2paError(
@@ -3686,6 +3858,95 @@ class Builder(ManagedResource):
             raise C2paError(
                 "First argument must be a Signer or a format string (MIME type)."
             )
+
+    def sign_fragmented(
+        self,
+        signer: Signer,
+        asset_path: Union[str, Path],
+        fragments_glob: Union[str, Path],
+        output_dir: Union[str, Path],
+    ) -> bytes:
+        """Sign a fragmented BMFF asset set (init segment + media fragments).
+
+        Wraps ``c2pa::Builder::sign_fragmented_files`` via the
+        ``c2pa_builder_sign_fragmented`` FFI. The output directory is
+        populated with a signed copy of the init segment (containing the
+        embedded JUMBF manifest) and fragment copies containing
+        merkle-tree placeholders per the C2PA BMFF fragmented-hash
+        algorithm.
+
+        Args:
+            signer: The signer to use. Must be a ``Signer`` created with
+                an explicit signing callback; context-only signers are
+                not supported on this code path yet.
+            asset_path: Filesystem path to the init segment (or a glob
+                pattern for multi-rendition asset sets — passed through
+                verbatim to c2pa-rs).
+            fragments_glob: Filename glob pattern (relative to the init
+                segment's directory) matching the media fragments —
+                e.g. ``"seg-*.m4s"``. Must NOT match the init segment
+                itself.
+            output_dir: Directory where the signed output will be
+                written. c2pa-rs places output at
+                ``<output_dir>/<init_parent_dir_name>/...``; callers
+                wanting a flat layout must post-process.
+
+        Returns:
+            The embedded manifest bytes (the same data that was written
+            into the output init segment's JUMBF box).
+
+        Raises:
+            C2paError: If there was an error during signing or reading
+                the manifest bytes back.
+        """
+        self._ensure_valid_state()
+        if not hasattr(signer, "_handle") or not signer._handle:
+            raise C2paError("Invalid or closed signer")
+
+        asset_path_bytes = os.fspath(asset_path).encode("utf-8")
+        fragments_glob_bytes = os.fspath(fragments_glob).encode("utf-8")
+        output_dir_bytes = os.fspath(output_dir).encode("utf-8")
+
+        manifest_bytes_ptr = ctypes.POINTER(ctypes.c_ubyte)()
+        try:
+            result = _lib.c2pa_builder_sign_fragmented(
+                self._handle,
+                signer._handle,
+                asset_path_bytes,
+                fragments_glob_bytes,
+                output_dir_bytes,
+                ctypes.byref(manifest_bytes_ptr),
+            )
+            # The Rust FFI consumes the builder pointer on sign; mark
+            # ours consumed too so subsequent methods raise clearly.
+            self._mark_consumed()
+        except Exception as e:
+            self._mark_consumed()
+            raise C2paError(f"Error during fragmented signing: {e}")
+
+        _check_ffi_operation_result(
+            result,
+            "Error during fragmented signing",
+            check=lambda r: r < 0,
+        )
+
+        manifest_bytes = b""
+        if manifest_bytes_ptr and result > 0:
+            try:
+                temp_buffer = (ctypes.c_ubyte * result)()
+                ctypes.memmove(temp_buffer, manifest_bytes_ptr, result)
+                manifest_bytes = bytes(temp_buffer)
+            except Exception:
+                manifest_bytes = b""
+            finally:
+                try:
+                    _lib.c2pa_manifest_bytes_free(manifest_bytes_ptr)
+                except Exception:
+                    logger.error(
+                        "Failed to release native manifest bytes memory"
+                    )
+
+        return manifest_bytes
 
     @overload
     def sign_file(

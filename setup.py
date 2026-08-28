@@ -12,9 +12,11 @@
 # each license.
 
 from setuptools import setup, find_namespace_packages
+import subprocess
 import sys
 import platform
 import shutil
+import os
 from pathlib import Path
 import toml
 
@@ -48,6 +50,75 @@ PLATFORM_FOLDERS = {
 # Directory structure
 ARTIFACTS_DIR = Path('artifacts')  # Where downloaded libraries are stored
 PACKAGE_LIBS_DIR = Path('src/c2pa/libs')  # Where libraries will be copied for the wheel
+C2PA_RS_SUBMODULE = Path('c2pa-rs')  # Optional git submodule with patched c2pa-rs
+
+# Native library file name per platform
+NATIVE_LIB_NAME = {
+    'linux': 'libc2pa_c.so',
+    'darwin': 'libc2pa_c.dylib',
+    'win32': 'c2pa_c.dll',
+}
+
+
+def build_native_from_source() -> bool:
+    """Build the native library from the c2pa-rs submodule.
+
+    Returns True if the build succeeded and the library was copied into
+    ``PACKAGE_LIBS_DIR``, False otherwise (Rust not installed, submodule
+    not present, build failed, etc.).
+    """
+    cargo_toml = C2PA_RS_SUBMODULE / 'c2pa_c_ffi' / 'Cargo.toml'
+    if not cargo_toml.exists():
+        return False
+
+    # Check for cargo
+    cargo = shutil.which('cargo')
+    if cargo is None:
+        # Try common rustup location
+        home = Path.home()
+        cargo_candidate = home / '.cargo' / 'bin' / 'cargo'
+        if cargo_candidate.exists():
+            cargo = str(cargo_candidate)
+        else:
+            print("Rust toolchain not found. Install via: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh")
+            return False
+
+    print(f"Building native library from source ({C2PA_RS_SUBMODULE}) ...")
+    try:
+        build_timeout = int(os.environ.get('C2PA_CARGO_BUILD_TIMEOUT_SECONDS', '600'))
+        result = subprocess.run(
+            [cargo, 'build', '--release', '--locked', '-p', 'c2pa-c-ffi', '--features', 'file_io'],
+            cwd=str(C2PA_RS_SUBMODULE),
+            capture_output=True,
+            text=True,
+            timeout=build_timeout,
+        )
+        if result.returncode != 0:
+            print(f"Cargo build failed:\n{result.stderr[-2000:]}")
+            return False
+    except FileNotFoundError:
+        print("cargo not found on PATH")
+        return False
+    except subprocess.TimeoutExpired:
+        print(f"Cargo build timed out (>{build_timeout}s)")
+        return False
+
+    # Determine the library file name for this platform
+    lib_name = NATIVE_LIB_NAME.get(sys.platform)
+    if lib_name is None:
+        print(f"Unsupported platform for source build: {sys.platform}")
+        return False
+
+    built_lib = C2PA_RS_SUBMODULE / 'target' / 'release' / lib_name
+    if not built_lib.exists():
+        print(f"Built library not found at {built_lib}")
+        return False
+
+    # Copy to package libs directory
+    PACKAGE_LIBS_DIR.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(str(built_lib), str(PACKAGE_LIBS_DIR / lib_name))
+    print(f"Copied {built_lib} -> {PACKAGE_LIBS_DIR / lib_name}")
+    return True
 
 
 def get_platform_identifier(target_arch=None) -> str:
@@ -166,9 +237,12 @@ def find_available_platforms():
 
 # For development installation
 if 'develop' in sys.argv or 'install' in sys.argv:
-    current_platform = get_platform_identifier()
-    print("Installing in development mode for platform ", current_platform)
-    copy_platform_libraries(current_platform)
+    # Try building from the c2pa-rs submodule first (patched version)
+    if not build_native_from_source():
+        # Fall back to pre-built artifacts
+        current_platform = get_platform_identifier()
+        print("Falling back to pre-built artifacts for platform ", current_platform)
+        copy_platform_libraries(current_platform)
 
 # For wheel building (both bdist_wheel and build)
 if 'bdist_wheel' in sys.argv or 'build' in sys.argv:
@@ -191,17 +265,22 @@ if 'bdist_wheel' in sys.argv or 'build' in sys.argv:
     target_platform = get_platform_identifier(target_arch)
     print(f"Building wheel for target platform: {target_platform}")
 
-    # Check if we have libraries for this platform
-    platform_dir = ARTIFACTS_DIR / target_platform
-    if not platform_dir.exists() or not any(platform_dir.iterdir()):
-        print(f"Warning: No libraries found for platform {target_platform}")
-        print("Available platforms:")
-        for platform_name in find_available_platforms():
-            print(f"  - {platform_name}")
+    # Try building from source first, fall back to pre-built artifacts
+    built_from_source = build_native_from_source()
 
-    # Copy libraries for the target platform
+    if not built_from_source:
+        # Check if we have libraries for this platform
+        platform_dir = ARTIFACTS_DIR / target_platform
+        if not platform_dir.exists() or not any(platform_dir.iterdir()):
+            print(f"Warning: No libraries found for platform {target_platform}")
+            print("Available platforms:")
+            for platform_name in find_available_platforms():
+                print(f"  - {platform_name}")
+
+    # Copy libraries for the target platform (only if not built from source)
     try:
-        copy_platform_libraries(target_platform, clean_first=True)
+        if not built_from_source:
+            copy_platform_libraries(target_platform, clean_first=True)
 
         # Build the wheel
         setup(
@@ -227,6 +306,19 @@ if 'bdist_wheel' in sys.argv or 'build' in sys.argv:
         if PACKAGE_LIBS_DIR.exists():
             shutil.rmtree(PACKAGE_LIBS_DIR)
     sys.exit(0)
+
+# Ensure native library is available for any install path
+# (PEP 517 builds may not trigger the develop/install/bdist_wheel branches above)
+if not PACKAGE_LIBS_DIR.exists() or not any(PACKAGE_LIBS_DIR.glob('*')):
+    if not build_native_from_source():
+        # Try pre-built artifacts as last resort
+        try:
+            current_platform = get_platform_identifier()
+            copy_platform_libraries(current_platform)
+        except (ValueError, FileNotFoundError):
+            print("WARNING: No native library available. Install Rust and ensure the c2pa-rs submodule is initialized:")
+            print("  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh")
+            print("  git submodule update --init --recursive")
 
 # For sdist and development installation
 setup(
