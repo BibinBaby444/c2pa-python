@@ -190,6 +190,50 @@ def test_windows_evidence_names_the_fork_as_the_native_source():
     assert "c2pa_native_library_sha256" in runs
 
 
+@pytest.mark.parametrize("job_id", sorted(_wheel_building_jobs()))
+def test_nothing_reads_src_c2pa_libs_after_bdist_wheel(job_id):
+    """setup.py's bdist_wheel path removes src/c2pa/libs in a finally block
+    after packaging (see AGENTS.md, "the src/c2pa/libs wipe"), so any
+    post-build check under that path fails on every successful build. Review
+    caught exactly that in an earlier revision of the windows job: the DLL
+    was hashed from src/c2pa/libs after setup.py had already deleted it."""
+    spec = _wheel_building_jobs()[job_id]["spec"]
+    scripts = "\n".join(s.get("run", "") for s in spec["steps"])
+    idx = scripts.find("setup.py bdist_wheel")
+    assert idx != -1
+    tail_code = [
+        line for line in scripts[idx:].splitlines()
+        if not line.strip().startswith("#")
+    ]
+    offenders = [line for line in tail_code if "src/c2pa/libs" in line]
+    assert not offenders, (
+        f"{job_id} touches src/c2pa/libs after bdist_wheel -- setup.py has "
+        f"already deleted it: {offenders}"
+    )
+
+
+def test_windows_native_digest_is_taken_from_the_wheel():
+    """The evidence must hash the bytes that ship. The wheel is the shipped
+    artifact; anything else is a copy that can drift or vanish."""
+    runs = _wheel_building_jobs()["build-wheel-windows"]["runs"]
+    assert "hashlib.sha256(zf.read(" in runs, (
+        "windows job no longer hashes the DLL out of the completed wheel"
+    )
+
+
+def test_windows_evidence_refuses_an_empty_native_digest():
+    """A missing step output arrives as an empty string, not an error, and
+    evidence written with an empty digest attests nothing."""
+    spec = _wheel_building_jobs()["build-wheel-windows"]["spec"]
+    evidence_runs = "\n".join(
+        s.get("run", "") for s in spec["steps"]
+        if s.get("name", "") == "Validate wheel and write evidence"
+    )
+    assert 'if [ -z "$NATIVE_LIB_SHA256" ]' in evidence_runs, (
+        "windows evidence step no longer guards against an empty digest"
+    )
+
+
 def test_windows_leg_is_opt_in():
     """An accidental windows build on a tag that only expects a linux asset
     would race the release upload; the leg runs only when asked."""

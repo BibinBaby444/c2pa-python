@@ -309,14 +309,6 @@ jobs:
           python -m pip install "wheel==0.45.1" "setuptools==80.9.0" "toml==0.10.2"
           python setup.py bdist_wheel --plat-name "$WHEEL_PLAT_NAME_WINDOWS"
 
-          lib="src/c2pa/libs/c2pa_c.dll"
-          if [ ! -s "$lib" ]; then
-            echo "::error::$lib missing after the build -- the submodule build did not produce it"
-            exit 1
-          fi
-          sha="$(sha256sum "$lib" | cut -d' ' -f1)"
-          echo "native_lib_sha256=${sha}" >> "$GITHUB_OUTPUT"
-
           mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' | sort)
           if [ "${#wheels[@]}" -ne 1 ]; then
             echo "::error::Expected exactly one wheel in dist/, got ${#wheels[@]}"
@@ -326,15 +318,35 @@ jobs:
           # There is no auditwheel equivalent on Windows, so record the wheel's
           # contents instead: the native c2pa_c.dll has to be inside it, or the
           # wheel imports only on a machine that happens to have one.
+          #
+          # The library's digest is taken from inside the completed wheel --
+          # the bytes that actually ship. Nothing may be read from
+          # src/c2pa/libs/ here: setup.py's bdist_wheel path removes that
+          # directory in a finally block after packaging (see AGENTS.md, "the
+          # src/c2pa/libs wipe"), so any post-build check under it fails on
+          # every successful build.
           python - "${wheels[0]}" > dist/wheel-contents.txt <<'PY'
+          import hashlib
+          import pathlib
           import sys
           import zipfile
 
-          names = sorted(zipfile.ZipFile(sys.argv[1]).namelist())
+          zf = zipfile.ZipFile(sys.argv[1])
+          names = sorted(zf.namelist())
           print("\n".join(names))
-          if not any(name.endswith("c2pa_c.dll") for name in names):
-              raise SystemExit("wheel does not contain c2pa_c.dll")
+          dlls = [name for name in names if name.endswith("c2pa_c.dll")]
+          if len(dlls) != 1:
+              raise SystemExit(f"expected exactly one c2pa_c.dll in the wheel, found {dlls!r}")
+          digest = hashlib.sha256(zf.read(dlls[0])).hexdigest()
+          pathlib.Path("dist/native-lib.sha256").write_text(digest + "\n", encoding="utf-8")
           PY
+
+          sha="$(tr -d '[:space:]' < dist/native-lib.sha256)"
+          if [ -z "$sha" ]; then
+            echo "::error::empty native library digest -- the wheel inspection did not produce one"
+            exit 1
+          fi
+          echo "native_lib_sha256=${sha}" >> "$GITHUB_OUTPUT"
 
           python -m venv "$RUNNER_TEMP/c2pa-wheel-smoke"
           "$RUNNER_TEMP/c2pa-wheel-smoke/Scripts/python.exe" -m pip install "${wheels[0]}"
@@ -361,6 +373,12 @@ jobs:
           NATIVE_LIB_SHA256: ${{ steps.build.outputs.native_lib_sha256 }}
         run: |
           set -euo pipefail
+          # A missing step output arrives as an empty string, not an error;
+          # evidence written with an empty digest would attest nothing.
+          if [ -z "$NATIVE_LIB_SHA256" ]; then
+            echo "::error::native_lib_sha256 is empty -- refusing to write evidence"
+            exit 1
+          fi
           mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' | sort)
           wheel_path="${wheels[0]}"
           wheel_name="$(basename "$wheel_path")"
