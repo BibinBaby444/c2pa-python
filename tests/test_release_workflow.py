@@ -242,6 +242,24 @@ def test_windows_leg_is_opt_in():
     assert spec.get("needs") == "build-wheel"
 
 
+def test_windows_openssl_build_pins_a_full_perl():
+    """openssl-src runs `perl ./Configure`; under Git Bash the bare name
+    resolves to MSYS's minimal perl, which lacks Configure's modules, and
+    the first release run failed exactly there. The job must pin a full
+    perl via OPENSSL_SRC_PERL and probe the module MSYS perl lacks before
+    starting the 15-minute build."""
+    spec = _wheel_building_jobs()["build-wheel-windows"]["spec"]
+    runs = "\n".join(s.get("run", "") for s in spec["steps"])
+    assert "OPENSSL_SRC_PERL=" in runs, "windows job no longer pins OPENSSL_SRC_PERL"
+    assert "Locale::Maketext::Simple" in runs, (
+        "windows job no longer probes the perl module set before building"
+    )
+    build_idx = runs.find("setup.py bdist_wheel")
+    assert runs.find("OPENSSL_SRC_PERL=") < build_idx, (
+        "the perl pin must land before the wheel build"
+    )
+
+
 def test_windows_leg_pins_the_shared_rust_toolchain():
     """Both legs must compile the same submodule with the same toolchain, or
     the two wheels' native libraries drift for reasons no evidence records."""

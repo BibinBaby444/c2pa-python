@@ -274,16 +274,32 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION_WINDOWS }}
 
-      - name: Pin the Rust toolchain
+      - name: Pin the Rust toolchain and OpenSSL's perl
         run: |
           set -euo pipefail
           # Same toolchain the manylinux leg installs via rustup. The
-          # windows-latest image ships rustup (and the Strawberry Perl that
-          # openssl-sys' vendored build needs); only the version is pinned
+          # windows-latest image ships rustup; only the version is pinned
           # here so the two legs cannot drift apart.
           rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
           rustup default "$RUST_TOOLCHAIN"
           cargo --version
+
+          # openssl-src runs `perl ./Configure`. This job's shell is Git
+          # Bash, where /usr/bin/perl -- MSYS's minimal perl, missing the
+          # modules Configure needs (Locale::Maketext::Simple) -- shadows
+          # the image's Strawberry Perl, and the first release run failed
+          # exactly there. openssl-src consults OPENSSL_SRC_PERL before
+          # falling back to bare `perl` (src/lib.rs of the pinned
+          # 300.6.0+3.6.2), and Configure bakes that path into the
+          # generated makefile, so pinning it here covers the whole
+          # vendored OpenSSL build.
+          if [ ! -x "/c/Strawberry/perl/bin/perl.exe" ]; then
+            choco install strawberryperl --no-progress -y
+          fi
+          # Fail here, not 15 minutes into cargo: assert the module MSYS
+          # perl lacks.
+          /c/Strawberry/perl/bin/perl.exe -MLocale::Maketext::Simple -e 1
+          echo "OPENSSL_SRC_PERL=C:/Strawberry/perl/bin/perl.exe" >> "$GITHUB_ENV"
 
       - name: Build wheel from the c2pa-rs submodule
         id: build
