@@ -16,6 +16,11 @@ on:
         description: "Optional central release workflow correlation id"
         required: false
         type: string
+      build_windows_wheel:
+        description: "Also build and publish a windows-x86_64 wheel bundle"
+        required: false
+        default: "false"
+        type: string
       allow_unprotected_ref:
         description: "Allow building from a non-default, unprotected ref. Use only for forked dependency release branches."
         required: false
@@ -34,12 +39,18 @@ env:
   MANYLINUX_PYTHON: /opt/python/cp311-cp311/bin/python
   RUST_TOOLCHAIN: "1.88.0"
   WHEEL_PLAT_NAME: manylinux_2_28_x86_64
+  WHEEL_PLAT_NAME_WINDOWS: win_amd64
+  PYTHON_VERSION_WINDOWS: "3.11"
 
 jobs:
   build-wheel:
     name: Build and publish release wheel
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+
+    outputs:
+      release_version: ${{ steps.inputs.outputs.release_version }}
+      release_tag: ${{ steps.inputs.outputs.release_tag }}
 
     steps:
       - name: Checkout
@@ -237,3 +248,229 @@ jobs:
               --notes-file "$notes_file" \
               --target "$GITHUB_SHA"
           fi
+  build-wheel-windows:
+    name: Build and publish release wheel (windows-x86_64)
+    needs: build-wheel
+    if: inputs.build_windows_wheel == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      NATIVE_TRIPLE: x86_64-pc-windows-msvc
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: ${{ env.PYTHON_VERSION_WINDOWS }}
+
+      - name: Pin the Rust toolchain
+        run: |
+          set -euo pipefail
+          # Same toolchain the manylinux leg installs via rustup. The
+          # windows-latest image ships rustup (and the Strawberry Perl that
+          # openssl-sys' vendored build needs); only the version is pinned
+          # here so the two legs cannot drift apart.
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          rustup default "$RUST_TOOLCHAIN"
+          cargo --version
+
+      - name: Build wheel from the c2pa-rs submodule
+        id: build
+        run: |
+          set -euo pipefail
+          # No artifacts/ directory may exist: setup.py falls back to prebuilt
+          # libraries from there when the source build fails, and a fallback
+          # would silently ship an unpatched native library -- the exact defect
+          # this leg exists to prevent. With the directory absent, the
+          # submodule build is the only possible origin of c2pa_c.dll.
+          if [ -d artifacts ]; then
+            echo "::error::artifacts/ exists; refusing to build where a prebuilt fallback is possible"
+            exit 1
+          fi
+
+          # SOURCE_DATE_EPOCH, as the manylinux leg sets: without it the wheel's
+          # ZIP timestamps come from the clock and the bundle digest is not
+          # reproducible for identical inputs.
+          export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
+          # 1800s as the manylinux leg sets: the c2pa-c-ffi release build takes
+          # ~16 minutes on a 4-vcpu runner, past setup.py's 600s default.
+          export C2PA_CARGO_BUILD_TIMEOUT_SECONDS=1800
+          python -m pip install "wheel==0.45.1" "setuptools==80.9.0" "toml==0.10.2"
+          python setup.py bdist_wheel --plat-name "$WHEEL_PLAT_NAME_WINDOWS"
+
+          mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' | sort)
+          if [ "${#wheels[@]}" -ne 1 ]; then
+            echo "::error::Expected exactly one wheel in dist/, got ${#wheels[@]}"
+            exit 1
+          fi
+
+          # There is no auditwheel equivalent on Windows, so record the wheel's
+          # contents instead: the native c2pa_c.dll has to be inside it, or the
+          # wheel imports only on a machine that happens to have one.
+          #
+          # The library's digest is taken from inside the completed wheel --
+          # the bytes that actually ship. Nothing may be read from
+          # src/c2pa/libs/ here: setup.py's bdist_wheel path removes that
+          # directory in a finally block after packaging (see AGENTS.md, "the
+          # src/c2pa/libs wipe"), so any post-build check under it fails on
+          # every successful build.
+          python - "${wheels[0]}" > dist/wheel-contents.txt <<'PY'
+          import hashlib
+          import pathlib
+          import sys
+          import zipfile
+
+          zf = zipfile.ZipFile(sys.argv[1])
+          names = sorted(zf.namelist())
+          print("\n".join(names))
+          dlls = [name for name in names if name.endswith("c2pa_c.dll")]
+          if len(dlls) != 1:
+              raise SystemExit(f"expected exactly one c2pa_c.dll in the wheel, found {dlls!r}")
+          digest = hashlib.sha256(zf.read(dlls[0])).hexdigest()
+          pathlib.Path("dist/native-lib.sha256").write_text(digest + "\n", encoding="utf-8")
+          PY
+
+          sha="$(tr -d '[:space:]' < dist/native-lib.sha256)"
+          if [ -z "$sha" ]; then
+            echo "::error::empty native library digest -- the wheel inspection did not produce one"
+            exit 1
+          fi
+          echo "native_lib_sha256=${sha}" >> "$GITHUB_OUTPUT"
+
+          python -m venv "$RUNNER_TEMP/c2pa-wheel-smoke"
+          "$RUNNER_TEMP/c2pa-wheel-smoke/Scripts/python.exe" -m pip install "${wheels[0]}"
+          # Import alone accepts an unpatched build; resolving the patched
+          # bindings is the point of building from the submodule, so assert
+          # them. Signer code calls all three.
+          "$RUNNER_TEMP/c2pa-wheel-smoke/Scripts/python.exe" - <<'PY' | tee dist/import-smoke.txt
+          import c2pa
+
+          print(c2pa.__file__)
+          for cls, name in ((c2pa.Signer, "add_dynamic_assertion"),
+                            (c2pa.Reader, "from_fragmented_files"),
+                            (c2pa.Builder, "sign_fragmented")):
+              if not hasattr(cls, name):
+                  raise SystemExit(f"{cls.__name__}.{name} missing -- unpatched c2pa build")
+              print(f"{cls.__name__}.{name} ok")
+          PY
+
+      - name: Validate wheel and write evidence
+        id: evidence
+        env:
+          RELEASE_VERSION: ${{ needs.build-wheel.outputs.release_version }}
+          RELEASE_TAG: ${{ needs.build-wheel.outputs.release_tag }}
+          NATIVE_LIB_SHA256: ${{ steps.build.outputs.native_lib_sha256 }}
+        run: |
+          set -euo pipefail
+          # A missing step output arrives as an empty string, not an error;
+          # evidence written with an empty digest would attest nothing.
+          if [ -z "$NATIVE_LIB_SHA256" ]; then
+            echo "::error::native_lib_sha256 is empty -- refusing to write evidence"
+            exit 1
+          fi
+          mapfile -t wheels < <(find dist -maxdepth 1 -type f -name '*.whl' | sort)
+          wheel_path="${wheels[0]}"
+          wheel_name="$(basename "$wheel_path")"
+          if [[ "$wheel_name" != *"$WHEEL_PLAT_NAME_WINDOWS"* ]]; then
+            echo "::error::Expected a $WHEEL_PLAT_NAME_WINDOWS wheel, got $wheel_name"
+            exit 1
+          fi
+          wheel_sha256="$(sha256sum "$wheel_path" | cut -d' ' -f1)"
+          printf '%s  %s\n' "$wheel_sha256" "$wheel_name" | tee "dist/${wheel_name}.sha256"
+          safe_release_version="${RELEASE_VERSION//+/-}"
+          bundle_name="c2pa-python-${safe_release_version}-wheel-bundle-windows-x86_64.tar.gz"
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            -cf - \
+            -C dist "$wheel_name" "${wheel_name}.sha256" wheel-contents.txt import-smoke.txt \
+            | gzip -n > "dist/${bundle_name}"
+          bundle_sha256="$(sha256sum "dist/${bundle_name}" | cut -d' ' -f1)"
+          printf '%s  %s\n' "$bundle_sha256" "$bundle_name" | tee "dist/${bundle_name}.sha256"
+          # This lineage carries the c2pa-rs submodule, and the build step
+          # refuses any other origin for the native library, so the commit is
+          # unconditional here -- consumers (the signer's Windows release leg)
+          # require it.
+          c2pa_rs_commit="$(git -C c2pa-rs rev-parse HEAD)"
+          c2pa_rs_status="$(git submodule status --recursive c2pa-rs)"
+          generated_at="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          python_version="$(python -VV)"
+          export wheel_name wheel_sha256 bundle_name bundle_sha256 c2pa_rs_commit c2pa_rs_status generated_at python_version
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          evidence = {
+              "artifact_type": "c2pa_python_release_wheel_evidence",
+              "package_name": "c2pa-python",
+              "platform": "windows-x86_64",
+              "release_version": os.environ["RELEASE_VERSION"],
+              "release_tag": os.environ["RELEASE_TAG"],
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "source_url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}",
+              "source_ref": os.environ["GITHUB_REF_NAME"],
+              "source_sha": os.environ["GITHUB_SHA"],
+              "github_run_id": os.environ["GITHUB_RUN_ID"],
+              "github_run_number": os.environ["GITHUB_RUN_NUMBER"],
+              "generated_at": os.environ["generated_at"],
+              "runner_os": os.environ["RUNNER_OS"],
+              "runner_arch": os.environ["RUNNER_ARCH"],
+              "python_version": os.environ["python_version"],
+              "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
+              "wheel_plat_name": os.environ["WHEEL_PLAT_NAME_WINDOWS"],
+              # Built from the c2pa-rs submodule -- the patched fork, the same
+              # lineage the Linux wheel ships -- not a downloaded prebuilt.
+              "c2pa_native_source_repository": "mstattma/c2pa-rs",
+              "c2pa_native_library_file": "c2pa_c.dll",
+              "c2pa_native_library_sha256": os.environ["NATIVE_LIB_SHA256"],
+              "c2pa_native_triple": os.environ["NATIVE_TRIPLE"],
+              "c2pa_rs_submodule_commit": os.environ["c2pa_rs_commit"],
+              "c2pa_rs_submodule_status": os.environ["c2pa_rs_status"],
+              "wheel_file": os.environ["wheel_name"],
+              "wheel_sha256": os.environ["wheel_sha256"],
+              "wheel_bundle_file": os.environ["bundle_name"],
+              "wheel_bundle_sha256": os.environ["bundle_sha256"],
+          }
+
+          Path("dist/c2pa-python-wheel-evidence-windows-x86_64.json").write_text(
+              json.dumps(evidence, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+          echo "wheel_sha256=${wheel_sha256}" >> "$GITHUB_OUTPUT"
+          echo "bundle_name=${bundle_name}" >> "$GITHUB_OUTPUT"
+          echo "bundle_sha256=${bundle_sha256}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload wheel evidence artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: c2pa-python-release-wheel-windows
+          path: |
+            dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz
+            dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz.sha256
+            dist/c2pa-python-wheel-evidence-windows-x86_64.json
+            dist/wheel-contents.txt
+            dist/import-smoke.txt
+
+      - name: Publish GitHub release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.build-wheel.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          # build-wheel has already created the release for this tag.
+          gh release upload "$RELEASE_TAG" \
+            dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz \
+            dist/c2pa-python-*-wheel-bundle-windows-x86_64.tar.gz.sha256 \
+            dist/c2pa-python-wheel-evidence-windows-x86_64.json \
+            --clobber
