@@ -1188,10 +1188,10 @@ def validate_evidence(
         ):
             fail("evidence workflow source is incorrect")
         allowed_events = {
-            f"refs/heads/{lock['pythonSource']['releaseBranch']}": "workflow_dispatch",
-            f"refs/tags/{lock['pythonSource']['releaseTag']}": "push",
+            f"refs/heads/{lock['pythonSource']['releaseBranch']}": {"workflow_dispatch", "push"},
+            f"refs/tags/{lock['pythonSource']['releaseTag']}": {"push"},
         }
-        if allowed_events.get(workflow["ref"]) != workflow["event"]:
+        if workflow["event"] not in allowed_events.get(workflow["ref"], set()):
             fail("evidence workflow ref is not a release ref")
 
 

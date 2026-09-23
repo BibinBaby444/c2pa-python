@@ -489,10 +489,18 @@ def test_release_packaging_never_rebuilds_or_falls_back(
 
 @pytest.fixture(params=["synthetic", "actual-cargo-tree"])
 def evidence(approved, tmp_path, monkeypatch, request):
+    # Synthetic evidence must not inherit the runner's real source identity.
     for name, value in (
         ("CARGO_BUILD_JOBS", "1"),
         ("CARGO_INCREMENTAL", "0"),
         ("PYTHONHASHSEED", "0"),
+        ("GITHUB_REPOSITORY", "castlabs/c2pa-python"),
+        ("GITHUB_REF", "refs/heads/fix/stable-single-file-fmp4"),
+        ("GITHUB_SHA", SOURCE),
+        ("GITHUB_EVENT_NAME", "push"),
+        ("GITHUB_RUN_ID", "1"),
+        ("GITHUB_RUN_ATTEMPT", "1"),
+        ("GITHUB_RUN_NUMBER", "1"),
     ):
         monkeypatch.setenv(name, value)
     members, mappings, facts = [], [], []
@@ -557,6 +565,27 @@ def test_schema2_standard_shape_and_strict_evidence(evidence):
         "workflow",
     }
     release.validate_evidence(data, directory, SOURCE)
+
+
+@pytest.mark.parametrize(
+    "event,ref,valid",
+    [
+        ("push", "refs/heads/fix/stable-single-file-fmp4", True),
+        ("workflow_dispatch", "refs/heads/fix/stable-single-file-fmp4", True),
+        ("push", f"refs/tags/{release.RELEASE_TAG}", True),
+        ("workflow_dispatch", f"refs/tags/{release.RELEASE_TAG}", False),
+        ("push", "refs/heads/main", False),
+        ("pull_request", "refs/heads/fix/stable-single-file-fmp4", False),
+    ],
+)
+def test_evidence_workflow_events(evidence, event, ref, valid):
+    data, directory = evidence
+    data["workflow"].update(event=event, ref=ref)
+    if valid:
+        release.validate_evidence(data, directory, SOURCE)
+    else:
+        with pytest.raises(SystemExit, match="workflow ref"):
+            release.validate_evidence(data, directory, SOURCE)
 
 
 @pytest.mark.parametrize(
