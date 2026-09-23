@@ -32,7 +32,7 @@
     "package": {
       "type": "object", "additionalProperties": false,
       "required": ["name", "version"],
-      "properties": {"name": {"const": "c2pa-python"}, "version": {"const": "0.31.0+stardustproof.3"}}
+      "properties": {"name": {"const": "c2pa-python"}, "version": {"const": "0.31.0+stardustproof.4"}}
     },
     "pythonSource": {
       "type": "object", "additionalProperties": false,
@@ -41,7 +41,7 @@
         "repository": {"const": "castlabs/c2pa-python"},
         "url": {"const": "https://github.com/castlabs/c2pa-python.git"},
         "releaseBranch": {"const": "fix/stable-single-file-fmp4"},
-        "releaseTag": {"const": "castlabs-v0.31.0+stardustproof.3"}
+        "releaseTag": {"const": "castlabs-v0.31.0+stardustproof.4"}
       }
     },
     "rustSource": {

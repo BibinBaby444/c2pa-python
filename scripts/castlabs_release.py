@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "release" / "castlabs-stable-fmp4-inputs.lock.json"
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
-RELEASE_VERSION = "0.31.0+stardustproof.3"
+RELEASE_VERSION = "0.31.0+stardustproof.4"
 # Reviewed stable native source; update these AND the lock/gitlink together.
 RUST_COMMIT: str | None = "c1282d33a8fd1145c32d93c27b313a16523f1dbd"
 CARGO_LOCK_SHA256: str | None = (
@@ -41,7 +41,7 @@ MANYLINUX_IMAGE = "quay.io/pypa/manylinux_2_28_x86_64"
 MANYLINUX_DIGEST = (
     "sha256:0d9c2a66a745961947a8cecbe217ca0a7ee7a5849ba2517f20f9581d18444977"
 )
-RELEASE_TAG = "castlabs-v0.31.0+stardustproof.3"
+RELEASE_TAG = "castlabs-v0.31.0+stardustproof.4"
 RELEASE_NAME = f"Castlabs c2pa-python {RELEASE_VERSION} (stable fMP4)"
 RELEASE_BODY_MARKER = f"castlabs-stable-fmp4-release:{RELEASE_VERSION}"
 RELEASE_IDENTITY_TEXT = (
@@ -246,12 +246,12 @@ def validate_lock(lock: dict[str, Any]) -> None:
     ):
         fail("missing approved stable Cargo.lock pin; release is blocked")
     if lock["package"] != {"name": "c2pa-python", "version": RELEASE_VERSION}:
-        fail("release lock package identity is not 0.31.0+stardustproof.3")
+        fail("release lock package identity is not 0.31.0+stardustproof.4")
     if lock["pythonSource"] != {
         "repository": "castlabs/c2pa-python",
         "url": "https://github.com/castlabs/c2pa-python.git",
         "releaseBranch": "fix/stable-single-file-fmp4",
-        "releaseTag": "castlabs-v0.31.0+stardustproof.3",
+        "releaseTag": "castlabs-v0.31.0+stardustproof.4",
     }:
         fail("unexpected c2pa-python release source policy")
     rust = lock["rustSource"]

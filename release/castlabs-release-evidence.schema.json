@@ -13,7 +13,7 @@
       "properties": {
         "type": {"enum": ["native-bundle", "wheel-bundle"]},
         "package": {"const": "c2pa-python"},
-        "version": {"const": "0.31.0+stardustproof.3"},
+        "version": {"const": "0.31.0+stardustproof.4"},
         "file": {"type": "string", "minLength": 1},
         "size": {"type": "integer", "minimum": 1},
         "sha256": {"$ref": "#/$defs/sha256"},

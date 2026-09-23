@@ -6,8 +6,8 @@ on the `84208af` baseline. It does not merge VSI APIs or change crypto providers
 
 | Contract | Value |
 | --- | --- |
-| Python package | `c2pa-python==0.31.0+stardustproof.3` |
-| Castlabs tag | `castlabs-v0.31.0+stardustproof.3` |
+| Python package | `c2pa-python==0.31.0+stardustproof.4` |
+| Castlabs tag | `castlabs-v0.31.0+stardustproof.4` |
 | Release context | `castlabs-stable-fmp4` |
 | Profile ID | `stable-fmp4-v1` |
 | Native SDK/FFI | `0.80.0` |
@@ -19,6 +19,16 @@ on the `84208af` baseline. It does not merge VSI APIs or change crypto providers
 | Evidence | schema 2, standard shape, no VSI capability inference |
 
 ## Approval Gate
+
+The previous `.3` candidate run
+[`35862631757`, attempt 2](https://github.com/castlabs/c2pa-python/actions/runs/35862631757)
+passed both platform builds and all installed-wheel tests at Python source
+`44437a5ca56e6e921cd116ce04db7cc7fd786b0c`. Its reserved tag
+`castlabs-v0.31.0+stardustproof.3` remains fixed at that source and was **never
+published as a release**. The unescaped `+` in its Actions tag filter prevented
+the release run from starting. Do not delete, move, reuse, or publish that tag.
+The `.4` repair uses a single-quoted filter with one literal backslash before
+`+`; exact event refs, evidence and asset names retain the unescaped `+`.
 
 The native audit is cleared and the approved source is committed and pushed in
 `castlabs/c2pa-rs`, branch `fix/stable-single-file-fmp4`:
@@ -145,10 +155,10 @@ python3 scripts/castlabs_release.py validate-lock
 
 Both commands must now succeed. Full `validate-sources` additionally requires a
 committed, clean Python checkout whose gitlink and immutable event SHA match the
-lock; it cannot qualify this still-uncommitted Python worktree for release.
+lock; uncommitted Python edits cannot qualify for release.
 
 Post-audit Linux qualification executed all four mandatory smokes successfully using
-this worktree's editable `.3` install and the rebuilt native
+this worktree's editable `.3` candidate install and the rebuilt native
 library at `/root/opencode-worktrees/c2pa-rs-stable-fmp4/target/debug/libc2pa_c.so`,
 SHA-256 `4bbaf1078fdd7b005b7d28cf49234c6e29714abcf5cc5aa027c2c18895c98094`.
 The synthetic tiny-segmented fixture works for both ordinary single-file and

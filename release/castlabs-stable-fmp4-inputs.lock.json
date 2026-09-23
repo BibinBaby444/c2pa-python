@@ -4,13 +4,13 @@
   "profileId": "stable-fmp4-v1",
   "package": {
     "name": "c2pa-python",
-    "version": "0.31.0+stardustproof.3"
+    "version": "0.31.0+stardustproof.4"
   },
   "pythonSource": {
     "repository": "castlabs/c2pa-python",
     "url": "https://github.com/castlabs/c2pa-python.git",
     "releaseBranch": "fix/stable-single-file-fmp4",
-    "releaseTag": "castlabs-v0.31.0+stardustproof.3"
+    "releaseTag": "castlabs-v0.31.0+stardustproof.4"
   },
   "rustSource": {
     "repository": "castlabs/c2pa-rs",

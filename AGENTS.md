@@ -3,7 +3,7 @@
 ## Stable fMP4 Release Lane
 
 This worktree's dedicated profile is `stable-fmp4-v1`, release context
-`castlabs-stable-fmp4`, Python `0.31.0+stardustproof.3`, native `0.80.0`.
+`castlabs-stable-fmp4`, Python `0.31.0+stardustproof.4`, native `0.80.0`.
 Use `.github/workflows/castlabs-stable-fmp4-release.yml`, the explicit lock at
 `release/castlabs-stable-fmp4-inputs.lock.json`, and `scripts/castlabs_release.py`.
 Native defaults (vendored OpenSSL + HTTP + thumbnails) and `file_io` must remain

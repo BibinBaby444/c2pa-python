@@ -133,7 +133,7 @@ def assert_clean(reader: c2pa.Reader) -> dict:
 
 
 def test_stable_installed_wheel_identity():
-    assert version("c2pa-python") == "0.31.0+stardustproof.3"
+    assert version("c2pa-python") == "0.31.0+stardustproof.4"
     assert re.search(r"(?<![\d.])0\.80\.0(?![\d.\w-])", c2pa.sdk_version())
     assert not hasattr(c2pa, "LiveVideoVsiSession")
     assert callable(c2pa.Signer.add_dynamic_assertion)

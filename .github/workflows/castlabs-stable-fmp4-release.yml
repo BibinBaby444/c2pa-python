@@ -5,7 +5,7 @@ on:
     branches:
       - fix/stable-single-file-fmp4
     tags:
-      - castlabs-v0.31.0+stardustproof.3
+      - 'castlabs-v0.31.0\+stardustproof.4'
   workflow_dispatch:
     inputs:
       source_sha:
@@ -14,7 +14,7 @@ on:
         type: string
 
 concurrency:
-  group: castlabs-stable-fmp4-release-0.31.0+stardustproof.3
+  group: castlabs-stable-fmp4-release-0.31.0+stardustproof.4
   cancel-in-progress: false
 
 permissions:
@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           case "${GITHUB_EVENT_NAME}:${GITHUB_REF}" in
-            workflow_dispatch:refs/heads/fix/stable-single-file-fmp4|push:refs/heads/fix/stable-single-file-fmp4|push:refs/tags/castlabs-v0.31.0+stardustproof.3) ;;
+            workflow_dispatch:refs/heads/fix/stable-single-file-fmp4|push:refs/heads/fix/stable-single-file-fmp4|push:refs/tags/castlabs-v0.31.0+stardustproof.4) ;;
             *) echo "unsupported stable release event/ref" >&2; exit 1 ;;
           esac
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
@@ -207,7 +207,7 @@ jobs:
               test "$(find wheelhouse -maxdepth 1 -name "*.whl" | wc -l)" -eq 1
               WHEEL=$(find wheelhouse -maxdepth 1 -name "*.whl")
               case "$(basename "$WHEEL")" in
-                c2pa_python-0.31.0+stardustproof.3-py3-none-manylinux_2_28_x86_64.whl) ;;
+                c2pa_python-0.31.0+stardustproof.4-py3-none-manylinux_2_28_x86_64.whl) ;;
                 *) echo "unexpected Linux wheel: $WHEEL" >&2; exit 1 ;;
               esac
               /opt/python/cp310-cp310/bin/python -m auditwheel show "$WHEEL"
@@ -227,7 +227,7 @@ jobs:
           SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.source_epoch }}
         run: |
           cd c2pa-python
-          BUNDLE=release-out/c2pa-python-0.31.0+stardustproof.3-native-linux-x86_64.tar.gz
+          BUNDLE=release-out/c2pa-python-0.31.0+stardustproof.4-native-linux-x86_64.tar.gz
           python3 scripts/castlabs_release.py pack --output "$BUNDLE" \
             --epoch "$SOURCE_DATE_EPOCH" \
             --member x86_64-unknown-linux-gnu/libc2pa_c.so=release-out/libc2pa_c.so
@@ -367,7 +367,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $wheels = @(Get-ChildItem dist/*.whl)
           if ($wheels.Count -ne 1) { throw "expected exactly one Windows wheel" }
-          if ($wheels[0].Name -ne "c2pa_python-0.31.0+stardustproof.3-py3-none-win_amd64.whl") {
+          if ($wheels[0].Name -ne "c2pa_python-0.31.0+stardustproof.4-py3-none-win_amd64.whl") {
             throw "unexpected Windows wheel $($wheels[0].Name)"
           }
           python -m twine check $wheels[0].FullName
@@ -387,7 +387,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           $PSNativeCommandUseErrorActionPreference = $true
           Push-Location c2pa-python
-          $bundle = "release-out/c2pa-python-0.31.0+stardustproof.3-native-windows-x86_64.tar.gz"
+          $bundle = "release-out/c2pa-python-0.31.0+stardustproof.4-native-windows-x86_64.tar.gz"
           python scripts/castlabs_release.py pack --output $bundle `
             --epoch $env:SOURCE_DATE_EPOCH `
             --member x86_64-pc-windows-msvc/c2pa_c.dll=release-out/c2pa_c.dll
@@ -440,7 +440,7 @@ jobs:
       - name: Test installed wheel in a clean environment
         shell: bash
         env:
-          CASTLABS_RELEASE_EXPECTED_VERSION: 0.31.0+stardustproof.3
+          CASTLABS_RELEASE_EXPECTED_VERSION: 0.31.0+stardustproof.4
           C2PA_SOURCE_BUILD_VERSION: 0.80.0
         run: |
           test "$(find release-out -maxdepth 1 -name '*.whl' | wc -l)" -eq 1
@@ -480,7 +480,7 @@ jobs:
       - name: Test installed wheel in a clean environment
         shell: pwsh
         env:
-          CASTLABS_RELEASE_EXPECTED_VERSION: 0.31.0+stardustproof.3
+          CASTLABS_RELEASE_EXPECTED_VERSION: 0.31.0+stardustproof.4
           C2PA_SOURCE_BUILD_VERSION: 0.80.0
         run: |
           $ErrorActionPreference = "Stop"
@@ -503,7 +503,7 @@ jobs:
 
   release:
     needs: [prepare, linux, windows, test-linux-wheel, test-windows-wheel]
-    if: github.event_name == 'push' && github.ref == 'refs/tags/castlabs-v0.31.0+stardustproof.3'
+    if: github.event_name == 'push' && github.ref == 'refs/tags/castlabs-v0.31.0+stardustproof.4'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: castlabs-stable-fmp4-release
@@ -538,7 +538,7 @@ jobs:
           LINUX_WHEEL=$(find collected/linux -maxdepth 1 -name "*.whl")
           WINDOWS_WHEEL=$(find collected/windows -maxdepth 1 -name "*.whl")
           test "$(find collected/linux collected/windows -name "*.whl" | wc -l)" -eq 2
-          BUNDLE=assets/c2pa-python-0.31.0+stardustproof.3-py3-none-wheels.tar.gz
+          BUNDLE=assets/c2pa-python-0.31.0+stardustproof.4-py3-none-wheels.tar.gz
           python3 c2pa-python/scripts/castlabs_release.py pack \
             --output "$BUNDLE" --epoch "$SOURCE_DATE_EPOCH" \
             --member "$(basename "$LINUX_WHEEL")=$LINUX_WHEEL" \
@@ -555,13 +555,13 @@ jobs:
           python3 c2pa-python/scripts/castlabs_release.py checksum \
             --artifact "$BUNDLE.evidence.json"
           cp "$LINUX_WHEEL" "$WINDOWS_WHEEL" assets/
-          cp collected/linux/c2pa-python-0.31.0+stardustproof.3-native-linux-x86_64.tar.gz* assets/
-          cp collected/windows/c2pa-python-0.31.0+stardustproof.3-native-windows-x86_64.tar.gz* assets/
+          cp collected/linux/c2pa-python-0.31.0+stardustproof.4-native-linux-x86_64.tar.gz* assets/
+          cp collected/windows/c2pa-python-0.31.0+stardustproof.4-native-windows-x86_64.tar.gz* assets/
           python3 c2pa-python/scripts/castlabs_release.py validate-evidence \
-            --evidence assets/c2pa-python-0.31.0+stardustproof.3-native-linux-x86_64.tar.gz.evidence.json \
+            --evidence assets/c2pa-python-0.31.0+stardustproof.4-native-linux-x86_64.tar.gz.evidence.json \
             --artifact-dir assets --source-sha "${{ needs.prepare.outputs.source_sha }}"
           python3 c2pa-python/scripts/castlabs_release.py validate-evidence \
-            --evidence assets/c2pa-python-0.31.0+stardustproof.3-native-windows-x86_64.tar.gz.evidence.json \
+            --evidence assets/c2pa-python-0.31.0+stardustproof.4-native-windows-x86_64.tar.gz.evidence.json \
             --artifact-dir assets --source-sha "${{ needs.prepare.outputs.source_sha }}"
           python3 c2pa-python/scripts/castlabs_release.py validate-evidence \
             --evidence "$BUNDLE.evidence.json" --artifact-dir assets \
@@ -575,7 +575,7 @@ jobs:
       - name: Require immutable release tag
         shell: bash
         run: |
-          TAG=castlabs-v0.31.0+stardustproof.3
+          TAG=castlabs-v0.31.0+stardustproof.4
           git -C c2pa-python fetch origin "refs/tags/${TAG}:refs/tags/${TAG}"
           test "$(git -C c2pa-python rev-list -n 1 "$TAG")" = \
             "${{ needs.prepare.outputs.source_sha }}"
@@ -591,7 +591,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TAG=castlabs-v0.31.0+stardustproof.3
+          TAG=castlabs-v0.31.0+stardustproof.4
           SOURCE_SHA="${{ needs.prepare.outputs.source_sha }}"
           RELEASE_NAME=$(python3 c2pa-python/scripts/castlabs_release.py release-value name)
           RELEASE_BODY=$(python3 c2pa-python/scripts/castlabs_release.py release-value body)
@@ -618,7 +618,7 @@ jobs:
           }
           discover_release() {
             gh api --paginate repos/castlabs/c2pa-python/releases \
-              --jq '.[] | select(.tag_name == "castlabs-v0.31.0+stardustproof.3")' > "$1"
+              --jq '.[] | select(.tag_name == "castlabs-v0.31.0+stardustproof.4")' > "$1"
             return 0
           }
           query_release_id() {

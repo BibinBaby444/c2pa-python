@@ -74,7 +74,7 @@ jobs:
             exit 1
           fi
           release_version="${INPUT_RELEASE_VERSION#v}"
-          if [[ "$release_version" == "0.31.0+stardustproof.3" ]]; then
+          if [[ "$release_version" == "0.31.0+stardustproof.3" || "$release_version" == "0.31.0+stardustproof.4" ]]; then
             echo "::error::Use castlabs-stable-fmp4-release.yml for the schema-2 stable hotfix"
             exit 1
           fi

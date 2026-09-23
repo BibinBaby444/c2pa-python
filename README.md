@@ -71,7 +71,7 @@ This project is licensed under the Apache License 2.0 and the MIT License. See t
 ## Castlabs Stable fMP4 Hotfix
 
 The dedicated `stable-fmp4-v1` release profile targets
-`c2pa-python==0.31.0+stardustproof.3` and native `0.80.0`, preserving default
+`c2pa-python==0.31.0+stardustproof.4` and native `0.80.0`, preserving default
 OpenSSL crypto without importing the live-video VSI runtime. Release context:
 `castlabs-stable-fmp4`. The approved native source is
 `c1282d33a8fd1145c32d93c27b313a16523f1dbd`; its exact Cargo.lock digest is pinned

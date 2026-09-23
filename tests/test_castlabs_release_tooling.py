@@ -780,7 +780,7 @@ def test_workflow_is_dedicated_pinned_all_platform_and_no_skip():
     jobs = workflow["jobs"]
     assert (
         jobs["release"]["if"]
-        == "github.event_name == 'push' && github.ref == 'refs/tags/castlabs-v0.31.0+stardustproof.3'"
+        == "github.event_name == 'push' && github.ref == 'refs/tags/castlabs-v0.31.0+stardustproof.4'"
     )
     assert set(jobs["release"]["needs"]) == {
         "prepare",
@@ -828,6 +828,53 @@ def test_workflow_is_dedicated_pinned_all_platform_and_no_skip():
         assert required in smoke
 
 
+def test_tag_filter_matches_literal_plus_under_actions_pattern_rules():
+    # Actions filters give '+' quantifier semantics (unlike Python fnmatch or
+    # minimatch's bare '+'). Model the literal/escape/quantifier subset used by
+    # this exact tag, rejecting any unsupported pattern syntax rather than
+    # accidentally treating new wildcards as literals.
+    def compile_filter(pattern):
+        regex = []
+        characters = iter(pattern)
+        for char in characters:
+            if char == "\\":
+                escaped = next(characters, None)
+                assert escaped in ("+", "\\")
+                regex.append(re.escape(escaped))
+            elif char == "+":
+                assert regex
+                regex.append("+")
+            else:
+                assert char not in "*?[]!"
+                regex.append(re.escape(char))
+        return re.compile("".join(regex))
+
+    text = (ROOT / ".github/workflows/castlabs-stable-fmp4-release.yml").read_text()
+    workflow = yaml.load(text, Loader=yaml.BaseLoader)
+    patterns = workflow["on"]["push"]["tags"]
+    assert len(patterns) == 1
+    pattern = patterns[0]
+    assert f"      - '{pattern}'" in text
+    matcher = compile_filter(pattern)
+    assert matcher.fullmatch(release.RELEASE_TAG)
+    for invalid in (
+        release.RELEASE_TAG.replace("+", ""),
+        release.RELEASE_TAG.replace("+", "0"),
+        release.RELEASE_TAG.replace("castlabs-", ""),
+        "castlabs-v0.31.0+stardustproof.3",
+        release.RELEASE_TAG + "-extra",
+    ):
+        assert not matcher.fullmatch(invalid)
+    # Reproduce the .3 incident and guard against double escaping in YAML.
+    assert not compile_filter(release.RELEASE_TAG).fullmatch(release.RELEASE_TAG)
+    assert compile_filter(release.RELEASE_TAG).fullmatch(
+        release.RELEASE_TAG.replace("+", "")
+    )
+    assert not compile_filter(release.RELEASE_TAG.replace("+", "\\\\+")).fullmatch(
+        release.RELEASE_TAG
+    )
+
+
 @pytest.mark.parametrize(
     "event,ref,source,success",
     [
@@ -844,7 +891,8 @@ def test_workflow_is_dedicated_pinned_all_platform_and_no_skip():
         ),
         ("push", "refs/heads/main", "", False),
         ("push", "refs/tags/castlabs-v0.31.0+stardustproof.2", "", False),
-        ("push", "refs/tags/v0.31.0+stardustproof.3", "", False),
+        ("push", "refs/tags/castlabs-v0.31.0+stardustproof.3", "", False),
+        ("push", "refs/tags/v0.31.0+stardustproof.4", "", False),
         ("pull_request", "refs/pull/1/merge", SOURCE, False),
     ],
 )
