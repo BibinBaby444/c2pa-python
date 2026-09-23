@@ -1,0 +1,756 @@
+name: Castlabs stable fMP4 hotfix
+
+on:
+  push:
+    tags:
+      - castlabs-v0.31.0+stardustproof.3
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Full fix/stable-single-file-fmp4 branch-tip SHA to release
+        required: true
+        type: string
+
+concurrency:
+  group: castlabs-stable-fmp4-release-0.31.0+stardustproof.3
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_BUILD_JOBS: "1"
+  CARGO_INCREMENTAL: "0"
+  PYTHONHASHSEED: "0"
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
+      source_epoch: ${{ steps.source.outputs.epoch }}
+      native_sha: ${{ steps.pin.outputs.sha }}
+    steps:
+      - name: Select full release source SHA
+        id: select
+        shell: bash
+        env:
+          INPUT_SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          set -euo pipefail
+          case "${GITHUB_EVENT_NAME}:${GITHUB_REF}" in
+            workflow_dispatch:refs/heads/fix/stable-single-file-fmp4|push:refs/tags/castlabs-v0.31.0+stardustproof.3) ;;
+            *) echo "unsupported stable release event/ref" >&2; exit 1 ;;
+          esac
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            SOURCE_SHA="${INPUT_SOURCE_SHA}"
+          else
+            SOURCE_SHA="${GITHUB_SHA}"
+          fi
+          if [[ ! "${SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "source_sha must be a full lowercase commit SHA" >&2
+            exit 1
+          fi
+          if [[ "${SOURCE_SHA}" != "${GITHUB_SHA}" ]]; then
+            echo "source_sha must match the workflow's immutable source SHA" >&2
+            exit 1
+          fi
+          echo "sha=${SOURCE_SHA}" >> "${GITHUB_OUTPUT}"
+
+      - name: Checkout Castlabs Python source at full SHA
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-python
+          ref: ${{ steps.select.outputs.sha }}
+          fetch-depth: 0
+          path: c2pa-python
+
+      - name: Require approved stable native pin before any native checkout
+        id: pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 c2pa-python/scripts/castlabs_release.py validate-lock
+          SHA=$(python3 c2pa-python/scripts/castlabs_release.py lock-value rustSource.commit)
+          echo "sha=${SHA}" >> "${GITHUB_OUTPUT}"
+
+      - name: Checkout pinned Castlabs Rust source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-rs
+          ref: ${{ steps.pin.outputs.sha }}
+          fetch-depth: 1
+          path: c2pa-rs
+
+      - name: Validate locked sources and release event
+        shell: bash
+        run: |
+          git -C c2pa-python fetch --no-tags origin \
+            refs/heads/fix/stable-single-file-fmp4:refs/remotes/origin/fix/stable-single-file-fmp4
+          EVENT=manual
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then EVENT=tag; fi
+          python3 c2pa-python/scripts/castlabs_release.py validate-sources \
+            --python-root c2pa-python \
+            --rust-root c2pa-rs \
+            --source-sha "${{ steps.select.outputs.sha }}" \
+            --repository "${GITHUB_REPOSITORY}" \
+            --event "${EVENT}" \
+            --ref "${GITHUB_REF}"
+
+      - name: Run lightweight release tooling tests
+        shell: bash
+        run: |
+          python3 -m pip install pytest==8.4.1 jsonschema==4.25.1 PyYAML==6.0.2 cbor2==5.6.5
+          python3 -m pytest -q c2pa-python/tests/test_castlabs_release_tooling.py
+
+      - name: Export immutable source facts
+        id: source
+        shell: bash
+        run: |
+          SOURCE_SHA=$(git -C c2pa-python rev-parse HEAD)
+          SOURCE_EPOCH=$(git -C c2pa-python show -s --format=%ct HEAD)
+          echo "sha=${SOURCE_SHA}" >> "${GITHUB_OUTPUT}"
+          echo "epoch=${SOURCE_EPOCH}" >> "${GITHUB_OUTPUT}"
+
+  linux:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - name: Checkout Castlabs Python source at full SHA
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-python
+          ref: ${{ needs.prepare.outputs.source_sha }}
+          fetch-depth: 0
+          path: c2pa-python
+
+      - name: Checkout pinned Castlabs Rust source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-rs
+          ref: ${{ needs.prepare.outputs.native_sha }}
+          fetch-depth: 1
+          path: c2pa-rs
+
+      - name: Validate locked sources
+        shell: bash
+        run: |
+          git -C c2pa-python fetch --no-tags origin \
+            refs/heads/fix/stable-single-file-fmp4:refs/remotes/origin/fix/stable-single-file-fmp4
+          EVENT=manual
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then EVENT=tag; fi
+          python3 c2pa-python/scripts/castlabs_release.py validate-sources \
+            --python-root c2pa-python --rust-root c2pa-rs \
+            --source-sha "${{ needs.prepare.outputs.source_sha }}" \
+            --repository "${GITHUB_REPOSITORY}" --event "${EVENT}" \
+            --ref "${GITHUB_REF}"
+
+      - name: Build locked native library and Linux wheel
+        shell: bash
+        env:
+          SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.source_epoch }}
+        run: |
+          mkdir -p c2pa-python/release-out
+          IMAGE=$(python3 c2pa-python/scripts/castlabs_release.py lock-value manylinux.image)
+          DIGEST=$(python3 c2pa-python/scripts/castlabs_release.py lock-value manylinux.digest)
+          RUSTUP_URL=$(python3 c2pa-python/scripts/castlabs_release.py lock-value rustToolchain.installers.x86_64-unknown-linux-gnu.url)
+          RUSTUP_SHA=$(python3 c2pa-python/scripts/castlabs_release.py lock-value rustToolchain.installers.x86_64-unknown-linux-gnu.sha256)
+          RUST_TOOLCHAIN=$(python3 c2pa-python/scripts/castlabs_release.py lock-value rustToolchain.channel)
+          docker run --rm \
+            -e SOURCE_DATE_EPOCH -e CARGO_BUILD_JOBS=1 \
+            -e CARGO_INCREMENTAL=0 -e PYTHONHASHSEED=0 \
+            -e "RUSTUP_URL=${RUSTUP_URL}" \
+            -e "RUSTUP_SHA=${RUSTUP_SHA}" \
+            -e "RUST_TOOLCHAIN=${RUST_TOOLCHAIN}" \
+            -v "${GITHUB_WORKSPACE}:/work" \
+            "${IMAGE}@${DIGEST}" bash -euxo pipefail -c '
+              command -v bash
+              command -v curl
+              command -v patchelf
+              command -v sha256sum
+              dnf -y install perl-IPC-Cmd perl-Time-Piece
+              perl -MIPC::Cmd -MTime::Piece -e 1
+              test -x /opt/python/cp310-cp310/bin/python
+              test "$CARGO_INCREMENTAL" = 0
+              test "$PYTHONHASHSEED" = 0
+              curl --fail --location --proto "=https" --tlsv1.2 \
+                "$RUSTUP_URL" --output /tmp/rustup-init
+              printf "%s  %s\n" "$RUSTUP_SHA" /tmp/rustup-init | sha256sum --check --strict
+              chmod 0755 /tmp/rustup-init
+              /tmp/rustup-init -y --profile minimal --default-toolchain "$RUST_TOOLCHAIN" \
+                --default-host x86_64-unknown-linux-gnu
+              export PATH="$HOME/.cargo/bin:$PATH"
+              test "$(rustc --version | cut -d" " -f2)" = "$RUST_TOOLCHAIN"
+              cd /work/c2pa-python
+              /opt/python/cp310-cp310/bin/python scripts/castlabs_release.py cargo-build \
+                --rust-root /work/c2pa-rs \
+                --target x86_64-unknown-linux-gnu \
+                --feature-report release-out/features-x86_64-unknown-linux-gnu.txt
+              /opt/python/cp310-cp310/bin/python scripts/castlabs_release.py stage-native \
+                --target x86_64-unknown-linux-gnu \
+                --source /work/c2pa-rs/target/x86_64-unknown-linux-gnu/release/libc2pa_c.so
+              /opt/python/cp310-cp310/bin/python -m pip install \
+                auditwheel==6.4.2 setuptools==68.0.0 toml==0.10.2 \
+                twine==6.2.0 wheel==0.46.2
+              rm -rf build dist wheelhouse src/c2pa/libs
+              CASTLABS_STABLE_RELEASE_TARGET=x86_64-unknown-linux-gnu \
+                /opt/python/cp310-cp310/bin/python setup.py bdist_wheel \
+                --plat-name linux_x86_64
+              /opt/python/cp310-cp310/bin/python -m auditwheel show dist/*.whl
+              /opt/python/cp310-cp310/bin/python -m auditwheel repair \
+                --only-plat --plat manylinux_2_28_x86_64 \
+                --wheel-dir wheelhouse dist/*.whl
+              test "$(find wheelhouse -maxdepth 1 -name "*.whl" | wc -l)" -eq 1
+              WHEEL=$(find wheelhouse -maxdepth 1 -name "*.whl")
+              case "$(basename "$WHEEL")" in
+                c2pa_python-0.31.0+stardustproof.3-py3-none-manylinux_2_28_x86_64.whl) ;;
+                *) echo "unexpected Linux wheel: $WHEEL" >&2; exit 1 ;;
+              esac
+              /opt/python/cp310-cp310/bin/python -m auditwheel show "$WHEEL"
+              /opt/python/cp310-cp310/bin/python -m twine check "$WHEEL"
+              /opt/python/cp310-cp310/bin/python scripts/castlabs_release.py verify-wheel-native \
+                --wheel "$WHEEL" --target x86_64-unknown-linux-gnu \
+                --native artifacts/x86_64-unknown-linux-gnu/libc2pa_c.so \
+                --output release-out/libc2pa_c.so
+              cp "$WHEEL" release-out/
+              /opt/python/cp310-cp310/bin/python --version 2>&1 \
+                > release-out/interpreter-x86_64-unknown-linux-gnu.txt
+            '
+
+      - name: Pack deterministic Linux native bundle and evidence
+        shell: bash
+        env:
+          SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.source_epoch }}
+        run: |
+          cd c2pa-python
+          BUNDLE=release-out/c2pa-python-0.31.0+stardustproof.3-native-linux-x86_64.tar.gz
+          python3 scripts/castlabs_release.py pack --output "$BUNDLE" \
+            --epoch "$SOURCE_DATE_EPOCH" \
+            --member x86_64-unknown-linux-gnu/libc2pa_c.so=release-out/libc2pa_c.so
+          python3 scripts/castlabs_release.py checksum --artifact "$BUNDLE"
+          INTERPRETER=$(cat release-out/interpreter-x86_64-unknown-linux-gnu.txt)
+          python3 scripts/castlabs_release.py build-facts \
+            --target x86_64-unknown-linux-gnu \
+            --feature-report release-out/features-x86_64-unknown-linux-gnu.txt \
+            --epoch "$SOURCE_DATE_EPOCH" --interpreter "$INTERPRETER" \
+            --container quay.io/pypa/manylinux_2_28_x86_64@sha256:0d9c2a66a745961947a8cecbe217ca0a7ee7a5849ba2517f20f9581d18444977 \
+            --output release-out/build-x86_64-unknown-linux-gnu.json
+          python3 scripts/castlabs_release.py evidence \
+            --artifact "$BUNDLE" --type native-bundle \
+            --source-sha "${{ needs.prepare.outputs.source_sha }}" \
+            --member x86_64-unknown-linux-gnu=release-out/libc2pa_c.so \
+            --build-facts release-out/build-x86_64-unknown-linux-gnu.json \
+            --output "$BUNDLE.evidence.json"
+          python3 scripts/castlabs_release.py checksum \
+            --artifact "$BUNDLE.evidence.json"
+
+      - name: Upload exact Linux outputs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: castlabs-stable-fmp4-linux
+          path: c2pa-python/release-out/
+          if-no-files-found: error
+          retention-days: 7
+
+  windows:
+    needs: prepare
+    runs-on: windows-2022
+    timeout-minutes: 240
+    env:
+      GIT_CONFIG_COUNT: "2"
+      GIT_CONFIG_KEY_0: core.autocrlf
+      GIT_CONFIG_VALUE_0: "false"
+      GIT_CONFIG_KEY_1: core.eol
+      GIT_CONFIG_VALUE_1: lf
+    steps:
+      - name: Validate byte-preserving Git checkout policy
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          if ((git config --get core.autocrlf) -ne "false") {
+            throw "core.autocrlf must be false before checkout"
+          }
+          if ((git config --get core.eol) -ne "lf") {
+            throw "core.eol must be lf before checkout"
+          }
+
+      - name: Checkout Castlabs Python source at full SHA
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-python
+          ref: ${{ needs.prepare.outputs.source_sha }}
+          fetch-depth: 0
+          path: c2pa-python
+
+      - name: Checkout pinned Castlabs Rust source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-rs
+          ref: ${{ needs.prepare.outputs.native_sha }}
+          fetch-depth: 1
+          path: c2pa-rs
+
+      - name: Install pinned wheel-build Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.10"
+
+      - name: Validate locked sources
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          if ((git config --get core.autocrlf) -ne "false" -or `
+              (git config --get core.eol) -ne "lf") {
+            throw "byte-preserving Git checkout policy changed"
+          }
+          $expectedCargoLock = python c2pa-python/scripts/castlabs_release.py lock-value rustSource.cargoLockSha256
+          $actualCargoLock = (Get-FileHash c2pa-rs/Cargo.lock -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actualCargoLock -ne $expectedCargoLock) {
+            throw "checked-out Cargo.lock SHA-256 changed"
+          }
+          git -C c2pa-python fetch --no-tags origin `
+            refs/heads/fix/stable-single-file-fmp4:refs/remotes/origin/fix/stable-single-file-fmp4
+          $event = if ($env:GITHUB_REF.StartsWith("refs/tags/")) { "tag" } else { "manual" }
+          python c2pa-python/scripts/castlabs_release.py validate-sources `
+            --python-root c2pa-python --rust-root c2pa-rs `
+            --source-sha "${{ needs.prepare.outputs.source_sha }}" `
+            --repository $env:GITHUB_REPOSITORY --event $event --ref $env:GITHUB_REF
+
+      - name: Install checksum-verified pinned Rust toolchain
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $url = python c2pa-python/scripts/castlabs_release.py lock-value rustToolchain.installers.x86_64-pc-windows-msvc.url
+          $expected = python c2pa-python/scripts/castlabs_release.py lock-value rustToolchain.installers.x86_64-pc-windows-msvc.sha256
+          $toolchain = python c2pa-python/scripts/castlabs_release.py lock-value rustToolchain.channel
+          Invoke-WebRequest -Uri $url -OutFile "$env:RUNNER_TEMP\rustup-init.exe"
+          $actual = (Get-FileHash "$env:RUNNER_TEMP\rustup-init.exe" -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $expected) { throw "rustup-init SHA-256 mismatch" }
+          & "$env:RUNNER_TEMP\rustup-init.exe" -y --profile minimal `
+            --default-toolchain $toolchain --default-host x86_64-pc-windows-msvc
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup default "${toolchain}-x86_64-pc-windows-msvc"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $rustVersion = (rustc --version).Split(' ')[1]
+          if ($rustVersion -ne $toolchain) { throw "unexpected rustc $rustVersion" }
+
+      - name: Build locked native library and Windows wheel
+        shell: pwsh
+        env:
+          SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.source_epoch }}
+          OPENSSL_SRC_PERL: C:/Strawberry/perl/bin/perl.exe
+          CASTLABS_STABLE_RELEASE_TARGET: x86_64-pc-windows-msvc
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          & $env:OPENSSL_SRC_PERL -MLocale::Maketext::Simple -MIPC::Cmd -e 1
+          if ($LASTEXITCODE -ne 0) { throw "full Strawberry Perl required for stable OpenSSL" }
+          New-Item -ItemType Directory -Force c2pa-python/release-out | Out-Null
+          python c2pa-python/scripts/castlabs_release.py cargo-build `
+            --rust-root c2pa-rs `
+            --target x86_64-pc-windows-msvc `
+            --feature-report c2pa-python/release-out/features-x86_64-pc-windows-msvc.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Push-Location c2pa-python
+          python scripts/castlabs_release.py stage-native `
+            --target x86_64-pc-windows-msvc `
+            --source ../c2pa-rs/target/x86_64-pc-windows-msvc/release/c2pa_c.dll
+          python -m pip install setuptools==68.0.0 wheel==0.46.2 toml==0.10.2 twine==6.2.0
+          Remove-Item -Recurse -Force build,dist,src/c2pa/libs -ErrorAction SilentlyContinue
+          python setup.py bdist_wheel --plat-name win_amd64
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $wheels = @(Get-ChildItem dist/*.whl)
+          if ($wheels.Count -ne 1) { throw "expected exactly one Windows wheel" }
+          if ($wheels[0].Name -ne "c2pa_python-0.31.0+stardustproof.3-py3-none-win_amd64.whl") {
+            throw "unexpected Windows wheel $($wheels[0].Name)"
+          }
+          python -m twine check $wheels[0].FullName
+          python scripts/castlabs_release.py verify-wheel-native `
+            --wheel $wheels[0].FullName --target x86_64-pc-windows-msvc `
+            --native artifacts/x86_64-pc-windows-msvc/c2pa_c.dll `
+            --output release-out/c2pa_c.dll
+          Copy-Item $wheels[0].FullName release-out/
+          python --version 2>&1 | Out-File -Encoding ascii release-out/interpreter-x86_64-pc-windows-msvc.txt
+          Pop-Location
+
+      - name: Pack deterministic Windows native bundle and evidence
+        shell: pwsh
+        env:
+          SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.source_epoch }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          Push-Location c2pa-python
+          $bundle = "release-out/c2pa-python-0.31.0+stardustproof.3-native-windows-x86_64.tar.gz"
+          python scripts/castlabs_release.py pack --output $bundle `
+            --epoch $env:SOURCE_DATE_EPOCH `
+            --member x86_64-pc-windows-msvc/c2pa_c.dll=release-out/c2pa_c.dll
+          python scripts/castlabs_release.py checksum --artifact $bundle
+          $interpreter = (Get-Content release-out/interpreter-x86_64-pc-windows-msvc.txt).Trim()
+          python scripts/castlabs_release.py build-facts `
+            --target x86_64-pc-windows-msvc `
+            --feature-report release-out/features-x86_64-pc-windows-msvc.txt `
+            --epoch $env:SOURCE_DATE_EPOCH --interpreter $interpreter `
+            --output release-out/build-x86_64-pc-windows-msvc.json
+          python scripts/castlabs_release.py evidence `
+            --artifact $bundle --type native-bundle `
+            --source-sha "${{ needs.prepare.outputs.source_sha }}" `
+            --member x86_64-pc-windows-msvc=release-out/c2pa_c.dll `
+            --build-facts release-out/build-x86_64-pc-windows-msvc.json `
+            --output "$bundle.evidence.json"
+          python scripts/castlabs_release.py checksum `
+            --artifact "$bundle.evidence.json"
+          Pop-Location
+
+      - name: Upload exact Windows outputs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: castlabs-stable-fmp4-windows
+          path: c2pa-python/release-out/
+          if-no-files-found: error
+          retention-days: 7
+
+  test-linux-wheel:
+    needs: [prepare, linux]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-python
+          ref: ${{ needs.prepare.outputs.source_sha }}
+          path: c2pa-python
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: castlabs-stable-fmp4-linux
+          path: release-out
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Test installed wheel in a clean environment
+        shell: bash
+        env:
+          CASTLABS_RELEASE_EXPECTED_VERSION: 0.31.0+stardustproof.3
+          C2PA_SOURCE_BUILD_VERSION: 0.80.0
+        run: |
+          test "$(find release-out -maxdepth 1 -name '*.whl' | wc -l)" -eq 1
+          python -m venv "${RUNNER_TEMP}/wheel-test"
+          "${RUNNER_TEMP}/wheel-test/bin/python" -m pip install --upgrade pip
+          "${RUNNER_TEMP}/wheel-test/bin/python" -m pip install release-out/*.whl
+          "${RUNNER_TEMP}/wheel-test/bin/python" -m pip install pytest==8.4.1 cbor2==5.6.5
+          "${RUNNER_TEMP}/wheel-test/bin/python" -m pytest -q \
+            c2pa-python/tests/test_castlabs_release_smoke.py
+          if [[ "${{ matrix.python }}" == "3.10" ]]; then
+            "${RUNNER_TEMP}/wheel-test/bin/python" -m pytest -q \
+              c2pa-python/tests/test_unit_tests.py \
+              c2pa-python/tests/test_builder_sign_fragmented.py
+          fi
+
+  test-windows-wheel:
+    needs: [prepare, windows]
+    runs-on: windows-2022
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-python
+          ref: ${{ needs.prepare.outputs.source_sha }}
+          path: c2pa-python
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: castlabs-stable-fmp4-windows
+          path: release-out
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Test installed wheel in a clean environment
+        shell: pwsh
+        env:
+          CASTLABS_RELEASE_EXPECTED_VERSION: 0.31.0+stardustproof.3
+          C2PA_SOURCE_BUILD_VERSION: 0.80.0
+        run: |
+          $ErrorActionPreference = "Stop"
+          $PSNativeCommandUseErrorActionPreference = $true
+          $installedWheels = @(Get-ChildItem release-out/*.whl)
+          if ($installedWheels.Count -ne 1) { throw "expected exactly one Windows wheel" }
+          python -m venv "$env:RUNNER_TEMP\wheel-test"
+          & "$env:RUNNER_TEMP\wheel-test\Scripts\python.exe" -m pip install --upgrade pip
+          $wheel = (Get-ChildItem release-out/*.whl).FullName
+          & "$env:RUNNER_TEMP\wheel-test\Scripts\python.exe" -m pip install $wheel
+          & "$env:RUNNER_TEMP\wheel-test\Scripts\python.exe" -m pip install pytest==8.4.1 cbor2==5.6.5
+          & "$env:RUNNER_TEMP\wheel-test\Scripts\python.exe" -m pytest -q `
+            c2pa-python/tests/test_castlabs_release_smoke.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ("${{ matrix.python }}" -eq "3.10") {
+            & "$env:RUNNER_TEMP\wheel-test\Scripts\python.exe" -m pytest -q `
+              c2pa-python/tests/test_unit_tests.py `
+              c2pa-python/tests/test_builder_sign_fragmented.py
+          }
+
+  release:
+    needs: [prepare, linux, windows, test-linux-wheel, test-windows-wheel]
+    if: github.event_name == 'push' && github.ref == 'refs/tags/castlabs-v0.31.0+stardustproof.3'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: castlabs-stable-fmp4-release
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: castlabs/c2pa-python
+          ref: ${{ needs.prepare.outputs.source_sha }}
+          fetch-depth: 0
+          path: c2pa-python
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: castlabs-stable-fmp4-linux
+          path: collected/linux
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: castlabs-stable-fmp4-windows
+          path: collected/windows
+
+      - name: Assemble deterministic wheel bundle and schema-2 evidence
+        shell: bash
+        env:
+          SOURCE_DATE_EPOCH: ${{ needs.prepare.outputs.source_epoch }}
+        run: |
+          mkdir -p assets
+          cp collected/linux/features-x86_64-unknown-linux-gnu.txt assets/
+          cp collected/windows/features-x86_64-pc-windows-msvc.txt assets/
+          LINUX_WHEEL=$(find collected/linux -maxdepth 1 -name "*.whl")
+          WINDOWS_WHEEL=$(find collected/windows -maxdepth 1 -name "*.whl")
+          test "$(find collected/linux collected/windows -name "*.whl" | wc -l)" -eq 2
+          BUNDLE=assets/c2pa-python-0.31.0+stardustproof.3-py3-none-wheels.tar.gz
+          python3 c2pa-python/scripts/castlabs_release.py pack \
+            --output "$BUNDLE" --epoch "$SOURCE_DATE_EPOCH" \
+            --member "$(basename "$LINUX_WHEEL")=$LINUX_WHEEL" \
+            --member "$(basename "$WINDOWS_WHEEL")=$WINDOWS_WHEEL"
+          python3 c2pa-python/scripts/castlabs_release.py checksum --artifact "$BUNDLE"
+          python3 c2pa-python/scripts/castlabs_release.py evidence \
+            --artifact "$BUNDLE" --type wheel-bundle \
+            --source-sha "${{ needs.prepare.outputs.source_sha }}" \
+            --member "x86_64-unknown-linux-gnu=$LINUX_WHEEL" \
+            --member "x86_64-pc-windows-msvc=$WINDOWS_WHEEL" \
+            --build-facts collected/linux/build-x86_64-unknown-linux-gnu.json \
+            --build-facts collected/windows/build-x86_64-pc-windows-msvc.json \
+            --output "$BUNDLE.evidence.json"
+          python3 c2pa-python/scripts/castlabs_release.py checksum \
+            --artifact "$BUNDLE.evidence.json"
+          cp "$LINUX_WHEEL" "$WINDOWS_WHEEL" assets/
+          cp collected/linux/c2pa-python-0.31.0+stardustproof.3-native-linux-x86_64.tar.gz* assets/
+          cp collected/windows/c2pa-python-0.31.0+stardustproof.3-native-windows-x86_64.tar.gz* assets/
+          python3 c2pa-python/scripts/castlabs_release.py validate-evidence \
+            --evidence assets/c2pa-python-0.31.0+stardustproof.3-native-linux-x86_64.tar.gz.evidence.json \
+            --artifact-dir assets --source-sha "${{ needs.prepare.outputs.source_sha }}"
+          python3 c2pa-python/scripts/castlabs_release.py validate-evidence \
+            --evidence assets/c2pa-python-0.31.0+stardustproof.3-native-windows-x86_64.tar.gz.evidence.json \
+            --artifact-dir assets --source-sha "${{ needs.prepare.outputs.source_sha }}"
+          python3 c2pa-python/scripts/castlabs_release.py validate-evidence \
+            --evidence "$BUNDLE.evidence.json" --artifact-dir assets \
+            --source-sha "${{ needs.prepare.outputs.source_sha }}"
+          pushd assets
+          sha256sum --check *.sha256
+          popd
+          python3 c2pa-python/scripts/castlabs_release.py validate-release-assets \
+            --assets-dir assets
+
+      - name: Require immutable release tag
+        shell: bash
+        run: |
+          TAG=castlabs-v0.31.0+stardustproof.3
+          git -C c2pa-python fetch origin "refs/tags/${TAG}:refs/tags/${TAG}"
+          test "$(git -C c2pa-python rev-list -n 1 "$TAG")" = \
+            "${{ needs.prepare.outputs.source_sha }}"
+
+      - name: Attest immutable release files
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3.0.0
+        with:
+          subject-path: assets/*
+
+      - name: Reconcile and publish exact stable release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=castlabs-v0.31.0+stardustproof.3
+          SOURCE_SHA="${{ needs.prepare.outputs.source_sha }}"
+          RELEASE_NAME=$(python3 c2pa-python/scripts/castlabs_release.py release-value name)
+          RELEASE_BODY=$(python3 c2pa-python/scripts/castlabs_release.py release-value body)
+          RELEASE_ID=""
+          CREATED_DRAFT_ID=""
+          CLEANUP_ARMED=0
+
+          cleanup_current_draft() {
+            status=$?
+            if [[ "$status" -ne 0 && "$CLEANUP_ARMED" -eq 1 && -n "$CREATED_DRAFT_ID" ]]; then
+              if gh api \
+                "repos/castlabs/c2pa-python/releases/${CREATED_DRAFT_ID}" \
+                > release-cleanup-candidate.json 2>/dev/null && \
+                python3 c2pa-python/scripts/castlabs_release.py validate-owned-empty-draft \
+                  --release-json release-cleanup-candidate.json \
+                  --source-sha "$SOURCE_SHA" \
+                  --expected-release-id "$CREATED_DRAFT_ID"; then
+                gh api --method DELETE \
+                  "repos/castlabs/c2pa-python/releases/${CREATED_DRAFT_ID}" || \
+                  echo "failed to remove draft created by this run" >&2
+              fi
+            fi
+            exit "$status"
+          }
+          discover_release() {
+            gh api --paginate repos/castlabs/c2pa-python/releases \
+              --jq '.[] | select(.tag_name == "castlabs-v0.31.0+stardustproof.3")' > "$1"
+            return 0
+          }
+          query_release_id() {
+            gh api "repos/castlabs/c2pa-python/releases/$1" > "$2"
+            return 0
+          }
+          verify_tag_source() {
+            git -C c2pa-python fetch origin "refs/tags/${TAG}:refs/tags/${TAG}"
+            test "$(git -C c2pa-python rev-list -n 1 "$TAG")" = "$SOURCE_SHA"
+            return 0
+          }
+          download_existing() {
+            mkdir -p "$2"
+            while IFS=$'\t' read -r asset_id asset_name; do
+              [[ -n "$asset_id" ]] || continue
+              gh api -H "Accept: application/octet-stream" \
+                "repos/castlabs/c2pa-python/releases/assets/${asset_id}" \
+                > "$2/$asset_name"
+            done < "$1"
+            return 0
+          }
+          upload_missing() {
+            local upload_index=0
+            while IFS= read -r asset_name; do
+              [[ -n "$asset_name" ]] || continue
+              if [[ "$CLEANUP_ARMED" -eq 1 ]]; then
+                CLEANUP_ARMED=0
+              fi
+              local response="release-upload-${upload_index}.json"
+              local encoded_name
+              encoded_name=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$asset_name")
+              gh api --method POST \
+                -H "Content-Type: application/octet-stream" \
+                --input "assets/$asset_name" \
+                "https://uploads.github.com/repos/castlabs/c2pa-python/releases/${RELEASE_ID}/assets?name=${encoded_name}" \
+                > "$response"
+              python3 c2pa-python/scripts/castlabs_release.py validate-upload-response \
+                --response "$response" --asset "assets/$asset_name"
+              upload_index=$((upload_index + 1))
+            done < "$1"
+            return 0
+          }
+          trap cleanup_current_draft EXIT
+
+          discover_release release-discovery.json
+          python3 c2pa-python/scripts/castlabs_release.py inspect-draft-release \
+            --assets-dir assets --release-json release-discovery.json \
+            --source-sha "$SOURCE_SHA" \
+            --plan release-discovery-plan.json \
+            --download-list release-discovery-downloads.txt
+
+          RELEASE_EXISTS=$(python3 -c \
+            'import json; print(str(json.load(open("release-discovery-plan.json"))["releaseExists"]).lower())')
+          if [[ "$RELEASE_EXISTS" == true ]]; then
+            RELEASE_ID=$(python3 -c \
+              'import json; print(json.load(open("release-discovery-plan.json"))["releaseId"])')
+            [[ "$RELEASE_ID" =~ ^[0-9]+$ ]]
+            query_release_id "$RELEASE_ID" release-exact.json
+          else
+            verify_tag_source
+            gh api --method POST \
+              repos/castlabs/c2pa-python/releases \
+              -f "tag_name=$TAG" \
+              -f "target_commitish=$SOURCE_SHA" \
+              -f "name=$RELEASE_NAME" \
+              -f "body=$RELEASE_BODY" \
+              -F draft=true -F prerelease=false \
+              > release-created-response.json
+            python3 c2pa-python/scripts/castlabs_release.py extract-release-id \
+              --release-json release-created-response.json \
+              --id-output release-created-id.txt
+            RELEASE_ID=$(<release-created-id.txt)
+            CREATED_DRAFT_ID="$RELEASE_ID"
+            query_release_id "$RELEASE_ID" release-exact.json
+            python3 c2pa-python/scripts/castlabs_release.py validate-owned-empty-draft \
+              --release-json release-exact.json \
+              --source-sha "$SOURCE_SHA" \
+              --expected-release-id "$RELEASE_ID"
+            python3 c2pa-python/scripts/castlabs_release.py validate-created-release \
+              --release-json release-created-response.json \
+              --source-sha "$SOURCE_SHA" \
+              --expected-release-id "$RELEASE_ID" \
+              --id-output release-create-validated-id.txt
+            python3 c2pa-python/scripts/castlabs_release.py validate-created-release \
+              --release-json release-exact.json \
+              --source-sha "$SOURCE_SHA" \
+              --expected-release-id "$RELEASE_ID" \
+              --id-output release-requery-id.txt
+            CLEANUP_ARMED=1
+          fi
+
+          python3 c2pa-python/scripts/castlabs_release.py inspect-draft-release \
+            --assets-dir assets --release-json release-exact.json \
+            --source-sha "$SOURCE_SHA" --expected-release-id "$RELEASE_ID" \
+            --plan release-exact-plan.json \
+            --download-list release-exact-downloads.txt
+          download_existing release-exact-downloads.txt existing-exact
+          python3 c2pa-python/scripts/castlabs_release.py verify-draft-release \
+            --assets-dir assets --existing-dir existing-exact \
+            --plan release-exact-plan.json \
+            --missing-list release-missing.txt
+          upload_missing release-missing.txt
+
+          verify_tag_source
+          query_release_id "$RELEASE_ID" release-final.json
+          python3 c2pa-python/scripts/castlabs_release.py inspect-draft-release \
+            --assets-dir assets --release-json release-final.json \
+            --source-sha "$SOURCE_SHA" --expected-release-id "$RELEASE_ID" \
+            --plan release-final-plan.json \
+            --download-list release-final-downloads.txt
+          download_existing release-final-downloads.txt existing-final
+          python3 c2pa-python/scripts/castlabs_release.py verify-draft-release \
+            --assets-dir assets --existing-dir existing-final \
+            --plan release-final-plan.json \
+            --missing-list release-final-missing.txt --require-complete
+
+          CLEANUP_ARMED=0
+          trap - EXIT
+          verify_tag_source
+          query_release_id "$RELEASE_ID" release-prepublish.json
+          python3 c2pa-python/scripts/castlabs_release.py inspect-draft-release \
+            --assets-dir assets --release-json release-prepublish.json \
+            --source-sha "$SOURCE_SHA" --expected-release-id "$RELEASE_ID" \
+            --plan release-prepublish-plan.json \
+            --download-list release-prepublish-downloads.txt
+          download_existing release-prepublish-downloads.txt existing-prepublish
+          python3 c2pa-python/scripts/castlabs_release.py verify-draft-release \
+            --assets-dir assets --existing-dir existing-prepublish \
+            --plan release-prepublish-plan.json \
+            --missing-list release-prepublish-missing.txt --require-complete
+          cmp release-final-plan.json release-prepublish-plan.json
+          gh api --method PATCH "repos/castlabs/c2pa-python/releases/${RELEASE_ID}" \
+            -F draft=false > release-published.json
+          python3 c2pa-python/scripts/castlabs_release.py validate-published-release \
+            --release-json release-published.json --source-sha "$SOURCE_SHA" \
+            --expected-release-id "$RELEASE_ID" --plan release-prepublish-plan.json
+          verify_tag_source

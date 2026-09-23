@@ -1,4 +1,4 @@
 [submodule "c2pa-rs"]
 	path = c2pa-rs
-	url = https://github.com/mstattma/c2pa-rs.git
-	branch = feat/dynamic-assertion-ffi
+	url = https://github.com/castlabs/c2pa-rs.git
+	branch = fix/stable-single-file-fmp4

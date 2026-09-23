@@ -1,0 +1,2582 @@
+c2pa-c-ffi v0.80.0 (/root/opencode-worktrees/c2pa-rs-stable-fmp4/c2pa_c_ffi)_features=[add_thumbnails,default,file_io,http]
+|-- base64 feature "default"
+|   |-- base64 v0.22.1_features=[alloc,default,std]
+|   `-- base64 feature "std"
+|       |-- base64 v0.22.1_features=[alloc,default,std]
+|       `-- base64 feature "alloc"
+|           `-- base64 v0.22.1_features=[alloc,default,std]
+|-- c2pa feature "fetch_remote_manifests"
+|   `-- c2pa v0.80.0 (/root/opencode-worktrees/c2pa-rs-stable-fmp4/sdk)_features=[add_thumbnails,fetch_remote_manifests,file_io,http_reqwest,http_reqwest_blocking,image,openssl,pdf]
+|       |-- byteorder v1.5.0_features=[default,i128,std]
+|       |-- zip v8.5.1_features=[]
+|       |   |-- memchr feature "default"
+|       |   |   |-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   `-- memchr feature "std"
+|       |   |       |-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |       `-- memchr feature "alloc"
+|       |   |           `-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |-- indexmap feature "default"
+|       |   |   |-- indexmap v2.14.0_features=[default,std]
+|       |   |   |   |-- equivalent v1.0.2_features=[]
+|       |   |   |   `-- hashbrown v0.17.0_features=[]
+|       |   |   `-- indexmap feature "std"
+|       |   |       `-- indexmap v2.14.0_features=[default,std] (*)
+|       |   |-- crc32fast feature "default"
+|       |   |   |-- crc32fast v1.5.0_features=[default,std]
+|       |   |   |   `-- cfg-if feature "default"
+|       |   |   |       `-- cfg-if v1.0.4_features=[]
+|       |   |   `-- crc32fast feature "std"
+|       |   |       `-- crc32fast v1.5.0_features=[default,std] (*)
+|       |   `-- typed-path feature "default"
+|       |       |-- typed-path v0.12.3_features=[default,std]
+|       |       `-- typed-path feature "std"
+|       |           `-- typed-path v0.12.3_features=[default,std]
+|       |-- base64 feature "default" (*)
+|       |-- asn1-rs feature "default"
+|       |   |-- asn1-rs v0.7.1_features=[datetime,default,std,time]
+|       |   |   |-- asn1-rs-derive feature "default"
+|       |   |   |   `-- asn1-rs-derive v0.6.0 (proc-macro)_features=[]
+|       |   |   |       |-- proc-macro2 feature "default"
+|       |   |   |       |   |-- proc-macro2 v1.0.106_features=[default,proc-macro]
+|       |   |   |       |   |   `-- unicode-ident feature "default"
+|       |   |   |       |   |       `-- unicode-ident v1.0.24_features=[]
+|       |   |   |       |   `-- proc-macro2 feature "proc-macro"
+|       |   |   |       |       `-- proc-macro2 v1.0.106_features=[default,proc-macro] (*)
+|       |   |   |       |-- quote feature "default"
+|       |   |   |       |   |-- quote v1.0.45_features=[default,proc-macro]
+|       |   |   |       |   |   `-- proc-macro2 v1.0.106_features=[default,proc-macro] (*)
+|       |   |   |       |   `-- quote feature "proc-macro"
+|       |   |   |       |       |-- quote v1.0.45_features=[default,proc-macro] (*)
+|       |   |   |       |       `-- proc-macro2 feature "proc-macro" (*)
+|       |   |   |       |-- syn feature "default"
+|       |   |   |       |   |-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut]
+|       |   |   |       |   |   |-- proc-macro2 v1.0.106_features=[default,proc-macro] (*)
+|       |   |   |       |   |   |-- quote v1.0.45_features=[default,proc-macro] (*)
+|       |   |   |       |   |   `-- unicode-ident feature "default" (*)
+|       |   |   |       |   |-- syn feature "clone-impls"
+|       |   |   |       |   |   `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |   |       |   |-- syn feature "derive"
+|       |   |   |       |   |   `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |   |       |   |-- syn feature "parsing"
+|       |   |   |       |   |   `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |   |       |   |-- syn feature "printing"
+|       |   |   |       |   |   `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |   |       |   `-- syn feature "proc-macro"
+|       |   |   |       |       |-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |   |       |       |-- proc-macro2 feature "proc-macro" (*)
+|       |   |   |       |       `-- quote feature "proc-macro" (*)
+|       |   |   |       |-- syn feature "full"
+|       |   |   |       |   `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |   |       `-- synstructure feature "default"
+|       |   |   |           |-- synstructure v0.13.2_features=[default,proc-macro]
+|       |   |   |           |   |-- proc-macro2 v1.0.106_features=[default,proc-macro] (*)
+|       |   |   |           |   |-- quote v1.0.45_features=[default,proc-macro] (*)
+|       |   |   |           |   |-- syn feature "clone-impls" (*)
+|       |   |   |           |   |-- syn feature "derive" (*)
+|       |   |   |           |   |-- syn feature "extra-traits"
+|       |   |   |           |   |   `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |   |           |   |-- syn feature "parsing" (*)
+|       |   |   |           |   |-- syn feature "printing" (*)
+|       |   |   |           |   `-- syn feature "visit"
+|       |   |   |           |       `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |   |           `-- synstructure feature "proc-macro"
+|       |   |   |               |-- synstructure v0.13.2_features=[default,proc-macro] (*)
+|       |   |   |               |-- proc-macro2 feature "proc-macro" (*)
+|       |   |   |               |-- quote feature "proc-macro" (*)
+|       |   |   |               `-- syn feature "proc-macro" (*)
+|       |   |   |-- asn1-rs-impl feature "default"
+|       |   |   |   `-- asn1-rs-impl v0.2.0 (proc-macro)_features=[]
+|       |   |   |       |-- proc-macro2 feature "default" (*)
+|       |   |   |       |-- quote feature "default" (*)
+|       |   |   |       `-- syn feature "default" (*)
+|       |   |   |-- displaydoc feature "default"
+|       |   |   |   |-- displaydoc v0.2.5 (proc-macro)_features=[default,std]
+|       |   |   |   |   |-- proc-macro2 feature "default" (*)
+|       |   |   |   |   |-- quote feature "default" (*)
+|       |   |   |   |   `-- syn feature "default" (*)
+|       |   |   |   `-- displaydoc feature "std"
+|       |   |   |       `-- displaydoc v0.2.5 (proc-macro)_features=[default,std] (*)
+|       |   |   |-- nom feature "std"
+|       |   |   |   |-- nom v7.1.3_features=[alloc,default,std]
+|       |   |   |   |   |-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   |   |   `-- minimal-lexical v0.2.1_features=[std]
+|       |   |   |   |-- nom feature "alloc"
+|       |   |   |   |   `-- nom v7.1.3_features=[alloc,default,std] (*)
+|       |   |   |   |-- memchr feature "std" (*)
+|       |   |   |   `-- minimal-lexical feature "std"
+|       |   |   |       `-- minimal-lexical v0.2.1_features=[std]
+|       |   |   |-- num-traits feature "default"
+|       |   |   |   |-- num-traits v0.2.19_features=[default,i128,std]
+|       |   |   |   |   [build-dependencies]
+|       |   |   |   |   `-- autocfg feature "default"
+|       |   |   |   |       `-- autocfg v1.5.0_features=[]
+|       |   |   |   `-- num-traits feature "std"
+|       |   |   |       `-- num-traits v0.2.19_features=[default,i128,std] (*)
+|       |   |   |-- rusticata-macros feature "default"
+|       |   |   |   `-- rusticata-macros v4.1.0_features=[]
+|       |   |   |       `-- nom feature "std" (*)
+|       |   |   |-- thiserror feature "default"
+|       |   |   |   |-- thiserror v2.0.18_features=[default,std]
+|       |   |   |   |   `-- thiserror-impl feature "default"
+|       |   |   |   |       `-- thiserror-impl v2.0.18 (proc-macro)_features=[]
+|       |   |   |   |           |-- proc-macro2 feature "default" (*)
+|       |   |   |   |           |-- quote feature "default" (*)
+|       |   |   |   |           `-- syn feature "default" (*)
+|       |   |   |   `-- thiserror feature "std"
+|       |   |   |       `-- thiserror v2.0.18_features=[default,std] (*)
+|       |   |   |-- time feature "default"
+|       |   |   |   |-- time v0.3.47_features=[alloc,default,formatting,macros,parsing,std]
+|       |   |   |   |   |-- powerfmt v0.2.0_features=[]
+|       |   |   |   |   |-- deranged feature "default"
+|       |   |   |   |   |   `-- deranged v0.5.8_features=[default,powerfmt]
+|       |   |   |   |   |       `-- powerfmt v0.2.0_features=[]
+|       |   |   |   |   |-- deranged feature "powerfmt"
+|       |   |   |   |   |   `-- deranged v0.5.8_features=[default,powerfmt] (*)
+|       |   |   |   |   |-- itoa feature "default"
+|       |   |   |   |   |   `-- itoa v1.0.18_features=[]
+|       |   |   |   |   |-- num-conv feature "default"
+|       |   |   |   |   |   `-- num-conv v0.2.1_features=[]
+|       |   |   |   |   |-- time-core feature "default"
+|       |   |   |   |   |   `-- time-core v0.1.8_features=[]
+|       |   |   |   |   `-- time-macros feature "default"
+|       |   |   |   |       `-- time-macros v0.2.27 (proc-macro)_features=[formatting,parsing]
+|       |   |   |   |           |-- num-conv feature "default"
+|       |   |   |   |           |   `-- num-conv v0.2.1_features=[]
+|       |   |   |   |           `-- time-core feature "default"
+|       |   |   |   |               `-- time-core v0.1.8_features=[]
+|       |   |   |   `-- time feature "std"
+|       |   |   |       |-- time v0.3.47_features=[alloc,default,formatting,macros,parsing,std] (*)
+|       |   |   |       `-- time feature "alloc"
+|       |   |   |           `-- time v0.3.47_features=[alloc,default,formatting,macros,parsing,std] (*)
+|       |   |   |-- time feature "formatting"
+|       |   |   |   |-- time v0.3.47_features=[alloc,default,formatting,macros,parsing,std] (*)
+|       |   |   |   |-- time feature "std" (*)
+|       |   |   |   `-- time-macros feature "formatting"
+|       |   |   |       `-- time-macros v0.2.27 (proc-macro)_features=[formatting,parsing] (*)
+|       |   |   |-- time feature "macros"
+|       |   |   |   `-- time v0.3.47_features=[alloc,default,formatting,macros,parsing,std] (*)
+|       |   |   `-- time feature "parsing"
+|       |   |       |-- time v0.3.47_features=[alloc,default,formatting,macros,parsing,std] (*)
+|       |   |       `-- time-macros feature "parsing"
+|       |   |           `-- time-macros v0.2.27 (proc-macro)_features=[formatting,parsing] (*)
+|       |   `-- asn1-rs feature "std"
+|       |       `-- asn1-rs v0.7.1_features=[datetime,default,std,time] (*)
+|       |-- nom feature "default"
+|       |   |-- nom v7.1.3_features=[alloc,default,std] (*)
+|       |   `-- nom feature "std" (*)
+|       |-- memchr feature "default" (*)
+|       |-- thiserror feature "default" (*)
+|       |-- async-generic feature "default"
+|       |   `-- async-generic v1.1.2 (proc-macro)_features=[]
+|       |       |-- proc-macro2 feature "default" (*)
+|       |       |-- quote feature "default" (*)
+|       |       |-- syn feature "default" (*)
+|       |       |-- syn feature "full" (*)
+|       |       `-- syn feature "visit-mut"
+|       |           `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |-- async-trait feature "default"
+|       |   `-- async-trait v0.1.89 (proc-macro)_features=[]
+|       |       |-- proc-macro2 feature "default" (*)
+|       |       |-- quote feature "default" (*)
+|       |       |-- syn feature "clone-impls" (*)
+|       |       |-- syn feature "full" (*)
+|       |       |-- syn feature "parsing" (*)
+|       |       |-- syn feature "printing" (*)
+|       |       |-- syn feature "proc-macro" (*)
+|       |       `-- syn feature "visit-mut" (*)
+|       |-- atree feature "default"
+|       |   `-- atree v0.5.2_features=[]
+|       |-- bcder feature "default"
+|       |   `-- bcder v0.7.6_features=[]
+|       |       |-- bytes feature "default"
+|       |       |   |-- bytes v1.11.1_features=[default,std]
+|       |       |   `-- bytes feature "std"
+|       |       |       `-- bytes v1.11.1_features=[default,std]
+|       |       `-- smallvec feature "default"
+|       |           `-- smallvec v1.15.1_features=[const_generics,const_new]
+|       |-- bytes feature "default" (*)
+|       |-- brotli feature "default"
+|       |   |-- brotli v7.0.0_features=[alloc-stdlib,default,std]
+|       |   |   |-- brotli-decompressor v4.0.3_features=[alloc-stdlib,std]
+|       |   |   |   |-- alloc-no-stdlib feature "default"
+|       |   |   |   |   `-- alloc-no-stdlib v2.0.4_features=[]
+|       |   |   |   `-- alloc-stdlib feature "default"
+|       |   |   |       `-- alloc-stdlib v0.2.2_features=[]
+|       |   |   |           `-- alloc-no-stdlib feature "default" (*)
+|       |   |   |-- alloc-no-stdlib feature "default" (*)
+|       |   |   `-- alloc-stdlib feature "default" (*)
+|       |   `-- brotli feature "std"
+|       |       |-- brotli v7.0.0_features=[alloc-stdlib,default,std] (*)
+|       |       |-- brotli feature "alloc-stdlib"
+|       |       |   `-- brotli v7.0.0_features=[alloc-stdlib,default,std] (*)
+|       |       `-- brotli-decompressor feature "std"
+|       |           |-- brotli-decompressor v4.0.3_features=[alloc-stdlib,std] (*)
+|       |           `-- brotli-decompressor feature "alloc-stdlib"
+|       |               `-- brotli-decompressor v4.0.3_features=[alloc-stdlib,std] (*)
+|       |-- byteordered feature "default"
+|       |   `-- byteordered v0.6.0_features=[]
+|       |       |-- byteorder feature "default"
+|       |       |   |-- byteorder v1.5.0_features=[default,i128,std]
+|       |       |   `-- byteorder feature "std"
+|       |       |       `-- byteorder v1.5.0_features=[default,i128,std]
+|       |       `-- byteorder feature "i128"
+|       |           `-- byteorder v1.5.0_features=[default,i128,std]
+|       |-- c2pa_cbor feature "default"
+|       |   `-- c2pa_cbor v0.77.2_features=[]
+|       |       |-- half feature "default"
+|       |       |   |-- half v2.7.1_features=[alloc,default,std]
+|       |       |   |   |-- cfg-if feature "default" (*)
+|       |       |   |   |-- zerocopy feature "derive"
+|       |       |   |   |   |-- zerocopy v0.8.48_features=[derive,simd,zerocopy-derive]
+|       |       |   |   |   |   `-- zerocopy-derive feature "default"
+|       |       |   |   |   |       `-- zerocopy-derive v0.8.48 (proc-macro)_features=[]
+|       |       |   |   |   |           |-- proc-macro2 feature "default" (*)
+|       |       |   |   |   |           |-- quote feature "default" (*)
+|       |       |   |   |   |           |-- syn feature "default" (*)
+|       |       |   |   |   |           `-- syn feature "full" (*)
+|       |       |   |   |   `-- zerocopy feature "zerocopy-derive"
+|       |       |   |   |       `-- zerocopy v0.8.48_features=[derive,simd,zerocopy-derive] (*)
+|       |       |   |   `-- zerocopy feature "simd"
+|       |       |   |       `-- zerocopy v0.8.48_features=[derive,simd,zerocopy-derive] (*)
+|       |       |   `-- half feature "std"
+|       |       |       |-- half v2.7.1_features=[alloc,default,std] (*)
+|       |       |       `-- half feature "alloc"
+|       |       |           `-- half v2.7.1_features=[alloc,default,std] (*)
+|       |       |-- serde feature "default"
+|       |       |   |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std]
+|       |       |   |   |-- serde_core feature "result"
+|       |       |   |   |   `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |       |   |   `-- serde_derive feature "default"
+|       |       |   |       `-- serde_derive v1.0.228 (proc-macro)_features=[default]
+|       |       |   |           |-- proc-macro2 feature "proc-macro" (*)
+|       |       |   |           |-- quote feature "proc-macro" (*)
+|       |       |   |           |-- syn feature "clone-impls" (*)
+|       |       |   |           |-- syn feature "derive" (*)
+|       |       |   |           |-- syn feature "parsing" (*)
+|       |       |   |           |-- syn feature "printing" (*)
+|       |       |   |           `-- syn feature "proc-macro" (*)
+|       |       |   `-- serde feature "std"
+|       |       |       |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |       |       `-- serde_core feature "std"
+|       |       |           `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |       |-- serde feature "derive"
+|       |       |   |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |       |   `-- serde feature "serde_derive"
+|       |       |       `-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |       `-- serde_bytes feature "default"
+|       |           |-- serde_bytes v0.11.19_features=[default,std]
+|       |           |   `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |           `-- serde_bytes feature "std"
+|       |               |-- serde_bytes v0.11.19_features=[default,std] (*)
+|       |               `-- serde_core feature "std" (*)
+|       |-- serde feature "default" (*)
+|       |-- serde feature "derive" (*)
+|       |-- serde_derive feature "default" (*)
+|       |-- serde_bytes feature "default" (*)
+|       |-- chrono feature "now"
+|       |   |-- chrono v0.4.44_features=[alloc,clock,iana-time-zone,now,serde,std,winapi,windows-link]
+|       |   |   |-- num-traits v0.2.19_features=[default,i128,std] (*)
+|       |   |   |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |   |   |-- iana-time-zone feature "default"
+|       |   |   |   `-- iana-time-zone v0.1.65_features=[fallback]
+|       |   |   `-- iana-time-zone feature "fallback"
+|       |   |       `-- iana-time-zone v0.1.65_features=[fallback]
+|       |   `-- chrono feature "std"
+|       |       |-- chrono v0.4.44_features=[alloc,clock,iana-time-zone,now,serde,std,winapi,windows-link] (*)
+|       |       `-- chrono feature "alloc"
+|       |           `-- chrono v0.4.44_features=[alloc,clock,iana-time-zone,now,serde,std,winapi,windows-link] (*)
+|       |-- chrono feature "serde"
+|       |   `-- chrono v0.4.44_features=[alloc,clock,iana-time-zone,now,serde,std,winapi,windows-link] (*)
+|       |-- config feature "json"
+|       |   |-- config v0.14.1_features=[json,serde_json,toml]
+|       |   |   |-- nom feature "default" (*)
+|       |   |   |-- serde feature "default" (*)
+|       |   |   |-- pathdiff feature "default"
+|       |   |   |   `-- pathdiff v0.2.3_features=[]
+|       |   |   |-- serde_json feature "default"
+|       |   |   |   |-- serde_json v1.0.149_features=[alloc,default,indexmap,preserve_order,std]
+|       |   |   |   |   |-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   |   |   |-- serde_core v1.0.228_features=[alloc,result,std]
+|       |   |   |   |   |-- itoa feature "default" (*)
+|       |   |   |   |   |-- indexmap feature "default" (*)
+|       |   |   |   |   `-- zmij feature "default"
+|       |   |   |   |       `-- zmij v1.0.21_features=[]
+|       |   |   |   `-- serde_json feature "std"
+|       |   |   |       |-- serde_json v1.0.149_features=[alloc,default,indexmap,preserve_order,std] (*)
+|       |   |   |       |-- memchr feature "std" (*)
+|       |   |   |       `-- serde_core feature "std" (*)
+|       |   |   `-- toml feature "default"
+|       |   |       |-- toml v0.8.23_features=[default,display,parse]
+|       |   |       |   |-- serde feature "default" (*)
+|       |   |       |   |-- serde_spanned feature "default"
+|       |   |       |   |   `-- serde_spanned v0.6.9_features=[serde]
+|       |   |       |   |       `-- serde feature "default" (*)
+|       |   |       |   |-- serde_spanned feature "serde"
+|       |   |       |   |   `-- serde_spanned v0.6.9_features=[serde] (*)
+|       |   |       |   |-- toml_datetime feature "default"
+|       |   |       |   |   `-- toml_datetime v0.6.11_features=[serde]
+|       |   |       |   |       `-- serde feature "default" (*)
+|       |   |       |   |-- toml_datetime feature "serde"
+|       |   |       |   |   `-- toml_datetime v0.6.11_features=[serde] (*)
+|       |   |       |   `-- toml_edit feature "serde"
+|       |   |       |       |-- toml_edit v0.22.27_features=[display,parse,serde]
+|       |   |       |       |   |-- serde feature "default" (*)
+|       |   |       |       |   |-- indexmap feature "default" (*)
+|       |   |       |       |   |-- indexmap feature "std" (*)
+|       |   |       |       |   |-- serde_spanned feature "default" (*)
+|       |   |       |       |   |-- serde_spanned feature "serde" (*)
+|       |   |       |       |   |-- toml_datetime feature "default" (*)
+|       |   |       |       |   |-- toml_write feature "default"
+|       |   |       |       |   |   |-- toml_write v0.1.2_features=[alloc,default,std]
+|       |   |       |       |   |   `-- toml_write feature "std"
+|       |   |       |       |   |       |-- toml_write v0.1.2_features=[alloc,default,std]
+|       |   |       |       |   |       `-- toml_write feature "alloc"
+|       |   |       |       |   |           `-- toml_write v0.1.2_features=[alloc,default,std]
+|       |   |       |       |   `-- winnow feature "default"
+|       |   |       |       |       |-- winnow v0.7.15_features=[alloc,default,std]
+|       |   |       |       |       `-- winnow feature "std"
+|       |   |       |       |           |-- winnow v0.7.15_features=[alloc,default,std]
+|       |   |       |       |           `-- winnow feature "alloc"
+|       |   |       |       |               `-- winnow v0.7.15_features=[alloc,default,std]
+|       |   |       |       `-- toml_datetime feature "serde" (*)
+|       |   |       |-- toml feature "display"
+|       |   |       |   |-- toml v0.8.23_features=[default,display,parse] (*)
+|       |   |       |   `-- toml_edit feature "display"
+|       |   |       |       `-- toml_edit v0.22.27_features=[display,parse,serde] (*)
+|       |   |       `-- toml feature "parse"
+|       |   |           |-- toml v0.8.23_features=[default,display,parse] (*)
+|       |   |           `-- toml_edit feature "parse"
+|       |   |               `-- toml_edit v0.22.27_features=[display,parse,serde] (*)
+|       |   `-- config feature "serde_json"
+|       |       `-- config v0.14.1_features=[json,serde_json,toml] (*)
+|       |-- config feature "toml"
+|       |   `-- config v0.14.1_features=[json,serde_json,toml] (*)
+|       |-- serde_json feature "default" (*)
+|       |-- serde_json feature "preserve_order"
+|       |   |-- serde_json v1.0.149_features=[alloc,default,indexmap,preserve_order,std] (*)
+|       |   |-- serde_json feature "indexmap"
+|       |   |   `-- serde_json v1.0.149_features=[alloc,default,indexmap,preserve_order,std] (*)
+|       |   `-- serde_json feature "std" (*)
+|       |-- const-hex feature "default"
+|       |   |-- const-hex v1.18.1_features=[alloc,default,std]
+|       |   |   |-- cfg-if feature "default" (*)
+|       |   |   `-- cpufeatures feature "default"
+|       |   |       `-- cpufeatures v0.2.17_features=[]
+|       |   `-- const-hex feature "std"
+|       |       |-- const-hex v1.18.1_features=[alloc,default,std] (*)
+|       |       `-- const-hex feature "alloc"
+|       |           `-- const-hex v1.18.1_features=[alloc,default,std] (*)
+|       |-- coset feature "default"
+|       |   `-- coset v0.4.2_features=[default]
+|       |       |-- ciborium v0.2.2_features=[]
+|       |       |   |-- serde feature "alloc"
+|       |       |   |   |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |       |   |   `-- serde_core feature "alloc"
+|       |       |   |       `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |       |   |-- serde feature "derive" (*)
+|       |       |   |-- ciborium-io feature "alloc"
+|       |       |   |   `-- ciborium-io v0.2.2_features=[alloc]
+|       |       |   |-- ciborium-io feature "default"
+|       |       |   |   `-- ciborium-io v0.2.2_features=[alloc]
+|       |       |   `-- ciborium-ll feature "default"
+|       |       |       `-- ciborium-ll v0.2.2_features=[]
+|       |       |           |-- half v2.7.1_features=[alloc,default,std] (*)
+|       |       |           `-- ciborium-io feature "default" (*)
+|       |       |-- ciborium-io feature "alloc" (*)
+|       |       `-- ciborium-io feature "default" (*)
+|       |-- der feature "alloc"
+|       |   |-- der v0.7.10_features=[alloc,oid,pem,std,zeroize]
+|       |   |   |-- zeroize v1.8.2_features=[alloc,default,zeroize_derive]
+|       |   |   |   `-- zeroize_derive feature "default"
+|       |   |   |       `-- zeroize_derive v1.4.3 (proc-macro)_features=[]
+|       |   |   |           |-- proc-macro2 feature "default" (*)
+|       |   |   |           |-- quote feature "default" (*)
+|       |   |   |           |-- syn feature "default" (*)
+|       |   |   |           |-- syn feature "extra-traits" (*)
+|       |   |   |           |-- syn feature "full" (*)
+|       |   |   |           `-- syn feature "visit" (*)
+|       |   |   |-- const-oid feature "default"
+|       |   |   |   `-- const-oid v0.9.6_features=[]
+|       |   |   |-- pem-rfc7468 feature "alloc"
+|       |   |   |   |-- pem-rfc7468 v0.7.0_features=[alloc]
+|       |   |   |   |   `-- base64ct feature "default"
+|       |   |   |   |       `-- base64ct v1.8.3_features=[alloc]
+|       |   |   |   `-- base64ct feature "alloc"
+|       |   |   |       `-- base64ct v1.8.3_features=[alloc]
+|       |   |   `-- pem-rfc7468 feature "default"
+|       |   |       `-- pem-rfc7468 v0.7.0_features=[alloc] (*)
+|       |   `-- zeroize feature "alloc"
+|       |       `-- zeroize v1.8.2_features=[alloc,default,zeroize_derive] (*)
+|       |-- der feature "default"
+|       |   `-- der v0.7.10_features=[alloc,oid,pem,std,zeroize] (*)
+|       |-- zeroize feature "default"
+|       |   |-- zeroize v1.8.2_features=[alloc,default,zeroize_derive] (*)
+|       |   `-- zeroize feature "alloc" (*)
+|       |-- zeroize feature "zeroize_derive"
+|       |   `-- zeroize v1.8.2_features=[alloc,default,zeroize_derive] (*)
+|       |-- ed25519-dalek feature "alloc"
+|       |   |-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize]
+|       |   |   |-- ed25519 v2.2.3_features=[alloc,pem,pkcs8,std]
+|       |   |   |   |-- signature v2.2.0_features=[alloc,digest,std]
+|       |   |   |   |   `-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std]
+|       |   |   |   |       |-- block-buffer feature "default"
+|       |   |   |   |       |   `-- block-buffer v0.10.4_features=[]
+|       |   |   |   |       |       `-- generic-array feature "default"
+|       |   |   |   |       |           `-- generic-array v0.14.7_features=[more_lengths]
+|       |   |   |   |       |               `-- typenum feature "default"
+|       |   |   |   |       |                   `-- typenum v1.19.0_features=[]
+|       |   |   |   |       |               [build-dependencies]
+|       |   |   |   |       |               `-- version_check feature "default"
+|       |   |   |   |       |                   `-- version_check v0.9.5_features=[]
+|       |   |   |   |       `-- crypto-common feature "default"
+|       |   |   |   |           `-- crypto-common v0.1.7_features=[std]
+|       |   |   |   |               |-- generic-array feature "default" (*)
+|       |   |   |   |               |-- generic-array feature "more_lengths"
+|       |   |   |   |               |   `-- generic-array v0.14.7_features=[more_lengths] (*)
+|       |   |   |   |               `-- typenum feature "default" (*)
+|       |   |   |   `-- pkcs8 feature "default"
+|       |   |   |       `-- pkcs8 v0.10.2_features=[alloc,pem,std]
+|       |   |   |           |-- der feature "default" (*)
+|       |   |   |           |-- der feature "oid"
+|       |   |   |           |   `-- der v0.7.10_features=[alloc,oid,pem,std,zeroize] (*)
+|       |   |   |           `-- spki feature "default"
+|       |   |   |               `-- spki v0.7.3_features=[alloc,pem,std]
+|       |   |   |                   |-- der feature "default" (*)
+|       |   |   |                   `-- der feature "oid" (*)
+|       |   |   |-- rand_core v0.6.4_features=[alloc,getrandom,std]
+|       |   |   |   `-- getrandom feature "default"
+|       |   |   |       `-- getrandom v0.2.17_features=[std]
+|       |   |   |           |-- libc v0.2.185_features=[default,std]
+|       |   |   |           `-- cfg-if feature "default" (*)
+|       |   |   |-- sha2 v0.10.9_features=[default,std]
+|       |   |   |   |-- cfg-if feature "default" (*)
+|       |   |   |   |-- cpufeatures feature "default" (*)
+|       |   |   |   `-- digest feature "default"
+|       |   |   |       |-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |   |   |       `-- digest feature "core-api"
+|       |   |   |           |-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |   |   |           `-- digest feature "block-buffer"
+|       |   |   |               `-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |   |   |-- signature v2.2.0_features=[alloc,digest,std] (*)
+|       |   |   |-- subtle v2.6.1_features=[]
+|       |   |   |-- zeroize v1.8.2_features=[alloc,default,zeroize_derive] (*)
+|       |   |   `-- curve25519-dalek feature "digest"
+|       |   |       `-- curve25519-dalek v4.1.3_features=[alloc,digest,precomputed-tables,zeroize]
+|       |   |           |-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |   |           |-- subtle v2.6.1_features=[]
+|       |   |           |-- zeroize v1.8.2_features=[alloc,default,zeroize_derive] (*)
+|       |   |           |-- cfg-if feature "default" (*)
+|       |   |           |-- cpufeatures feature "default" (*)
+|       |   |           `-- curve25519-dalek-derive feature "default"
+|       |   |               `-- curve25519-dalek-derive v0.1.1 (proc-macro)_features=[]
+|       |   |                   |-- proc-macro2 feature "default" (*)
+|       |   |                   |-- quote feature "default" (*)
+|       |   |                   |-- syn feature "default" (*)
+|       |   |                   `-- syn feature "full" (*)
+|       |   |           [build-dependencies]
+|       |   |           `-- rustc_version feature "default"
+|       |   |               `-- rustc_version v0.4.1_features=[]
+|       |   |                   `-- semver feature "default"
+|       |   |                       |-- semver v1.0.28_features=[default,std]
+|       |   |                       `-- semver feature "std"
+|       |   |                           `-- semver v1.0.28_features=[default,std]
+|       |   |-- zeroize feature "alloc" (*)
+|       |   |-- ed25519-dalek feature "zeroize"
+|       |   |   |-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |   |   `-- curve25519-dalek feature "zeroize"
+|       |   |       `-- curve25519-dalek v4.1.3_features=[alloc,digest,precomputed-tables,zeroize] (*)
+|       |   |-- curve25519-dalek feature "alloc"
+|       |   |   |-- curve25519-dalek v4.1.3_features=[alloc,digest,precomputed-tables,zeroize] (*)
+|       |   |   `-- zeroize feature "alloc" (*)
+|       |   `-- ed25519 feature "alloc"
+|       |       |-- ed25519 v2.2.3_features=[alloc,pem,pkcs8,std] (*)
+|       |       `-- pkcs8 feature "alloc"
+|       |           |-- pkcs8 v0.10.2_features=[alloc,pem,std] (*)
+|       |           |-- der feature "alloc" (*)
+|       |           |-- der feature "zeroize"
+|       |           |   `-- der v0.7.10_features=[alloc,oid,pem,std,zeroize] (*)
+|       |           `-- spki feature "alloc"
+|       |               |-- spki v0.7.3_features=[alloc,pem,std] (*)
+|       |               `-- der feature "alloc" (*)
+|       |-- ed25519-dalek feature "default"
+|       |   |-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |   |-- ed25519-dalek feature "fast"
+|       |   |   |-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |   |   `-- curve25519-dalek feature "precomputed-tables"
+|       |   |       `-- curve25519-dalek v4.1.3_features=[alloc,digest,precomputed-tables,zeroize] (*)
+|       |   |-- ed25519-dalek feature "std"
+|       |   |   |-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |   |   |-- ed25519-dalek feature "alloc" (*)
+|       |   |   |-- ed25519 feature "std"
+|       |   |   |   |-- ed25519 v2.2.3_features=[alloc,pem,pkcs8,std] (*)
+|       |   |   |   |-- pkcs8 feature "std"
+|       |   |   |   |   |-- pkcs8 v0.10.2_features=[alloc,pem,std] (*)
+|       |   |   |   |   |-- der feature "std"
+|       |   |   |   |   |   |-- der v0.7.10_features=[alloc,oid,pem,std,zeroize] (*)
+|       |   |   |   |   |   `-- der feature "alloc" (*)
+|       |   |   |   |   |-- pkcs8 feature "alloc" (*)
+|       |   |   |   |   `-- spki feature "std"
+|       |   |   |   |       |-- spki v0.7.3_features=[alloc,pem,std] (*)
+|       |   |   |   |       |-- der feature "std" (*)
+|       |   |   |   |       `-- spki feature "alloc" (*)
+|       |   |   |   `-- signature feature "std"
+|       |   |   |       |-- signature v2.2.0_features=[alloc,digest,std] (*)
+|       |   |   |       `-- signature feature "alloc"
+|       |   |   |           `-- signature v2.2.0_features=[alloc,digest,std] (*)
+|       |   |   `-- sha2 feature "std"
+|       |   |       |-- sha2 v0.10.9_features=[default,std] (*)
+|       |   |       `-- digest feature "std"
+|       |   |           |-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |   |           |-- digest feature "alloc"
+|       |   |           |   `-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |   |           `-- crypto-common feature "std"
+|       |   |               `-- crypto-common v0.1.7_features=[std] (*)
+|       |   `-- ed25519-dalek feature "zeroize" (*)
+|       |-- ed25519-dalek feature "digest"
+|       |   |-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |   |-- ed25519-dalek feature "signature"
+|       |   |   `-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |   `-- signature feature "digest"
+|       |       `-- signature v2.2.0_features=[alloc,digest,std] (*)
+|       |-- ed25519-dalek feature "pem"
+|       |   |-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |   |-- ed25519-dalek feature "alloc" (*)
+|       |   |-- ed25519-dalek feature "pkcs8"
+|       |   |   |-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |   |   `-- ed25519 feature "pkcs8"
+|       |   |       `-- ed25519 v2.2.3_features=[alloc,pem,pkcs8,std] (*)
+|       |   `-- ed25519 feature "pem"
+|       |       |-- ed25519 v2.2.3_features=[alloc,pem,pkcs8,std] (*)
+|       |       |-- ed25519 feature "alloc" (*)
+|       |       |-- ed25519 feature "pkcs8" (*)
+|       |       `-- pkcs8 feature "pem"
+|       |           |-- pkcs8 v0.10.2_features=[alloc,pem,std] (*)
+|       |           |-- der feature "pem"
+|       |           |   |-- der v0.7.10_features=[alloc,oid,pem,std,zeroize] (*)
+|       |           |   |-- der feature "alloc" (*)
+|       |           |   `-- der feature "zeroize" (*)
+|       |           |-- pkcs8 feature "alloc" (*)
+|       |           `-- spki feature "pem"
+|       |               |-- spki v0.7.3_features=[alloc,pem,std] (*)
+|       |               |-- der feature "pem" (*)
+|       |               `-- spki feature "alloc" (*)
+|       |-- ed25519-dalek feature "pkcs8" (*)
+|       |-- ed25519-dalek feature "rand_core"
+|       |   `-- ed25519-dalek v2.2.0_features=[alloc,default,digest,fast,pem,pkcs8,rand_core,signature,std,zeroize] (*)
+|       |-- pkcs8 feature "default" (*)
+|       |-- sha2 feature "default"
+|       |   |-- sha2 v0.10.9_features=[default,std] (*)
+|       |   `-- sha2 feature "std" (*)
+|       |-- env_logger feature "default"
+|       |   |-- env_logger v0.11.10_features=[auto-color,color,default,humantime,regex]
+|       |   |   |-- env_filter v1.0.1_features=[regex]
+|       |   |   |   |-- log feature "default"
+|       |   |   |   |   `-- log v0.4.29_features=[std]
+|       |   |   |   |-- log feature "std"
+|       |   |   |   |   `-- log v0.4.29_features=[std]
+|       |   |   |   |-- regex feature "perf"
+|       |   |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   |   |   |-- aho-corasick v1.1.4_features=[perf-literal,std]
+|       |   |   |   |   |   |   `-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   |   |   |   |-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   |   |   |   |-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   |   |   |-- regex-automata feature "alloc"
+|       |   |   |   |   |   |   `-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary]
+|       |   |   |   |   |   |       |-- aho-corasick v1.1.4_features=[perf-literal,std] (*)
+|       |   |   |   |   |   |       |-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   |   |   |   |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   |   |   |-- regex-automata feature "meta"
+|       |   |   |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |   |   |-- regex-automata feature "nfa-pikevm"
+|       |   |   |   |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |   |   |   `-- regex-automata feature "nfa-thompson"
+|       |   |   |   |   |   |   |       |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |   |   |       `-- regex-automata feature "alloc" (*)
+|       |   |   |   |   |   |   `-- regex-automata feature "syntax"
+|       |   |   |   |   |   |       |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |   |       `-- regex-automata feature "alloc" (*)
+|       |   |   |   |   |   |-- regex-automata feature "nfa-pikevm" (*)
+|       |   |   |   |   |   `-- regex-automata feature "syntax" (*)
+|       |   |   |   |   |-- regex feature "perf-backtrack"
+|       |   |   |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |   |   `-- regex-automata feature "nfa-backtrack"
+|       |   |   |   |   |       |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |       `-- regex-automata feature "nfa-thompson" (*)
+|       |   |   |   |   |-- regex feature "perf-cache"
+|       |   |   |   |   |   `-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |   |-- regex feature "perf-dfa"
+|       |   |   |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |   |   `-- regex-automata feature "hybrid"
+|       |   |   |   |   |       |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |       |-- regex-automata feature "alloc" (*)
+|       |   |   |   |   |       `-- regex-automata feature "nfa-thompson" (*)
+|       |   |   |   |   |-- regex feature "perf-inline"
+|       |   |   |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |   |   `-- regex-automata feature "perf-inline"
+|       |   |   |   |   |       `-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |-- regex feature "perf-literal"
+|       |   |   |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |   |   `-- regex-automata feature "perf-literal"
+|       |   |   |   |   |       |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |       |-- regex-automata feature "perf-literal-multisubstring"
+|       |   |   |   |   |       |   `-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |       `-- regex-automata feature "perf-literal-substring"
+|       |   |   |   |   |           |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   |           `-- aho-corasick feature "perf-literal"
+|       |   |   |   |   |               `-- aho-corasick v1.1.4_features=[perf-literal,std] (*)
+|       |   |   |   |   `-- regex feature "perf-onepass"
+|       |   |   |   |       |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |       `-- regex-automata feature "dfa-onepass"
+|       |   |   |   |           |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |           `-- regex-automata feature "nfa-thompson" (*)
+|       |   |   |   `-- regex feature "std"
+|       |   |   |       |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |       |-- memchr feature "std" (*)
+|       |   |   |       |-- aho-corasick feature "std"
+|       |   |   |       |   |-- aho-corasick v1.1.4_features=[perf-literal,std] (*)
+|       |   |   |       |   `-- memchr feature "std" (*)
+|       |   |   |       |-- regex-automata feature "std"
+|       |   |   |       |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |       |   |-- memchr feature "std" (*)
+|       |   |   |       |   |-- aho-corasick feature "std" (*)
+|       |   |   |       |   |-- regex-automata feature "alloc" (*)
+|       |   |   |       |   `-- regex-syntax feature "std"
+|       |   |   |       |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |       `-- regex-syntax feature "std" (*)
+|       |   |   |-- anstream feature "wincon"
+|       |   |   |   `-- anstream v1.0.0_features=[auto,wincon]
+|       |   |   |       |-- anstyle feature "default"
+|       |   |   |       |   |-- anstyle v1.0.14_features=[default,std]
+|       |   |   |       |   `-- anstyle feature "std"
+|       |   |   |       |       `-- anstyle v1.0.14_features=[default,std]
+|       |   |   |       |-- anstyle-parse feature "default"
+|       |   |   |       |   |-- anstyle-parse v1.0.0_features=[default,utf8]
+|       |   |   |       |   |   `-- utf8parse feature "default"
+|       |   |   |       |   |       `-- utf8parse v0.2.2_features=[default]
+|       |   |   |       |   `-- anstyle-parse feature "utf8"
+|       |   |   |       |       `-- anstyle-parse v1.0.0_features=[default,utf8] (*)
+|       |   |   |       |-- utf8parse feature "default" (*)
+|       |   |   |       |-- anstyle-query feature "default"
+|       |   |   |       |   `-- anstyle-query v1.1.5_features=[]
+|       |   |   |       |-- colorchoice feature "default"
+|       |   |   |       |   `-- colorchoice v1.0.5_features=[]
+|       |   |   |       `-- is_terminal_polyfill feature "default"
+|       |   |   |           `-- is_terminal_polyfill v1.70.2_features=[default]
+|       |   |   |-- anstyle feature "default" (*)
+|       |   |   |-- log feature "default" (*)
+|       |   |   |-- log feature "std" (*)
+|       |   |   `-- jiff feature "std"
+|       |   |       |-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |       `-- jiff feature "alloc"
+|       |   |           `-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |-- env_logger feature "auto-color"
+|       |   |   |-- env_logger v0.11.10_features=[auto-color,color,default,humantime,regex] (*)
+|       |   |   |-- env_logger feature "anstream"
+|       |   |   |   `-- env_logger v0.11.10_features=[auto-color,color,default,humantime,regex] (*)
+|       |   |   |-- env_logger feature "color"
+|       |   |   |   `-- env_logger v0.11.10_features=[auto-color,color,default,humantime,regex] (*)
+|       |   |   `-- anstream feature "auto"
+|       |   |       `-- anstream v1.0.0_features=[auto,wincon] (*)
+|       |   |-- env_logger feature "humantime"
+|       |   |   `-- env_logger v0.11.10_features=[auto-color,color,default,humantime,regex] (*)
+|       |   `-- env_logger feature "regex"
+|       |       |-- env_logger v0.11.10_features=[auto-color,color,default,humantime,regex] (*)
+|       |       `-- env_filter feature "regex"
+|       |           `-- env_filter v1.0.1_features=[regex] (*)
+|       |-- log feature "default" (*)
+|       |-- regex feature "default"
+|       |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |-- regex feature "perf" (*)
+|       |   |-- regex feature "std" (*)
+|       |   |-- regex feature "unicode"
+|       |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |-- regex feature "unicode-age"
+|       |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |-- regex-automata feature "unicode-age"
+|       |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   `-- regex-syntax feature "unicode-age"
+|       |   |   |   |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   `-- regex-syntax feature "unicode-age" (*)
+|       |   |   |-- regex feature "unicode-bool"
+|       |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |-- regex-automata feature "unicode-bool"
+|       |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   `-- regex-syntax feature "unicode-bool"
+|       |   |   |   |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   `-- regex-syntax feature "unicode-bool" (*)
+|       |   |   |-- regex feature "unicode-case"
+|       |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |-- regex-automata feature "unicode-case"
+|       |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   `-- regex-syntax feature "unicode-case"
+|       |   |   |   |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   `-- regex-syntax feature "unicode-case" (*)
+|       |   |   |-- regex feature "unicode-gencat"
+|       |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |-- regex-automata feature "unicode-gencat"
+|       |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   `-- regex-syntax feature "unicode-gencat"
+|       |   |   |   |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   `-- regex-syntax feature "unicode-gencat" (*)
+|       |   |   |-- regex feature "unicode-perl"
+|       |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |-- regex-automata feature "unicode-perl"
+|       |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   `-- regex-syntax feature "unicode-perl"
+|       |   |   |   |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   |-- regex-automata feature "unicode-word-boundary"
+|       |   |   |   |   `-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   `-- regex-syntax feature "unicode-perl" (*)
+|       |   |   |-- regex feature "unicode-script"
+|       |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |-- regex-automata feature "unicode-script"
+|       |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   `-- regex-syntax feature "unicode-script"
+|       |   |   |   |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   `-- regex-syntax feature "unicode-script" (*)
+|       |   |   |-- regex feature "unicode-segment"
+|       |   |   |   |-- regex v1.12.3_features=[default,perf,perf-backtrack,perf-cache,perf-dfa,perf-inline,perf-literal,perf-onepass,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment] (*)
+|       |   |   |   |-- regex-automata feature "unicode-segment"
+|       |   |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |   `-- regex-syntax feature "unicode-segment"
+|       |   |   |   |       `-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |   `-- regex-syntax feature "unicode-segment" (*)
+|       |   |   |-- regex-automata feature "unicode"
+|       |   |   |   |-- regex-automata v0.4.14_features=[alloc,dfa-onepass,hybrid,meta,nfa-backtrack,nfa-pikevm,nfa-thompson,perf-inline,perf-literal,perf-literal-multisubstring,perf-literal-substring,std,syntax,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment,unicode-word-boundary] (*)
+|       |   |   |   |-- regex-automata feature "unicode-age" (*)
+|       |   |   |   |-- regex-automata feature "unicode-bool" (*)
+|       |   |   |   |-- regex-automata feature "unicode-case" (*)
+|       |   |   |   |-- regex-automata feature "unicode-gencat" (*)
+|       |   |   |   |-- regex-automata feature "unicode-perl" (*)
+|       |   |   |   |-- regex-automata feature "unicode-script" (*)
+|       |   |   |   |-- regex-automata feature "unicode-segment" (*)
+|       |   |   |   |-- regex-automata feature "unicode-word-boundary" (*)
+|       |   |   |   `-- regex-syntax feature "unicode"
+|       |   |   |       |-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |   |   |       |-- regex-syntax feature "unicode-age" (*)
+|       |   |   |       |-- regex-syntax feature "unicode-bool" (*)
+|       |   |   |       |-- regex-syntax feature "unicode-case" (*)
+|       |   |   |       |-- regex-syntax feature "unicode-gencat" (*)
+|       |   |   |       |-- regex-syntax feature "unicode-perl" (*)
+|       |   |   |       |-- regex-syntax feature "unicode-script" (*)
+|       |   |   |       `-- regex-syntax feature "unicode-segment" (*)
+|       |   |   `-- regex-syntax feature "unicode" (*)
+|       |   `-- regex-syntax feature "default"
+|       |       |-- regex-syntax v0.8.10_features=[default,std,unicode,unicode-age,unicode-bool,unicode-case,unicode-gencat,unicode-perl,unicode-script,unicode-segment]
+|       |       |-- regex-syntax feature "std" (*)
+|       |       `-- regex-syntax feature "unicode" (*)
+|       |-- extfmt feature "default"
+|       |   `-- extfmt v0.2.0_features=[]
+|       |-- getrandom feature "std"
+|       |   `-- getrandom v0.3.4_features=[std]
+|       |       |-- libc v0.2.185_features=[default,std]
+|       |       `-- cfg-if feature "default" (*)
+|       |-- glob feature "default"
+|       |   `-- glob v0.3.3_features=[]
+|       |-- hex feature "default"
+|       |   |-- hex v0.4.3_features=[alloc,default,std]
+|       |   `-- hex feature "std"
+|       |       |-- hex v0.4.3_features=[alloc,default,std]
+|       |       `-- hex feature "alloc"
+|       |           `-- hex v0.4.3_features=[alloc,default,std]
+|       |-- hex-literal feature "default"
+|       |   `-- hex-literal v1.1.0_features=[]
+|       |-- http feature "default"
+|       |   |-- http v1.4.0_features=[default,std]
+|       |   |   |-- itoa feature "default" (*)
+|       |   |   `-- bytes feature "default" (*)
+|       |   `-- http feature "std"
+|       |       `-- http v1.4.0_features=[default,std] (*)
+|       |-- id3 feature "default"
+|       |   |-- id3 v1.16.4_features=[decode_picture,default]
+|       |   |   |-- byteorder feature "default" (*)
+|       |   |   |-- bitflags feature "default"
+|       |   |   |   `-- bitflags v2.11.1_features=[std]
+|       |   |   `-- flate2 feature "default"
+|       |   |       |-- flate2 v1.1.9_features=[any_impl,default,miniz_oxide,rust_backend]
+|       |   |       |   |-- crc32fast feature "default" (*)
+|       |   |       |   |-- miniz_oxide feature "simd"
+|       |   |       |   |   |-- miniz_oxide v0.8.9_features=[default,simd,simd-adler32,std,with-alloc]
+|       |   |       |   |   |   |-- adler2 v2.0.1_features=[]
+|       |   |       |   |   |   `-- simd-adler32 v0.3.9_features=[const-generics,default,std]
+|       |   |       |   |   `-- miniz_oxide feature "simd-adler32"
+|       |   |       |   |       `-- miniz_oxide v0.8.9_features=[default,simd,simd-adler32,std,with-alloc] (*)
+|       |   |       |   `-- miniz_oxide feature "with-alloc"
+|       |   |       |       `-- miniz_oxide v0.8.9_features=[default,simd,simd-adler32,std,with-alloc] (*)
+|       |   |       `-- flate2 feature "rust_backend"
+|       |   |           |-- flate2 v1.1.9_features=[any_impl,default,miniz_oxide,rust_backend] (*)
+|       |   |           |-- flate2 feature "any_impl"
+|       |   |           |   `-- flate2 v1.1.9_features=[any_impl,default,miniz_oxide,rust_backend] (*)
+|       |   |           `-- flate2 feature "miniz_oxide"
+|       |   |               |-- flate2 v1.1.9_features=[any_impl,default,miniz_oxide,rust_backend] (*)
+|       |   |               `-- flate2 feature "any_impl" (*)
+|       |   `-- id3 feature "decode_picture"
+|       |       `-- id3 v1.16.4_features=[decode_picture,default] (*)
+|       |-- image feature "gif"
+|       |   `-- image v0.25.10_features=[gif,jpeg,png,tiff,webp]
+|       |       |-- zune-core v0.5.1_features=[std]
+|       |       |-- num-traits feature "default" (*)
+|       |       |-- bytemuck feature "default"
+|       |       |   `-- bytemuck v1.25.0_features=[extern_crate_alloc]
+|       |       |-- bytemuck feature "extern_crate_alloc"
+|       |       |   `-- bytemuck v1.25.0_features=[extern_crate_alloc]
+|       |       |-- byteorder-lite feature "default"
+|       |       |   |-- byteorder-lite v0.1.0_features=[default,std]
+|       |       |   `-- byteorder-lite feature "std"
+|       |       |       `-- byteorder-lite v0.1.0_features=[default,std]
+|       |       |-- color_quant feature "default"
+|       |       |   `-- color_quant v1.1.0_features=[]
+|       |       |-- gif feature "default"
+|       |       |   |-- gif v0.14.2_features=[color_quant,default,raii_no_panic,std]
+|       |       |   |   |-- color_quant feature "default" (*)
+|       |       |   |   `-- weezl feature "default"
+|       |       |   |       |-- weezl v0.1.12_features=[alloc,default,std]
+|       |       |   |       `-- weezl feature "std"
+|       |       |   |           |-- weezl v0.1.12_features=[alloc,default,std]
+|       |       |   |           `-- weezl feature "alloc"
+|       |       |   |               `-- weezl v0.1.12_features=[alloc,default,std]
+|       |       |   |-- gif feature "color_quant"
+|       |       |   |   `-- gif v0.14.2_features=[color_quant,default,raii_no_panic,std] (*)
+|       |       |   |-- gif feature "raii_no_panic"
+|       |       |   |   `-- gif v0.14.2_features=[color_quant,default,raii_no_panic,std] (*)
+|       |       |   `-- gif feature "std"
+|       |       |       `-- gif v0.14.2_features=[color_quant,default,raii_no_panic,std] (*)
+|       |       |-- image-webp feature "default"
+|       |       |   `-- image-webp v0.2.4_features=[]
+|       |       |       |-- byteorder-lite feature "default" (*)
+|       |       |       `-- quick-error feature "default"
+|       |       |           `-- quick-error v2.0.1_features=[]
+|       |       |-- moxcms feature "default"
+|       |       |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths]
+|       |       |   |   |-- num-traits feature "default" (*)
+|       |       |   |   `-- pxfm feature "default"
+|       |       |   |       `-- pxfm v0.1.29_features=[]
+|       |       |   |-- moxcms feature "avx_luts"
+|       |       |   |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   |-- moxcms feature "avx"
+|       |       |   |   |   `-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   `-- moxcms feature "lut"
+|       |       |   |       `-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |-- moxcms feature "avx_shaper_fixed_point_paths"
+|       |       |   |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   `-- moxcms feature "avx" (*)
+|       |       |   |-- moxcms feature "avx_shaper_paths"
+|       |       |   |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   `-- moxcms feature "avx" (*)
+|       |       |   |-- moxcms feature "lut" (*)
+|       |       |   |-- moxcms feature "neon_luts"
+|       |       |   |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   |-- moxcms feature "lut" (*)
+|       |       |   |   `-- moxcms feature "neon"
+|       |       |   |       `-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |-- moxcms feature "neon_shaper_fixed_point_paths"
+|       |       |   |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   `-- moxcms feature "neon" (*)
+|       |       |   |-- moxcms feature "neon_shaper_paths"
+|       |       |   |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   `-- moxcms feature "neon" (*)
+|       |       |   |-- moxcms feature "sse_luts"
+|       |       |   |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   |-- moxcms feature "lut" (*)
+|       |       |   |   `-- moxcms feature "sse"
+|       |       |   |       `-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |-- moxcms feature "sse_shaper_fixed_point_paths"
+|       |       |   |   |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |   |   `-- moxcms feature "sse" (*)
+|       |       |   `-- moxcms feature "sse_shaper_paths"
+|       |       |       |-- moxcms v0.8.1_features=[avx,avx_luts,avx_shaper_fixed_point_paths,avx_shaper_paths,default,lut,neon,neon_luts,neon_shaper_fixed_point_paths,neon_shaper_paths,sse,sse_luts,sse_shaper_fixed_point_paths,sse_shaper_paths] (*)
+|       |       |       `-- moxcms feature "sse" (*)
+|       |       |-- png feature "default"
+|       |       |   `-- png v0.18.1_features=[]
+|       |       |       |-- bitflags feature "default" (*)
+|       |       |       |-- flate2 feature "default" (*)
+|       |       |       |-- crc32fast feature "default" (*)
+|       |       |       |-- miniz_oxide feature "default"
+|       |       |       |   |-- miniz_oxide v0.8.9_features=[default,simd,simd-adler32,std,with-alloc] (*)
+|       |       |       |   `-- miniz_oxide feature "with-alloc" (*)
+|       |       |       |-- miniz_oxide feature "simd" (*)
+|       |       |       `-- fdeflate feature "default"
+|       |       |           `-- fdeflate v0.3.7_features=[]
+|       |       |               `-- simd-adler32 feature "default"
+|       |       |                   |-- simd-adler32 v0.3.9_features=[const-generics,default,std]
+|       |       |                   |-- simd-adler32 feature "const-generics"
+|       |       |                   |   `-- simd-adler32 v0.3.9_features=[const-generics,default,std]
+|       |       |                   `-- simd-adler32 feature "std"
+|       |       |                       `-- simd-adler32 v0.3.9_features=[const-generics,default,std]
+|       |       |-- tiff feature "default"
+|       |       |   |-- tiff v0.11.3_features=[default,deflate,fax,jpeg,lzw]
+|       |       |   |   |-- half feature "default" (*)
+|       |       |   |   |-- flate2 feature "default" (*)
+|       |       |   |   |-- weezl feature "default" (*)
+|       |       |   |   |-- quick-error feature "default" (*)
+|       |       |   |   |-- fax feature "default"
+|       |       |   |   |   `-- fax v0.2.6_features=[]
+|       |       |   |   |       `-- fax_derive feature "default"
+|       |       |   |   |           `-- fax_derive v0.2.0 (proc-macro)_features=[]
+|       |       |   |   |               |-- proc-macro2 feature "default" (*)
+|       |       |   |   |               |-- quote feature "default" (*)
+|       |       |   |   |               `-- syn feature "default" (*)
+|       |       |   |   `-- zune-jpeg feature "default"
+|       |       |   |       |-- zune-jpeg v0.5.15_features=[default,neon,std,x86]
+|       |       |   |       |   `-- zune-core feature "default"
+|       |       |   |       |       `-- zune-core v0.5.1_features=[std]
+|       |       |   |       |-- zune-jpeg feature "neon"
+|       |       |   |       |   `-- zune-jpeg v0.5.15_features=[default,neon,std,x86] (*)
+|       |       |   |       |-- zune-jpeg feature "std"
+|       |       |   |       |   |-- zune-jpeg v0.5.15_features=[default,neon,std,x86] (*)
+|       |       |   |       |   `-- zune-core feature "std"
+|       |       |   |       |       `-- zune-core v0.5.1_features=[std]
+|       |       |   |       `-- zune-jpeg feature "x86"
+|       |       |   |           `-- zune-jpeg v0.5.15_features=[default,neon,std,x86] (*)
+|       |       |   |-- tiff feature "deflate"
+|       |       |   |   `-- tiff v0.11.3_features=[default,deflate,fax,jpeg,lzw] (*)
+|       |       |   |-- tiff feature "fax"
+|       |       |   |   `-- tiff v0.11.3_features=[default,deflate,fax,jpeg,lzw] (*)
+|       |       |   |-- tiff feature "jpeg"
+|       |       |   |   `-- tiff v0.11.3_features=[default,deflate,fax,jpeg,lzw] (*)
+|       |       |   `-- tiff feature "lzw"
+|       |       |       `-- tiff v0.11.3_features=[default,deflate,fax,jpeg,lzw] (*)
+|       |       `-- zune-jpeg feature "default" (*)
+|       |-- image feature "jpeg"
+|       |   `-- image v0.25.10_features=[gif,jpeg,png,tiff,webp] (*)
+|       |-- image feature "png"
+|       |   `-- image v0.25.10_features=[gif,jpeg,png,tiff,webp] (*)
+|       |-- image feature "tiff"
+|       |   `-- image v0.25.10_features=[gif,jpeg,png,tiff,webp] (*)
+|       |-- image feature "webp"
+|       |   `-- image v0.25.10_features=[gif,jpeg,png,tiff,webp] (*)
+|       |-- img-parts feature "default"
+|       |   |-- img-parts v0.4.0_features=[default,std]
+|       |   |   |-- bytes v1.11.1_features=[default,std]
+|       |   |   |-- crc32fast v1.5.0_features=[default,std] (*)
+|       |   |   `-- miniz_oxide feature "default" (*)
+|       |   `-- img-parts feature "std"
+|       |       |-- img-parts v0.4.0_features=[default,std] (*)
+|       |       |-- bytes feature "std" (*)
+|       |       |-- crc32fast feature "std" (*)
+|       |       `-- miniz_oxide feature "std"
+|       |           `-- miniz_oxide v0.8.9_features=[default,simd,simd-adler32,std,with-alloc] (*)
+|       |-- iref feature "default"
+|       |   `-- iref v3.2.2_features=[default,serde]
+|       |       `-- iref-core feature "default"
+|       |           `-- iref-core v3.2.2_features=[default,serde]
+|       |               |-- smallvec feature "default" (*)
+|       |               |-- serde feature "default" (*)
+|       |               |-- pct-str feature "default"
+|       |               |   `-- pct-str v2.0.0_features=[]
+|       |               |       |-- thiserror feature "default"
+|       |               |       |   `-- thiserror v1.0.69_features=[]
+|       |               |       |       `-- thiserror-impl feature "default"
+|       |               |       |           `-- thiserror-impl v1.0.69 (proc-macro)_features=[]
+|       |               |       |               |-- proc-macro2 feature "default" (*)
+|       |               |       |               |-- quote feature "default" (*)
+|       |               |       |               `-- syn feature "default" (*)
+|       |               |       `-- utf8-decode feature "default"
+|       |               |           `-- utf8-decode v1.0.1_features=[]
+|       |               |-- thiserror feature "default" (*)
+|       |               `-- static-regular-grammar feature "default"
+|       |                   `-- static-regular-grammar v2.0.2 (proc-macro)_features=[]
+|       |                       |-- proc-macro2 feature "default" (*)
+|       |                       |-- quote feature "default" (*)
+|       |                       |-- syn feature "default" (*)
+|       |                       |-- abnf feature "default"
+|       |                       |   `-- abnf v0.13.0_features=[]
+|       |                       |       |-- abnf-core feature "default"
+|       |                       |       |   `-- abnf-core v0.5.0_features=[]
+|       |                       |       |       `-- nom feature "default"
+|       |                       |       |           |-- nom v7.1.3_features=[alloc,default,std]
+|       |                       |       |           |   |-- memchr v2.8.0_features=[alloc,std]
+|       |                       |       |           |   `-- minimal-lexical v0.2.1_features=[std]
+|       |                       |       |           `-- nom feature "std"
+|       |                       |       |               |-- nom v7.1.3_features=[alloc,default,std] (*)
+|       |                       |       |               |-- nom feature "alloc"
+|       |                       |       |               |   `-- nom v7.1.3_features=[alloc,default,std] (*)
+|       |                       |       |               |-- memchr feature "std"
+|       |                       |       |               |   |-- memchr v2.8.0_features=[alloc,std]
+|       |                       |       |               |   `-- memchr feature "alloc"
+|       |                       |       |               |       `-- memchr v2.8.0_features=[alloc,std]
+|       |                       |       |               `-- minimal-lexical feature "std"
+|       |                       |       |                   `-- minimal-lexical v0.2.1_features=[std]
+|       |                       |       `-- nom feature "default" (*)
+|       |                       |-- btree-range-map feature "default"
+|       |                       |   `-- btree-range-map v0.7.2_features=[serde]
+|       |                       |       |-- btree-slab feature "default"
+|       |                       |       |   |-- btree-slab v0.6.1_features=[default,slab,std-slab]
+|       |                       |       |   |   |-- cc-traits feature "default"
+|       |                       |       |   |   |   |-- cc-traits v2.0.0_features=[alloc,default,slab,std]
+|       |                       |       |   |   |   |   `-- slab feature "default"
+|       |                       |       |   |   |   |       |-- slab v0.4.12_features=[default,std]
+|       |                       |       |   |   |   |       `-- slab feature "std"
+|       |                       |       |   |   |   |           `-- slab v0.4.12_features=[default,std]
+|       |                       |       |   |   |   |-- cc-traits feature "alloc"
+|       |                       |       |   |   |   |   `-- cc-traits v2.0.0_features=[alloc,default,slab,std] (*)
+|       |                       |       |   |   |   `-- cc-traits feature "std"
+|       |                       |       |   |   |       `-- cc-traits v2.0.0_features=[alloc,default,slab,std] (*)
+|       |                       |       |   |   |-- slab feature "default" (*)
+|       |                       |       |   |   `-- smallvec feature "default"
+|       |                       |       |   |       `-- smallvec v1.15.1_features=[]
+|       |                       |       |   `-- btree-slab feature "std-slab"
+|       |                       |       |       |-- btree-slab v0.6.1_features=[default,slab,std-slab] (*)
+|       |                       |       |       |-- btree-slab feature "slab"
+|       |                       |       |       |   `-- btree-slab v0.6.1_features=[default,slab,std-slab] (*)
+|       |                       |       |       `-- cc-traits feature "slab"
+|       |                       |       |           `-- cc-traits v2.0.0_features=[alloc,default,slab,std] (*)
+|       |                       |       |-- cc-traits feature "default" (*)
+|       |                       |       |-- slab feature "default" (*)
+|       |                       |       |-- range-traits feature "default"
+|       |                       |       |   `-- range-traits v0.3.2_features=[]
+|       |                       |       `-- serde feature "default"
+|       |                       |           |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std]
+|       |                       |           |   |-- serde_derive feature "default" (*)
+|       |                       |           |   `-- serde_core feature "result"
+|       |                       |           |       `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |                       |           `-- serde feature "std"
+|       |                       |               |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |                       |               `-- serde_core feature "std"
+|       |                       |                   `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |                       |-- btree-range-map feature "serde"
+|       |                       |   `-- btree-range-map v0.7.2_features=[serde] (*)
+|       |                       |-- serde feature "default" (*)
+|       |                       |-- serde feature "derive"
+|       |                       |   |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |                       |   `-- serde feature "serde_derive"
+|       |                       |       `-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |                       |-- ciborium feature "default"
+|       |                       |   |-- ciborium v0.2.2_features=[default,std]
+|       |                       |   |   |-- serde feature "alloc"
+|       |                       |   |   |   |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |                       |   |   |   `-- serde_core feature "alloc"
+|       |                       |   |   |       `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |                       |   |   |-- serde feature "derive" (*)
+|       |                       |   |   |-- ciborium-io feature "alloc"
+|       |                       |   |   |   `-- ciborium-io v0.2.2_features=[alloc,std]
+|       |                       |   |   |-- ciborium-io feature "default"
+|       |                       |   |   |   `-- ciborium-io v0.2.2_features=[alloc,std]
+|       |                       |   |   `-- ciborium-ll feature "default"
+|       |                       |   |       `-- ciborium-ll v0.2.2_features=[]
+|       |                       |   |           |-- half v2.7.1_features=[]
+|       |                       |   |           |   |-- cfg-if feature "default"
+|       |                       |   |           |   |   `-- cfg-if v1.0.4_features=[]
+|       |                       |   |           |   |-- zerocopy feature "derive"
+|       |                       |   |           |   |   |-- zerocopy v0.8.48_features=[derive,simd,zerocopy-derive]
+|       |                       |   |           |   |   |   `-- zerocopy-derive feature "default" (*)
+|       |                       |   |           |   |   `-- zerocopy feature "zerocopy-derive"
+|       |                       |   |           |   |       `-- zerocopy v0.8.48_features=[derive,simd,zerocopy-derive] (*)
+|       |                       |   |           |   `-- zerocopy feature "simd"
+|       |                       |   |           |       `-- zerocopy v0.8.48_features=[derive,simd,zerocopy-derive] (*)
+|       |                       |   |           `-- ciborium-io feature "default" (*)
+|       |                       |   `-- ciborium feature "std"
+|       |                       |       |-- ciborium v0.2.2_features=[default,std] (*)
+|       |                       |       |-- serde feature "std" (*)
+|       |                       |       `-- ciborium-io feature "std"
+|       |                       |           |-- ciborium-io v0.2.2_features=[alloc,std]
+|       |                       |           `-- ciborium-io feature "alloc" (*)
+|       |                       |-- hex_fmt feature "default"
+|       |                       |   `-- hex_fmt v0.3.0_features=[]
+|       |                       |-- indoc feature "default"
+|       |                       |   `-- indoc v2.0.7 (proc-macro)_features=[]
+|       |                       |       [build-dependencies]
+|       |                       |       `-- rustversion feature "default"
+|       |                       |           `-- rustversion v1.0.22 (proc-macro)_features=[]
+|       |                       |-- proc-macro-error feature "default"
+|       |                       |   |-- proc-macro-error v1.0.4_features=[default,syn,syn-error]
+|       |                       |   |   |-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut]
+|       |                       |   |   |   |-- proc-macro2 v1.0.106_features=[default,proc-macro] (*)
+|       |                       |   |   |   |-- quote v1.0.45_features=[default,proc-macro] (*)
+|       |                       |   |   |   `-- unicode-ident feature "default" (*)
+|       |                       |   |   |-- proc-macro2 feature "default" (*)
+|       |                       |   |   |-- quote feature "default" (*)
+|       |                       |   |   `-- proc-macro-error-attr feature "default"
+|       |                       |   |       `-- proc-macro-error-attr v1.0.4 (proc-macro)_features=[]
+|       |                       |   |           |-- proc-macro2 feature "default" (*)
+|       |                       |   |           `-- quote feature "default" (*)
+|       |                       |   |           [build-dependencies]
+|       |                       |   |           `-- version_check feature "default" (*)
+|       |                       |   |   [build-dependencies]
+|       |                       |   |   `-- version_check feature "default" (*)
+|       |                       |   `-- proc-macro-error feature "syn-error"
+|       |                       |       |-- proc-macro-error v1.0.4_features=[default,syn,syn-error] (*)
+|       |                       |       `-- proc-macro-error feature "syn"
+|       |                       |           `-- proc-macro-error v1.0.4_features=[default,syn,syn-error] (*)
+|       |                       |-- sha2 feature "default"
+|       |                       |   |-- sha2 v0.10.9_features=[default,std]
+|       |                       |   |   |-- cfg-if feature "default" (*)
+|       |                       |   |   |-- cpufeatures feature "default"
+|       |                       |   |   |   `-- cpufeatures v0.2.17_features=[]
+|       |                       |   |   `-- digest feature "default"
+|       |                       |   |       |-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std]
+|       |                       |   |       |   |-- block-buffer feature "default"
+|       |                       |   |       |   |   `-- block-buffer v0.10.4_features=[]
+|       |                       |   |       |   |       `-- generic-array feature "default"
+|       |                       |   |       |   |           `-- generic-array v0.14.7_features=[more_lengths]
+|       |                       |   |       |   |               `-- typenum feature "default"
+|       |                       |   |       |   |                   `-- typenum v1.19.0_features=[]
+|       |                       |   |       |   |               [build-dependencies]
+|       |                       |   |       |   |               `-- version_check feature "default" (*)
+|       |                       |   |       |   `-- crypto-common feature "default"
+|       |                       |   |       |       `-- crypto-common v0.1.7_features=[std]
+|       |                       |   |       |           |-- generic-array feature "default" (*)
+|       |                       |   |       |           |-- generic-array feature "more_lengths"
+|       |                       |   |       |           |   `-- generic-array v0.14.7_features=[more_lengths] (*)
+|       |                       |   |       |           `-- typenum feature "default" (*)
+|       |                       |   |       `-- digest feature "core-api"
+|       |                       |   |           |-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |                       |   |           `-- digest feature "block-buffer"
+|       |                       |   |               `-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |                       |   `-- sha2 feature "std"
+|       |                       |       |-- sha2 v0.10.9_features=[default,std] (*)
+|       |                       |       `-- digest feature "std"
+|       |                       |           |-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |                       |           |-- digest feature "alloc"
+|       |                       |           |   `-- digest v0.10.7_features=[alloc,block-buffer,core-api,default,std] (*)
+|       |                       |           `-- crypto-common feature "std"
+|       |                       |               `-- crypto-common v0.1.7_features=[std] (*)
+|       |                       `-- thiserror feature "default"
+|       |                           `-- thiserror v1.0.69_features=[]
+|       |                               `-- thiserror-impl feature "default" (*)
+|       |-- iref feature "serde"
+|       |   |-- iref v3.2.2_features=[default,serde] (*)
+|       |   `-- iref-core feature "serde"
+|       |       `-- iref-core v3.2.2_features=[default,serde] (*)
+|       |-- jfifdump feature "default"
+|       |   `-- jfifdump v0.6.0_features=[default]
+|       |-- lazy_static feature "default"
+|       |   `-- lazy_static v1.5.0_features=[]
+|       |-- lopdf feature "default"
+|       |   |-- lopdf v0.39.0_features=[chrono,default,jiff,rayon,time]
+|       |   |   |-- thiserror feature "default" (*)
+|       |   |   |-- time feature "default" (*)
+|       |   |   |-- time feature "formatting" (*)
+|       |   |   |-- time feature "parsing" (*)
+|       |   |   |-- itoa feature "default" (*)
+|       |   |   |-- chrono feature "clock"
+|       |   |   |   |-- chrono v0.4.44_features=[alloc,clock,iana-time-zone,now,serde,std,winapi,windows-link] (*)
+|       |   |   |   |-- chrono feature "iana-time-zone"
+|       |   |   |   |   `-- chrono v0.4.44_features=[alloc,clock,iana-time-zone,now,serde,std,winapi,windows-link] (*)
+|       |   |   |   |-- chrono feature "now" (*)
+|       |   |   |   `-- chrono feature "winapi"
+|       |   |   |       |-- chrono v0.4.44_features=[alloc,clock,iana-time-zone,now,serde,std,winapi,windows-link] (*)
+|       |   |   |       `-- chrono feature "windows-link"
+|       |   |   |           `-- chrono v0.4.44_features=[alloc,clock,iana-time-zone,now,serde,std,winapi,windows-link] (*)
+|       |   |   |-- chrono feature "std" (*)
+|       |   |   |-- indexmap feature "default" (*)
+|       |   |   |-- sha2 feature "default" (*)
+|       |   |   |-- log feature "default" (*)
+|       |   |   |-- jiff feature "default"
+|       |   |   |   |-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |   |   |-- jiff feature "perf-inline"
+|       |   |   |   |   `-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |   |   |-- jiff feature "std" (*)
+|       |   |   |   |-- jiff feature "tz-fat"
+|       |   |   |   |   `-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |   |   |-- jiff feature "tz-system"
+|       |   |   |   |   |-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |   |   |   `-- jiff feature "std" (*)
+|       |   |   |   |-- jiff feature "tzdb-bundle-platform"
+|       |   |   |   |   |-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |   |   |   `-- jiff feature "alloc" (*)
+|       |   |   |   |-- jiff feature "tzdb-concatenated"
+|       |   |   |   |   |-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |   |   |   `-- jiff feature "std" (*)
+|       |   |   |   `-- jiff feature "tzdb-zoneinfo"
+|       |   |   |       |-- jiff v0.2.23_features=[alloc,default,perf-inline,std,tz-fat,tz-system,tzdb-bundle-platform,tzdb-concatenated,tzdb-zoneinfo]
+|       |   |   |       `-- jiff feature "std" (*)
+|       |   |   |-- getrandom feature "default"
+|       |   |   |   `-- getrandom v0.3.4_features=[std] (*)
+|       |   |   |-- bitflags feature "default" (*)
+|       |   |   |-- flate2 feature "default" (*)
+|       |   |   |-- weezl feature "default" (*)
+|       |   |   |-- aes feature "default"
+|       |   |   |   `-- aes v0.8.4_features=[]
+|       |   |   |       |-- cfg-if feature "default" (*)
+|       |   |   |       |-- cpufeatures feature "default" (*)
+|       |   |   |       `-- cipher feature "default"
+|       |   |   |           `-- cipher v0.4.4_features=[block-padding]
+|       |   |   |               |-- crypto-common feature "default" (*)
+|       |   |   |               `-- inout feature "default"
+|       |   |   |                   `-- inout v0.1.4_features=[block-padding]
+|       |   |   |                       |-- generic-array feature "default" (*)
+|       |   |   |                       `-- block-padding feature "default"
+|       |   |   |                           `-- block-padding v0.3.3_features=[]
+|       |   |   |                               `-- generic-array feature "default" (*)
+|       |   |   |-- cbc feature "default"
+|       |   |   |   |-- cbc v0.1.2_features=[block-padding,default]
+|       |   |   |   |   `-- cipher feature "default" (*)
+|       |   |   |   `-- cbc feature "block-padding"
+|       |   |   |       |-- cbc v0.1.2_features=[block-padding,default] (*)
+|       |   |   |       `-- cipher feature "block-padding"
+|       |   |   |           |-- cipher v0.4.4_features=[block-padding] (*)
+|       |   |   |           `-- inout feature "block-padding"
+|       |   |   |               `-- inout v0.1.4_features=[block-padding] (*)
+|       |   |   |-- ecb feature "default"
+|       |   |   |   |-- ecb v0.1.2_features=[block-padding,default]
+|       |   |   |   |   `-- cipher feature "default" (*)
+|       |   |   |   `-- ecb feature "block-padding"
+|       |   |   |       |-- ecb v0.1.2_features=[block-padding,default] (*)
+|       |   |   |       `-- cipher feature "block-padding" (*)
+|       |   |   |-- encoding_rs feature "default"
+|       |   |   |   |-- encoding_rs v0.8.35_features=[alloc,default]
+|       |   |   |   |   `-- cfg-if feature "default" (*)
+|       |   |   |   `-- encoding_rs feature "alloc"
+|       |   |   |       `-- encoding_rs v0.8.35_features=[alloc,default] (*)
+|       |   |   |-- md-5 feature "default"
+|       |   |   |   |-- md-5 v0.10.6_features=[default,std]
+|       |   |   |   |   |-- cfg-if feature "default" (*)
+|       |   |   |   |   `-- digest feature "default" (*)
+|       |   |   |   `-- md-5 feature "std"
+|       |   |   |       |-- md-5 v0.10.6_features=[default,std] (*)
+|       |   |   |       `-- digest feature "std" (*)
+|       |   |   |-- nom feature "default"
+|       |   |   |   |-- nom v8.0.0_features=[alloc,default,std]
+|       |   |   |   |   `-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   |   `-- nom feature "std"
+|       |   |   |       |-- nom v8.0.0_features=[alloc,default,std] (*)
+|       |   |   |       |-- memchr feature "std" (*)
+|       |   |   |       `-- nom feature "alloc"
+|       |   |   |           `-- nom v8.0.0_features=[alloc,default,std] (*)
+|       |   |   |-- nom_locate feature "default"
+|       |   |   |   |-- nom_locate v5.0.0_features=[alloc,default,std]
+|       |   |   |   |   |-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   |   |   |-- nom v8.0.0_features=[alloc,default,std] (*)
+|       |   |   |   |   `-- bytecount feature "default"
+|       |   |   |   |       `-- bytecount v0.6.9_features=[]
+|       |   |   |   `-- nom_locate feature "std"
+|       |   |   |       |-- nom_locate v5.0.0_features=[alloc,default,std] (*)
+|       |   |   |       |-- memchr feature "use_std"
+|       |   |   |       |   |-- memchr v2.8.0_features=[alloc,default,std,use_std]
+|       |   |   |       |   `-- memchr feature "std" (*)
+|       |   |   |       |-- nom feature "std" (*)
+|       |   |   |       `-- nom_locate feature "alloc"
+|       |   |   |           |-- nom_locate v5.0.0_features=[alloc,default,std] (*)
+|       |   |   |           `-- nom feature "alloc" (*)
+|       |   |   |-- rand feature "default"
+|       |   |   |   |-- rand v0.9.4_features=[alloc,default,os_rng,small_rng,std,std_rng,thread_rng]
+|       |   |   |   |   |-- rand_chacha v0.9.0_features=[default,os_rng,std]
+|       |   |   |   |   |   |-- ppv-lite86 feature "simd"
+|       |   |   |   |   |   |   `-- ppv-lite86 v0.2.21_features=[simd,std]
+|       |   |   |   |   |   |       |-- zerocopy feature "default"
+|       |   |   |   |   |   |       |   `-- zerocopy v0.8.48_features=[derive,simd,zerocopy-derive] (*)
+|       |   |   |   |   |   |       `-- zerocopy feature "simd" (*)
+|       |   |   |   |   |   `-- rand_core feature "default"
+|       |   |   |   |   |       `-- rand_core v0.9.5_features=[os_rng,std]
+|       |   |   |   |   |           `-- getrandom feature "default" (*)
+|       |   |   |   |   `-- rand_core v0.9.5_features=[os_rng,std] (*)
+|       |   |   |   |-- rand feature "os_rng"
+|       |   |   |   |   |-- rand v0.9.4_features=[alloc,default,os_rng,small_rng,std,std_rng,thread_rng] (*)
+|       |   |   |   |   `-- rand_core feature "os_rng"
+|       |   |   |   |       `-- rand_core v0.9.5_features=[os_rng,std] (*)
+|       |   |   |   |-- rand feature "small_rng"
+|       |   |   |   |   `-- rand v0.9.4_features=[alloc,default,os_rng,small_rng,std,std_rng,thread_rng] (*)
+|       |   |   |   |-- rand feature "std"
+|       |   |   |   |   |-- rand v0.9.4_features=[alloc,default,os_rng,small_rng,std,std_rng,thread_rng] (*)
+|       |   |   |   |   |-- rand feature "alloc"
+|       |   |   |   |   |   `-- rand v0.9.4_features=[alloc,default,os_rng,small_rng,std,std_rng,thread_rng] (*)
+|       |   |   |   |   |-- rand_chacha feature "std"
+|       |   |   |   |   |   |-- rand_chacha v0.9.0_features=[default,os_rng,std] (*)
+|       |   |   |   |   |   |-- ppv-lite86 feature "std"
+|       |   |   |   |   |   |   `-- ppv-lite86 v0.2.21_features=[simd,std] (*)
+|       |   |   |   |   |   `-- rand_core feature "std"
+|       |   |   |   |   |       |-- rand_core v0.9.5_features=[os_rng,std] (*)
+|       |   |   |   |   |       `-- getrandom feature "std" (*)
+|       |   |   |   |   `-- rand_core feature "std" (*)
+|       |   |   |   |-- rand feature "std_rng"
+|       |   |   |   |   `-- rand v0.9.4_features=[alloc,default,os_rng,small_rng,std,std_rng,thread_rng] (*)
+|       |   |   |   `-- rand feature "thread_rng"
+|       |   |   |       |-- rand v0.9.4_features=[alloc,default,os_rng,small_rng,std,std_rng,thread_rng] (*)
+|       |   |   |       |-- rand feature "os_rng" (*)
+|       |   |   |       |-- rand feature "std" (*)
+|       |   |   |       `-- rand feature "std_rng" (*)
+|       |   |   |-- rangemap feature "default"
+|       |   |   |   `-- rangemap v1.7.1_features=[]
+|       |   |   |-- rayon feature "default"
+|       |   |   |   `-- rayon v1.12.0_features=[]
+|       |   |   |       |-- either v1.15.0_features=[]
+|       |   |   |       `-- rayon-core feature "default"
+|       |   |   |           `-- rayon-core v1.13.0_features=[]
+|       |   |   |               |-- crossbeam-deque feature "default"
+|       |   |   |               |   |-- crossbeam-deque v0.8.6_features=[default,std]
+|       |   |   |               |   |   |-- crossbeam-epoch v0.9.18_features=[alloc,std]
+|       |   |   |               |   |   |   `-- crossbeam-utils v0.8.21_features=[default,std]
+|       |   |   |               |   |   `-- crossbeam-utils v0.8.21_features=[default,std]
+|       |   |   |               |   `-- crossbeam-deque feature "std"
+|       |   |   |               |       |-- crossbeam-deque v0.8.6_features=[default,std] (*)
+|       |   |   |               |       |-- crossbeam-epoch feature "std"
+|       |   |   |               |       |   |-- crossbeam-epoch v0.9.18_features=[alloc,std] (*)
+|       |   |   |               |       |   |-- crossbeam-epoch feature "alloc"
+|       |   |   |               |       |   |   `-- crossbeam-epoch v0.9.18_features=[alloc,std] (*)
+|       |   |   |               |       |   `-- crossbeam-utils feature "std"
+|       |   |   |               |       |       `-- crossbeam-utils v0.8.21_features=[default,std]
+|       |   |   |               |       `-- crossbeam-utils feature "std" (*)
+|       |   |   |               `-- crossbeam-utils feature "default"
+|       |   |   |                   |-- crossbeam-utils v0.8.21_features=[default,std]
+|       |   |   |                   `-- crossbeam-utils feature "std" (*)
+|       |   |   |-- stringprep feature "default"
+|       |   |   |   `-- stringprep v0.1.5_features=[]
+|       |   |   |       |-- unicode-bidi feature "default"
+|       |   |   |       |   |-- unicode-bidi v0.3.18_features=[default,hardcoded-data,std]
+|       |   |   |       |   |-- unicode-bidi feature "hardcoded-data"
+|       |   |   |       |   |   `-- unicode-bidi v0.3.18_features=[default,hardcoded-data,std]
+|       |   |   |       |   `-- unicode-bidi feature "std"
+|       |   |   |       |       `-- unicode-bidi v0.3.18_features=[default,hardcoded-data,std]
+|       |   |   |       |-- unicode-normalization feature "default"
+|       |   |   |       |   |-- unicode-normalization v0.1.25_features=[default,std]
+|       |   |   |       |   |   |-- tinyvec feature "alloc"
+|       |   |   |       |   |   |   |-- tinyvec v1.11.0_features=[alloc,default,tinyvec_macros]
+|       |   |   |       |   |   |   |   `-- tinyvec_macros feature "default"
+|       |   |   |       |   |   |   |       `-- tinyvec_macros v0.1.1_features=[]
+|       |   |   |       |   |   |   `-- tinyvec feature "tinyvec_macros"
+|       |   |   |       |   |   |       `-- tinyvec v1.11.0_features=[alloc,default,tinyvec_macros] (*)
+|       |   |   |       |   |   `-- tinyvec feature "default"
+|       |   |   |       |   |       `-- tinyvec v1.11.0_features=[alloc,default,tinyvec_macros] (*)
+|       |   |   |       |   `-- unicode-normalization feature "std"
+|       |   |   |       |       `-- unicode-normalization v0.1.25_features=[default,std] (*)
+|       |   |   |       `-- unicode-properties feature "default"
+|       |   |   |           |-- unicode-properties v0.1.4_features=[default,emoji,general-category]
+|       |   |   |           |-- unicode-properties feature "emoji"
+|       |   |   |           |   `-- unicode-properties v0.1.4_features=[default,emoji,general-category]
+|       |   |   |           `-- unicode-properties feature "general-category"
+|       |   |   |               `-- unicode-properties v0.1.4_features=[default,emoji,general-category]
+|       |   |   `-- ttf-parser feature "default"
+|       |   |       |-- ttf-parser v0.25.1_features=[apple-layout,default,glyph-names,opentype-layout,std,variable-fonts]
+|       |   |       |-- ttf-parser feature "apple-layout"
+|       |   |       |   `-- ttf-parser v0.25.1_features=[apple-layout,default,glyph-names,opentype-layout,std,variable-fonts]
+|       |   |       |-- ttf-parser feature "glyph-names"
+|       |   |       |   `-- ttf-parser v0.25.1_features=[apple-layout,default,glyph-names,opentype-layout,std,variable-fonts]
+|       |   |       |-- ttf-parser feature "opentype-layout"
+|       |   |       |   `-- ttf-parser v0.25.1_features=[apple-layout,default,glyph-names,opentype-layout,std,variable-fonts]
+|       |   |       |-- ttf-parser feature "std"
+|       |   |       |   `-- ttf-parser v0.25.1_features=[apple-layout,default,glyph-names,opentype-layout,std,variable-fonts]
+|       |   |       `-- ttf-parser feature "variable-fonts"
+|       |   |           `-- ttf-parser v0.25.1_features=[apple-layout,default,glyph-names,opentype-layout,std,variable-fonts]
+|       |   |-- lopdf feature "chrono"
+|       |   |   `-- lopdf v0.39.0_features=[chrono,default,jiff,rayon,time] (*)
+|       |   |-- lopdf feature "jiff"
+|       |   |   `-- lopdf v0.39.0_features=[chrono,default,jiff,rayon,time] (*)
+|       |   |-- lopdf feature "rayon"
+|       |   |   `-- lopdf v0.39.0_features=[chrono,default,jiff,rayon,time] (*)
+|       |   `-- lopdf feature "time"
+|       |       `-- lopdf v0.39.0_features=[chrono,default,jiff,rayon,time] (*)
+|       |-- rand_chacha feature "default"
+|       |   |-- rand_chacha v0.9.0_features=[default,os_rng,std] (*)
+|       |   `-- rand_chacha feature "std" (*)
+|       |-- rand_chacha feature "os_rng"
+|       |   |-- rand_chacha v0.9.0_features=[default,os_rng,std] (*)
+|       |   `-- rand_core feature "os_rng" (*)
+|       |-- mp4 feature "default"
+|       |   `-- mp4 v0.14.0_features=[]
+|       |       |-- bytes feature "default" (*)
+|       |       |-- byteorder feature "default" (*)
+|       |       |-- serde feature "default" (*)
+|       |       |-- serde feature "derive" (*)
+|       |       |-- serde_json feature "default" (*)
+|       |       |-- thiserror feature "default" (*)
+|       |       |-- num-rational feature "default"
+|       |       |   |-- num-rational v0.4.2_features=[default,num-bigint,serde,std]
+|       |       |   |   |-- num-bigint v0.4.6_features=[default,std]
+|       |       |   |   |   |-- num-traits feature "i128"
+|       |       |   |   |   |   `-- num-traits v0.2.19_features=[default,i128,std] (*)
+|       |       |   |   |   `-- num-integer feature "i128"
+|       |       |   |   |       `-- num-integer v0.1.46_features=[i128,std]
+|       |       |   |   |           `-- num-traits feature "i128" (*)
+|       |       |   |   |-- serde v1.0.228_features=[alloc,default,derive,serde_derive,std] (*)
+|       |       |   |   |-- num-traits feature "i128" (*)
+|       |       |   |   `-- num-integer feature "i128" (*)
+|       |       |   |-- num-rational feature "num-bigint"
+|       |       |   |   `-- num-rational v0.4.2_features=[default,num-bigint,serde,std] (*)
+|       |       |   `-- num-rational feature "std"
+|       |       |       |-- num-rational v0.4.2_features=[default,num-bigint,serde,std] (*)
+|       |       |       |-- num-traits feature "std" (*)
+|       |       |       |-- num-bigint feature "std"
+|       |       |       |   |-- num-bigint v0.4.6_features=[default,std] (*)
+|       |       |       |   |-- num-traits feature "std" (*)
+|       |       |       |   `-- num-integer feature "std"
+|       |       |       |       |-- num-integer v0.1.46_features=[i128,std] (*)
+|       |       |       |       `-- num-traits feature "std" (*)
+|       |       |       `-- num-integer feature "std" (*)
+|       |       `-- num-rational feature "serde"
+|       |           `-- num-rational v0.4.2_features=[default,num-bigint,serde,std] (*)
+|       |-- non-empty-string feature "default"
+|       |   `-- non-empty-string v0.2.6_features=[default,serde]
+|       |       |-- serde feature "default" (*)
+|       |       `-- delegate feature "default"
+|       |           `-- delegate v0.8.0 (proc-macro)_features=[]
+|       |               |-- proc-macro2 feature "default" (*)
+|       |               |-- quote feature "default" (*)
+|       |               |-- syn feature "default"
+|       |               |   |-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |               |   |-- syn feature "clone-impls"
+|       |               |   |   `-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |               |   |-- syn feature "derive"
+|       |               |   |   `-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |               |   |-- syn feature "parsing"
+|       |               |   |   `-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |               |   |-- syn feature "printing"
+|       |               |   |   |-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |               |   |   `-- syn feature "quote"
+|       |               |   |       `-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |               |   `-- syn feature "proc-macro"
+|       |               |       |-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |               |       |-- proc-macro2 feature "proc-macro" (*)
+|       |               |       |-- quote feature "proc-macro" (*)
+|       |               |       `-- syn feature "quote" (*)
+|       |               |-- syn feature "full"
+|       |               |   `-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |               `-- syn feature "visit-mut"
+|       |                   `-- syn v1.0.109_features=[clone-impls,default,derive,full,parsing,printing,proc-macro,quote,visit-mut] (*)
+|       |-- non-empty-string feature "serde"
+|       |   `-- non-empty-string v0.2.6_features=[default,serde] (*)
+|       |-- nonempty-collections feature "default"
+|       |   `-- nonempty-collections v1.3.0_features=[serde]
+|       |       |-- serde feature "default" (*)
+|       |       `-- serde feature "serde_derive" (*)
+|       |-- nonempty-collections feature "serde"
+|       |   `-- nonempty-collections v1.3.0_features=[serde] (*)
+|       |-- openssl feature "default"
+|       |   `-- openssl v0.10.77_features=[default,vendored]
+|       |       |-- cfg-if feature "default" (*)
+|       |       |-- libc feature "default"
+|       |       |   |-- libc v0.2.185_features=[default,std]
+|       |       |   `-- libc feature "std"
+|       |       |       `-- libc v0.2.185_features=[default,std]
+|       |       |-- bitflags feature "default" (*)
+|       |       |-- foreign-types feature "default"
+|       |       |   `-- foreign-types v0.3.2_features=[]
+|       |       |       `-- foreign-types-shared feature "default"
+|       |       |           `-- foreign-types-shared v0.1.1_features=[]
+|       |       |-- once_cell feature "default"
+|       |       |   |-- once_cell v1.21.4_features=[alloc,default,race,std]
+|       |       |   `-- once_cell feature "std"
+|       |       |       |-- once_cell v1.21.4_features=[alloc,default,race,std]
+|       |       |       `-- once_cell feature "alloc"
+|       |       |           |-- once_cell v1.21.4_features=[alloc,default,race,std]
+|       |       |           `-- once_cell feature "race"
+|       |       |               `-- once_cell v1.21.4_features=[alloc,default,race,std]
+|       |       |-- openssl-macros feature "default"
+|       |       |   `-- openssl-macros v0.1.1 (proc-macro)_features=[]
+|       |       |       |-- proc-macro2 feature "default" (*)
+|       |       |       |-- quote feature "default" (*)
+|       |       |       |-- syn feature "default" (*)
+|       |       |       `-- syn feature "full" (*)
+|       |       `-- openssl-sys feature "default"
+|       |           `-- openssl-sys v0.9.113_features=[openssl-src,vendored]
+|       |               `-- libc feature "default" (*)
+|       |               [build-dependencies]
+|       |               |-- cc feature "default"
+|       |               |   `-- cc v1.2.60_features=[]
+|       |               |       |-- find-msvc-tools feature "default"
+|       |               |       |   `-- find-msvc-tools v0.1.9_features=[]
+|       |               |       `-- shlex feature "default"
+|       |               |           |-- shlex v1.3.0_features=[default,std]
+|       |               |           `-- shlex feature "std"
+|       |               |               `-- shlex v1.3.0_features=[default,std]
+|       |               |-- openssl-src feature "default"
+|       |               |   `-- openssl-src v300.6.0+3.6.2_features=[default,legacy]
+|       |               |       `-- cc feature "default" (*)
+|       |               |-- openssl-src feature "legacy"
+|       |               |   `-- openssl-src v300.6.0+3.6.2_features=[default,legacy] (*)
+|       |               |-- pkg-config feature "default"
+|       |               |   `-- pkg-config v0.3.33_features=[]
+|       |               `-- vcpkg feature "default"
+|       |                   `-- vcpkg v0.2.15_features=[]
+|       |-- openssl feature "vendored"
+|       |   |-- openssl v0.10.77_features=[default,vendored] (*)
+|       |   `-- openssl-sys feature "vendored"
+|       |       |-- openssl-sys v0.9.113_features=[openssl-src,vendored] (*)
+|       |       `-- openssl-sys feature "openssl-src"
+|       |           `-- openssl-sys v0.9.113_features=[openssl-src,vendored] (*)
+|       |-- pem feature "default"
+|       |   |-- pem v3.0.6_features=[default,std]
+|       |   |   `-- base64 feature "alloc" (*)
+|       |   `-- pem feature "std"
+|       |       |-- pem v3.0.6_features=[default,std] (*)
+|       |       `-- base64 feature "std" (*)
+|       |-- png_pong feature "default"
+|       |   `-- png_pong v0.10.0_features=[default]
+|       |       |-- simd-adler32 feature "default" (*)
+|       |       |-- miniz_oxide feature "default"
+|       |       |   |-- miniz_oxide v0.9.1_features=[default,simd,simd-adler32,with-alloc]
+|       |       |   |   |-- adler2 v2.0.1_features=[]
+|       |       |   |   `-- simd-adler32 v0.3.9_features=[const-generics,default,std]
+|       |       |   `-- miniz_oxide feature "with-alloc"
+|       |       |       `-- miniz_oxide v0.9.1_features=[default,simd,simd-adler32,with-alloc] (*)
+|       |       |-- miniz_oxide feature "simd"
+|       |       |   |-- miniz_oxide v0.9.1_features=[default,simd,simd-adler32,with-alloc] (*)
+|       |       |   `-- miniz_oxide feature "simd-adler32"
+|       |       |       `-- miniz_oxide v0.9.1_features=[default,simd,simd-adler32,with-alloc] (*)
+|       |       |-- parsenic feature "default"
+|       |       |   `-- parsenic v0.2.1_features=[]
+|       |       |       `-- traitful feature "default"
+|       |       |           `-- traitful v0.3.0 (proc-macro)_features=[]
+|       |       |               |-- proc-macro2 feature "default" (*)
+|       |       |               |-- quote feature "default" (*)
+|       |       |               |-- syn feature "clone-impls" (*)
+|       |       |               |-- syn feature "extra-traits" (*)
+|       |       |               |-- syn feature "full" (*)
+|       |       |               |-- syn feature "parsing" (*)
+|       |       |               |-- syn feature "printing" (*)
+|       |       |               `-- syn feature "proc-macro" (*)
+|       |       |-- traitful feature "default" (*)
+|       |       `-- pix feature "default"
+|       |           `-- pix v0.14.0_features=[]
+|       |-- quick-xml feature "default"
+|       |   `-- quick-xml v0.39.2_features=[default]
+|       |       `-- memchr feature "default" (*)
+|       |-- rand feature "default"
+|       |   |-- rand v0.8.5_features=[alloc,default,getrandom,libc,rand_chacha,std,std_rng]
+|       |   |   |-- libc v0.2.185_features=[default,std]
+|       |   |   |-- rand_chacha v0.3.1_features=[std]
+|       |   |   |   |-- rand_core feature "default"
+|       |   |   |   |   `-- rand_core v0.6.4_features=[alloc,getrandom,std] (*)
+|       |   |   |   `-- ppv-lite86 feature "simd" (*)
+|       |   |   `-- rand_core feature "default" (*)
+|       |   |-- rand feature "std"
+|       |   |   |-- rand v0.8.5_features=[alloc,default,getrandom,libc,rand_chacha,std,std_rng] (*)
+|       |   |   |-- rand_core feature "std"
+|       |   |   |   |-- rand_core v0.6.4_features=[alloc,getrandom,std] (*)
+|       |   |   |   |-- rand_core feature "alloc"
+|       |   |   |   |   `-- rand_core v0.6.4_features=[alloc,getrandom,std] (*)
+|       |   |   |   |-- rand_core feature "getrandom"
+|       |   |   |   |   `-- rand_core v0.6.4_features=[alloc,getrandom,std] (*)
+|       |   |   |   `-- getrandom feature "std"
+|       |   |   |       `-- getrandom v0.2.17_features=[std] (*)
+|       |   |   |-- rand feature "alloc"
+|       |   |   |   |-- rand v0.8.5_features=[alloc,default,getrandom,libc,rand_chacha,std,std_rng] (*)
+|       |   |   |   `-- rand_core feature "alloc" (*)
+|       |   |   |-- rand feature "getrandom"
+|       |   |   |   |-- rand v0.8.5_features=[alloc,default,getrandom,libc,rand_chacha,std,std_rng] (*)
+|       |   |   |   `-- rand_core feature "getrandom" (*)
+|       |   |   |-- rand feature "libc"
+|       |   |   |   `-- rand v0.8.5_features=[alloc,default,getrandom,libc,rand_chacha,std,std_rng] (*)
+|       |   |   |-- rand feature "rand_chacha"
+|       |   |   |   `-- rand v0.8.5_features=[alloc,default,getrandom,libc,rand_chacha,std,std_rng] (*)
+|       |   |   `-- rand_chacha feature "std"
+|       |   |       |-- rand_chacha v0.3.1_features=[std] (*)
+|       |   |       `-- ppv-lite86 feature "std" (*)
+|       |   `-- rand feature "std_rng"
+|       |       |-- rand v0.8.5_features=[alloc,default,getrandom,libc,rand_chacha,std,std_rng] (*)
+|       |       `-- rand feature "rand_chacha" (*)
+|       |-- range-set feature "default"
+|       |   `-- range-set v0.1.0_features=[]
+|       |       |-- num-traits feature "default" (*)
+|       |       `-- smallvec feature "default" (*)
+|       |-- rasn feature "default"
+|       |   |-- rasn v0.28.12_features=[bytes,default,f32,f64]
+|       |   |   |-- bytes v1.11.1_features=[default,std]
+|       |   |   |-- either v1.15.0_features=[]
+|       |   |   |-- num-bigint v0.4.6_features=[default,std] (*)
+|       |   |   |-- num-traits v0.2.19_features=[default,i128,std] (*)
+|       |   |   |-- nom feature "alloc" (*)
+|       |   |   |-- cfg-if feature "default" (*)
+|       |   |   |-- chrono feature "alloc" (*)
+|       |   |   |-- serde_json feature "alloc"
+|       |   |   |   |-- serde_json v1.0.149_features=[alloc,default,indexmap,preserve_order,std] (*)
+|       |   |   |   `-- serde_core feature "alloc" (*)
+|       |   |   |-- num-integer feature "i128" (*)
+|       |   |   |-- once_cell feature "alloc" (*)
+|       |   |   |-- once_cell feature "race" (*)
+|       |   |   |-- bitvec feature "alloc"
+|       |   |   |   `-- bitvec v1.0.1_features=[alloc]
+|       |   |   |       |-- funty v2.0.0_features=[]
+|       |   |   |       |-- wyz v0.5.1_features=[]
+|       |   |   |       |   `-- tap feature "default"
+|       |   |   |       |       `-- tap v1.0.1_features=[]
+|       |   |   |       |-- radium feature "default"
+|       |   |   |       |   `-- radium v0.7.0_features=[]
+|       |   |   |       `-- tap feature "default" (*)
+|       |   |   |-- bitvec-nom2 feature "default"
+|       |   |   |   |-- bitvec-nom2 v0.2.1_features=[alloc,default]
+|       |   |   |   |   |-- nom v7.1.3_features=[alloc,default,std] (*)
+|       |   |   |   |   `-- bitvec feature "alloc" (*)
+|       |   |   |   `-- bitvec-nom2 feature "alloc"
+|       |   |   |       `-- bitvec-nom2 v0.2.1_features=[alloc,default] (*)
+|       |   |   |-- rasn-derive feature "default"
+|       |   |   |   `-- rasn-derive v0.28.12 (proc-macro)_features=[]
+|       |   |   |       |-- proc-macro2 feature "default" (*)
+|       |   |   |       |-- syn feature "default" (*)
+|       |   |   |       |-- syn feature "extra-traits" (*)
+|       |   |   |       `-- rasn-derive-impl feature "default"
+|       |   |   |           `-- rasn-derive-impl v0.28.12_features=[]
+|       |   |   |               |-- either v1.15.0_features=[std,use_std]
+|       |   |   |               |-- proc-macro2 feature "default" (*)
+|       |   |   |               |-- quote feature "default" (*)
+|       |   |   |               |-- syn feature "default" (*)
+|       |   |   |               |-- syn feature "extra-traits" (*)
+|       |   |   |               |-- syn feature "visit" (*)
+|       |   |   |               |-- itertools feature "default"
+|       |   |   |               |   |-- itertools v0.13.0_features=[default,use_alloc,use_std]
+|       |   |   |               |   |   `-- either v1.15.0_features=[std,use_std]
+|       |   |   |               |   `-- itertools feature "use_std"
+|       |   |   |               |       |-- itertools v0.13.0_features=[default,use_alloc,use_std] (*)
+|       |   |   |               |       |-- either feature "use_std"
+|       |   |   |               |       |   |-- either v1.15.0_features=[std,use_std]
+|       |   |   |               |       |   `-- either feature "std"
+|       |   |   |               |       |       `-- either v1.15.0_features=[std,use_std]
+|       |   |   |               |       `-- itertools feature "use_alloc"
+|       |   |   |               |           `-- itertools v0.13.0_features=[default,use_alloc,use_std] (*)
+|       |   |   |               `-- uuid feature "v4"
+|       |   |   |                   |-- uuid v1.23.1_features=[rng,v4]
+|       |   |   |                   |   `-- getrandom feature "default"
+|       |   |   |                   |       `-- getrandom v0.4.2_features=[]
+|       |   |   |                   |           |-- libc v0.2.185_features=[]
+|       |   |   |                   |           `-- cfg-if feature "default" (*)
+|       |   |   |                   `-- uuid feature "rng"
+|       |   |   |                       `-- uuid v1.23.1_features=[rng,v4] (*)
+|       |   |   |-- snafu feature "rust_1_81"
+|       |   |   |   |-- snafu v0.8.9_features=[rust_1_61,rust_1_65,rust_1_81]
+|       |   |   |   |   `-- snafu-derive feature "default"
+|       |   |   |   |       `-- snafu-derive v0.8.9 (proc-macro)_features=[rust_1_61]
+|       |   |   |   |           |-- heck v0.5.0_features=[]
+|       |   |   |   |           |-- proc-macro2 feature "default" (*)
+|       |   |   |   |           |-- quote feature "default" (*)
+|       |   |   |   |           |-- syn feature "default" (*)
+|       |   |   |   |           `-- syn feature "full" (*)
+|       |   |   |   `-- snafu feature "rust_1_65"
+|       |   |   |       |-- snafu v0.8.9_features=[rust_1_61,rust_1_65,rust_1_81] (*)
+|       |   |   |       `-- snafu feature "rust_1_61"
+|       |   |   |           |-- snafu v0.8.9_features=[rust_1_61,rust_1_65,rust_1_81] (*)
+|       |   |   |           `-- snafu-derive feature "rust_1_61"
+|       |   |   |               `-- snafu-derive v0.8.9 (proc-macro)_features=[rust_1_61] (*)
+|       |   |   `-- xml-no-std feature "default"
+|       |   |       `-- xml-no-std v0.8.26_features=[]
+|       |   |-- rasn feature "bytes"
+|       |   |   `-- rasn v0.28.12_features=[bytes,default,f32,f64] (*)
+|       |   |-- rasn feature "f32"
+|       |   |   `-- rasn v0.28.12_features=[bytes,default,f32,f64] (*)
+|       |   `-- rasn feature "f64"
+|       |       `-- rasn v0.28.12_features=[bytes,default,f32,f64] (*)
+|       |-- rasn-cms feature "default"
+|       |   |-- rasn-cms v0.28.12_features=[default]
+|       |   |   |-- rasn v0.28.12_features=[bytes,default,f32,f64] (*)
+|       |   |   `-- rasn-pkix v0.28.12_features=[default]
+|       |   |       `-- rasn v0.28.12_features=[bytes,default,f32,f64] (*)
+|       |   |-- rasn feature "bytes" (*)
+|       |   |-- rasn feature "f32" (*)
+|       |   `-- rasn feature "f64" (*)
+|       |-- rasn-pkix feature "default"
+|       |   |-- rasn-pkix v0.28.12_features=[default] (*)
+|       |   |-- rasn feature "bytes" (*)
+|       |   |-- rasn feature "f32" (*)
+|       |   `-- rasn feature "f64" (*)
+|       |-- rasn-ocsp feature "default"
+|       |   |-- rasn-ocsp v0.28.12_features=[default]
+|       |   |   |-- rasn v0.28.12_features=[bytes,default,f32,f64] (*)
+|       |   |   `-- rasn-pkix feature "default" (*)
+|       |   |-- rasn feature "bytes" (*)
+|       |   |-- rasn feature "f32" (*)
+|       |   `-- rasn feature "f64" (*)
+|       |-- reqwest feature "http2"
+|       |   |-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy]
+|       |   |   |-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |-- futures-util v0.3.32_features=[alloc,futures-io,futures-sink,io,memchr,sink,slab,std]
+|       |   |   |   |-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |   |-- futures-sink v0.3.32_features=[alloc,default,std]
+|       |   |   |   |-- futures-task v0.3.32_features=[alloc,std]
+|       |   |   |   |-- slab v0.4.12_features=[default,std]
+|       |   |   |   |-- memchr feature "default" (*)
+|       |   |   |   |-- futures-io feature "std"
+|       |   |   |   |   `-- futures-io v0.3.32_features=[std]
+|       |   |   |   `-- pin-project-lite feature "default"
+|       |   |   |       `-- pin-project-lite v0.2.17_features=[]
+|       |   |   |-- base64 feature "default" (*)
+|       |   |   |-- bytes feature "default" (*)
+|       |   |   |-- serde feature "default" (*)
+|       |   |   |-- log feature "default" (*)
+|       |   |   |-- http feature "default" (*)
+|       |   |   |-- futures-channel feature "default"
+|       |   |   |   |-- futures-channel v0.3.32_features=[alloc,default,futures-sink,sink,std]
+|       |   |   |   |   |-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |   |   `-- futures-sink v0.3.32_features=[alloc,default,std]
+|       |   |   |   `-- futures-channel feature "std"
+|       |   |   |       |-- futures-channel v0.3.32_features=[alloc,default,futures-sink,sink,std] (*)
+|       |   |   |       |-- futures-channel feature "alloc"
+|       |   |   |       |   |-- futures-channel v0.3.32_features=[alloc,default,futures-sink,sink,std] (*)
+|       |   |   |       |   `-- futures-core feature "alloc"
+|       |   |   |       |       `-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |       `-- futures-core feature "std"
+|       |   |   |           |-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |           `-- futures-core feature "alloc" (*)
+|       |   |   |-- pin-project-lite feature "default" (*)
+|       |   |   |-- h2 feature "default"
+|       |   |   |   `-- h2 v0.4.13_features=[]
+|       |   |   |       |-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |       |-- futures-sink v0.3.32_features=[alloc,default,std]
+|       |   |   |       |-- bytes feature "default" (*)
+|       |   |   |       |-- indexmap feature "default" (*)
+|       |   |   |       |-- indexmap feature "std" (*)
+|       |   |   |       |-- http feature "default" (*)
+|       |   |   |       |-- slab feature "default"
+|       |   |   |       |   |-- slab v0.4.12_features=[default,std]
+|       |   |   |       |   `-- slab feature "std"
+|       |   |   |       |       `-- slab v0.4.12_features=[default,std]
+|       |   |   |       |-- atomic-waker feature "default"
+|       |   |   |       |   `-- atomic-waker v1.1.2_features=[]
+|       |   |   |       |-- fnv feature "default"
+|       |   |   |       |   |-- fnv v1.0.7_features=[default,std]
+|       |   |   |       |   `-- fnv feature "std"
+|       |   |   |       |       `-- fnv v1.0.7_features=[default,std]
+|       |   |   |       |-- tokio feature "default"
+|       |   |   |       |   `-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time]
+|       |   |   |       |       |-- mio v1.2.0_features=[net,os-ext,os-poll]
+|       |   |   |       |       |   `-- libc feature "default" (*)
+|       |   |   |       |       |-- bytes feature "default" (*)
+|       |   |   |       |       |-- libc feature "default" (*)
+|       |   |   |       |       |-- pin-project-lite feature "default" (*)
+|       |   |   |       |       |-- socket2 feature "all"
+|       |   |   |       |       |   `-- socket2 v0.6.3_features=[all]
+|       |   |   |       |       |       `-- libc feature "default" (*)
+|       |   |   |       |       `-- socket2 feature "default"
+|       |   |   |       |           `-- socket2 v0.6.3_features=[all] (*)
+|       |   |   |       |-- tokio feature "io-util"
+|       |   |   |       |   |-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |       |   `-- tokio feature "bytes"
+|       |   |   |       |       `-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |       |-- tokio-util feature "codec"
+|       |   |   |       |   `-- tokio-util v0.7.18_features=[codec,default,io]
+|       |   |   |       |       |-- bytes feature "default" (*)
+|       |   |   |       |       |-- futures-core feature "default"
+|       |   |   |       |       |   |-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |       |       |   `-- futures-core feature "std" (*)
+|       |   |   |       |       |-- futures-sink feature "default"
+|       |   |   |       |       |   |-- futures-sink v0.3.32_features=[alloc,default,std]
+|       |   |   |       |       |   `-- futures-sink feature "std"
+|       |   |   |       |       |       |-- futures-sink v0.3.32_features=[alloc,default,std]
+|       |   |   |       |       |       `-- futures-sink feature "alloc"
+|       |   |   |       |       |           `-- futures-sink v0.3.32_features=[alloc,default,std]
+|       |   |   |       |       |-- pin-project-lite feature "default" (*)
+|       |   |   |       |       |-- tokio feature "default" (*)
+|       |   |   |       |       `-- tokio feature "sync"
+|       |   |   |       |           `-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |       |-- tokio-util feature "default"
+|       |   |   |       |   `-- tokio-util v0.7.18_features=[codec,default,io] (*)
+|       |   |   |       |-- tokio-util feature "io"
+|       |   |   |       |   `-- tokio-util v0.7.18_features=[codec,default,io] (*)
+|       |   |   |       `-- tracing feature "std"
+|       |   |   |           |-- tracing v0.1.44_features=[std]
+|       |   |   |           |   |-- tracing-core v0.1.36_features=[once_cell,std]
+|       |   |   |           |   |   `-- once_cell feature "default" (*)
+|       |   |   |           |   `-- pin-project-lite feature "default" (*)
+|       |   |   |           `-- tracing-core feature "std"
+|       |   |   |               |-- tracing-core v0.1.36_features=[once_cell,std] (*)
+|       |   |   |               `-- tracing-core feature "once_cell"
+|       |   |   |                   `-- tracing-core v0.1.36_features=[once_cell,std] (*)
+|       |   |   |-- tokio feature "net"
+|       |   |   |   |-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |   |-- tokio feature "libc"
+|       |   |   |   |   `-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |   |-- tokio feature "mio"
+|       |   |   |   |   `-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |   |-- tokio feature "socket2"
+|       |   |   |   |   `-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |   |-- mio feature "net"
+|       |   |   |   |   `-- mio v1.2.0_features=[net,os-ext,os-poll] (*)
+|       |   |   |   |-- mio feature "os-ext"
+|       |   |   |   |   |-- mio v1.2.0_features=[net,os-ext,os-poll] (*)
+|       |   |   |   |   `-- mio feature "os-poll"
+|       |   |   |   |       `-- mio v1.2.0_features=[net,os-ext,os-poll] (*)
+|       |   |   |   `-- mio feature "os-poll" (*)
+|       |   |   |-- tokio feature "time"
+|       |   |   |   `-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |-- http-body feature "default"
+|       |   |   |   `-- http-body v1.0.1_features=[]
+|       |   |   |       |-- bytes feature "default" (*)
+|       |   |   |       `-- http feature "default" (*)
+|       |   |   |-- http-body-util feature "default"
+|       |   |   |   `-- http-body-util v0.1.3_features=[default]
+|       |   |   |       |-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |       |-- bytes feature "default" (*)
+|       |   |   |       |-- http feature "default" (*)
+|       |   |   |       |-- pin-project-lite feature "default" (*)
+|       |   |   |       `-- http-body feature "default" (*)
+|       |   |   |-- hyper feature "client"
+|       |   |   |   `-- hyper v1.9.0_features=[client,default,http1,http2]
+|       |   |   |       |-- itoa feature "default" (*)
+|       |   |   |       |-- bytes feature "default" (*)
+|       |   |   |       |-- smallvec feature "const_generics"
+|       |   |   |       |   `-- smallvec v1.15.1_features=[const_generics,const_new]
+|       |   |   |       |-- smallvec feature "const_new"
+|       |   |   |       |   |-- smallvec v1.15.1_features=[const_generics,const_new]
+|       |   |   |       |   `-- smallvec feature "const_generics" (*)
+|       |   |   |       |-- smallvec feature "default" (*)
+|       |   |   |       |-- http feature "default" (*)
+|       |   |   |       |-- futures-channel feature "default" (*)
+|       |   |   |       |-- futures-core feature "default" (*)
+|       |   |   |       |-- pin-project-lite feature "default" (*)
+|       |   |   |       |-- h2 feature "default" (*)
+|       |   |   |       |-- atomic-waker feature "default" (*)
+|       |   |   |       |-- tokio feature "default" (*)
+|       |   |   |       |-- tokio feature "sync" (*)
+|       |   |   |       |-- http-body feature "default" (*)
+|       |   |   |       |-- httparse feature "default"
+|       |   |   |       |   |-- httparse v1.10.1_features=[default,std]
+|       |   |   |       |   `-- httparse feature "std"
+|       |   |   |       |       `-- httparse v1.10.1_features=[default,std]
+|       |   |   |       `-- want feature "default"
+|       |   |   |           `-- want v0.3.1_features=[]
+|       |   |   |               `-- try-lock feature "default"
+|       |   |   |                   `-- try-lock v0.2.5_features=[]
+|       |   |   |-- hyper feature "default"
+|       |   |   |   `-- hyper v1.9.0_features=[client,default,http1,http2] (*)
+|       |   |   |-- hyper feature "http1"
+|       |   |   |   `-- hyper v1.9.0_features=[client,default,http1,http2] (*)
+|       |   |   |-- hyper-rustls feature "http1"
+|       |   |   |   |-- hyper-rustls v0.27.9_features=[http1,http2,ring,tls12,webpki-roots,webpki-tokio]
+|       |   |   |   |   |-- hyper v1.9.0_features=[client,default,http1,http2] (*)
+|       |   |   |   |   |-- rustls v0.23.38_features=[ring,std,tls12]
+|       |   |   |   |   |   |-- subtle v2.6.1_features=[]
+|       |   |   |   |   |   |-- zeroize feature "default" (*)
+|       |   |   |   |   |   |-- once_cell feature "alloc" (*)
+|       |   |   |   |   |   |-- once_cell feature "race" (*)
+|       |   |   |   |   |   |-- ring feature "default"
+|       |   |   |   |   |   |   |-- ring v0.17.14_features=[alloc,default,dev_urandom_fallback]
+|       |   |   |   |   |   |   |   |-- cfg-if v1.0.4_features=[]
+|       |   |   |   |   |   |   |   |-- getrandom feature "default" (*)
+|       |   |   |   |   |   |   |   `-- untrusted feature "default"
+|       |   |   |   |   |   |   |       `-- untrusted v0.9.0_features=[]
+|       |   |   |   |   |   |   |   [build-dependencies]
+|       |   |   |   |   |   |   |   `-- cc v1.2.60_features=[] (*)
+|       |   |   |   |   |   |   |-- ring feature "alloc"
+|       |   |   |   |   |   |   |   `-- ring v0.17.14_features=[alloc,default,dev_urandom_fallback] (*)
+|       |   |   |   |   |   |   `-- ring feature "dev_urandom_fallback"
+|       |   |   |   |   |   |       `-- ring v0.17.14_features=[alloc,default,dev_urandom_fallback] (*)
+|       |   |   |   |   |   |-- rustls-pki-types feature "alloc"
+|       |   |   |   |   |   |   `-- rustls-pki-types v1.14.0_features=[alloc,default,std]
+|       |   |   |   |   |   |       `-- zeroize feature "default" (*)
+|       |   |   |   |   |   |-- rustls-pki-types feature "default"
+|       |   |   |   |   |   |   |-- rustls-pki-types v1.14.0_features=[alloc,default,std] (*)
+|       |   |   |   |   |   |   `-- rustls-pki-types feature "alloc" (*)
+|       |   |   |   |   |   `-- rustls-webpki feature "alloc"
+|       |   |   |   |   |       |-- rustls-webpki v0.103.12_features=[alloc,ring,std]
+|       |   |   |   |   |       |   |-- ring v0.17.14_features=[alloc,default,dev_urandom_fallback] (*)
+|       |   |   |   |   |       |   |-- rustls-pki-types v1.14.0_features=[alloc,default,std] (*)
+|       |   |   |   |   |       |   `-- untrusted feature "default" (*)
+|       |   |   |   |   |       |-- ring feature "alloc" (*)
+|       |   |   |   |   |       `-- rustls-pki-types feature "alloc" (*)
+|       |   |   |   |   |-- tokio-rustls v0.26.4_features=[ring,tls12]
+|       |   |   |   |   |   |-- tokio feature "default" (*)
+|       |   |   |   |   |   `-- rustls feature "std"
+|       |   |   |   |   |       |-- rustls v0.23.38_features=[ring,std,tls12] (*)
+|       |   |   |   |   |       |-- once_cell feature "std" (*)
+|       |   |   |   |   |       |-- rustls-pki-types feature "std"
+|       |   |   |   |   |       |   |-- rustls-pki-types v1.14.0_features=[alloc,default,std] (*)
+|       |   |   |   |   |       |   `-- rustls-pki-types feature "alloc" (*)
+|       |   |   |   |   |       `-- rustls-webpki feature "std"
+|       |   |   |   |   |           |-- rustls-webpki v0.103.12_features=[alloc,ring,std] (*)
+|       |   |   |   |   |           |-- rustls-pki-types feature "std" (*)
+|       |   |   |   |   |           `-- rustls-webpki feature "alloc" (*)
+|       |   |   |   |   |-- http feature "default" (*)
+|       |   |   |   |   |-- tokio feature "default" (*)
+|       |   |   |   |   |-- hyper-util feature "client-legacy"
+|       |   |   |   |   |   |-- hyper-util v0.1.20_features=[client,client-legacy,client-proxy,client-proxy-system,default,http1,http2,tokio]
+|       |   |   |   |   |   |   |-- futures-util v0.3.32_features=[alloc,futures-io,futures-sink,io,memchr,sink,slab,std] (*)
+|       |   |   |   |   |   |   |-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |   |   |   |   |-- base64 feature "default" (*)
+|       |   |   |   |   |   |   |-- bytes feature "default" (*)
+|       |   |   |   |   |   |   |-- libc feature "default" (*)
+|       |   |   |   |   |   |   |-- http feature "default" (*)
+|       |   |   |   |   |   |   |-- futures-channel feature "default" (*)
+|       |   |   |   |   |   |   |-- pin-project-lite feature "default" (*)
+|       |   |   |   |   |   |   |-- socket2 feature "all" (*)
+|       |   |   |   |   |   |   |-- socket2 feature "default" (*)
+|       |   |   |   |   |   |   |-- tracing feature "std" (*)
+|       |   |   |   |   |   |   |-- http-body feature "default" (*)
+|       |   |   |   |   |   |   |-- hyper feature "default" (*)
+|       |   |   |   |   |   |   |-- ipnet feature "default"
+|       |   |   |   |   |   |   |   |-- ipnet v2.12.0_features=[default,std]
+|       |   |   |   |   |   |   |   `-- ipnet feature "std"
+|       |   |   |   |   |   |   |       `-- ipnet v2.12.0_features=[default,std]
+|       |   |   |   |   |   |   |-- percent-encoding feature "default"
+|       |   |   |   |   |   |   |   |-- percent-encoding v2.3.2_features=[alloc,default,std]
+|       |   |   |   |   |   |   |   `-- percent-encoding feature "std"
+|       |   |   |   |   |   |   |       |-- percent-encoding v2.3.2_features=[alloc,default,std]
+|       |   |   |   |   |   |   |       `-- percent-encoding feature "alloc"
+|       |   |   |   |   |   |   |           `-- percent-encoding v2.3.2_features=[alloc,default,std]
+|       |   |   |   |   |   |   `-- tower-service feature "default"
+|       |   |   |   |   |   |       `-- tower-service v0.3.3_features=[]
+|       |   |   |   |   |   |-- tokio feature "sync" (*)
+|       |   |   |   |   |   |-- hyper-util feature "client"
+|       |   |   |   |   |   |   |-- hyper-util v0.1.20_features=[client,client-legacy,client-proxy,client-proxy-system,default,http1,http2,tokio] (*)
+|       |   |   |   |   |   |   |-- tokio feature "net" (*)
+|       |   |   |   |   |   |   |-- hyper feature "client" (*)
+|       |   |   |   |   |   |   `-- hyper-util feature "tokio"
+|       |   |   |   |   |   |       |-- hyper-util v0.1.20_features=[client,client-legacy,client-proxy,client-proxy-system,default,http1,http2,tokio] (*)
+|       |   |   |   |   |   |       |-- tokio feature "rt"
+|       |   |   |   |   |   |       |   `-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|       |   |   |   |   |   |       |-- tokio feature "time" (*)
+|       |   |   |   |   |   |       `-- hyper-util feature "tokio" (*)
+|       |   |   |   |   |   `-- hyper-util feature "tokio" (*)
+|       |   |   |   |   |-- hyper-util feature "tokio" (*)
+|       |   |   |   |   |-- tower-service feature "default" (*)
+|       |   |   |   |   `-- webpki-roots feature "default"
+|       |   |   |   |       `-- webpki-roots v1.0.7_features=[]
+|       |   |   |   |           `-- rustls-pki-types v1.14.0_features=[alloc,default,std] (*)
+|       |   |   |   `-- hyper-util feature "http1"
+|       |   |   |       |-- hyper-util v0.1.20_features=[client,client-legacy,client-proxy,client-proxy-system,default,http1,http2,tokio] (*)
+|       |   |   |       `-- hyper feature "http1" (*)
+|       |   |   |-- hyper-rustls feature "tls12"
+|       |   |   |   |-- hyper-rustls v0.27.9_features=[http1,http2,ring,tls12,webpki-roots,webpki-tokio] (*)
+|       |   |   |   |-- rustls feature "tls12"
+|       |   |   |   |   `-- rustls v0.23.38_features=[ring,std,tls12] (*)
+|       |   |   |   `-- tokio-rustls feature "tls12"
+|       |   |   |       |-- tokio-rustls v0.26.4_features=[ring,tls12] (*)
+|       |   |   |       `-- rustls feature "tls12" (*)
+|       |   |   |-- hyper-util feature "client" (*)
+|       |   |   |-- hyper-util feature "client-legacy" (*)
+|       |   |   |-- hyper-util feature "client-proxy"
+|       |   |   |   |-- hyper-util v0.1.20_features=[client,client-legacy,client-proxy,client-proxy-system,default,http1,http2,tokio] (*)
+|       |   |   |   `-- hyper-util feature "client" (*)
+|       |   |   |-- hyper-util feature "default"
+|       |   |   |   `-- hyper-util v0.1.20_features=[client,client-legacy,client-proxy,client-proxy-system,default,http1,http2,tokio] (*)
+|       |   |   |-- hyper-util feature "http1" (*)
+|       |   |   |-- hyper-util feature "tokio" (*)
+|       |   |   |-- percent-encoding feature "default" (*)
+|       |   |   |-- tower-service feature "default" (*)
+|       |   |   |-- rustls feature "std" (*)
+|       |   |   |-- rustls feature "tls12" (*)
+|       |   |   |-- rustls-pki-types feature "default" (*)
+|       |   |   |-- rustls-pki-types feature "std" (*)
+|       |   |   |-- tokio-rustls feature "tls12" (*)
+|       |   |   |-- webpki-roots feature "default" (*)
+|       |   |   |-- serde_urlencoded feature "default"
+|       |   |   |   `-- serde_urlencoded v0.7.1_features=[]
+|       |   |   |       |-- itoa feature "default" (*)
+|       |   |   |       |-- serde feature "default" (*)
+|       |   |   |       |-- form_urlencoded feature "default"
+|       |   |   |       |   |-- form_urlencoded v1.2.2_features=[alloc,default,std]
+|       |   |   |       |   |   `-- percent-encoding v2.3.2_features=[alloc,default,std]
+|       |   |   |       |   `-- form_urlencoded feature "std"
+|       |   |   |       |       |-- form_urlencoded v1.2.2_features=[alloc,default,std] (*)
+|       |   |   |       |       |-- percent-encoding feature "std" (*)
+|       |   |   |       |       `-- form_urlencoded feature "alloc"
+|       |   |   |       |           |-- form_urlencoded v1.2.2_features=[alloc,default,std] (*)
+|       |   |   |       |           `-- percent-encoding feature "alloc" (*)
+|       |   |   |       `-- ryu feature "default"
+|       |   |   |           `-- ryu v1.0.23_features=[]
+|       |   |   |-- sync_wrapper feature "default"
+|       |   |   |   `-- sync_wrapper v1.0.2_features=[futures,futures-core]
+|       |   |   |       `-- futures-core v0.3.32_features=[alloc,default,std]
+|       |   |   |-- sync_wrapper feature "futures"
+|       |   |   |   |-- sync_wrapper v1.0.2_features=[futures,futures-core] (*)
+|       |   |   |   `-- sync_wrapper feature "futures-core"
+|       |   |   |       `-- sync_wrapper v1.0.2_features=[futures,futures-core] (*)
+|       |   |   |-- tower feature "retry"
+|       |   |   |   |-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util]
+|       |   |   |   |   |-- futures-core feature "default" (*)
+|       |   |   |   |   |-- futures-util feature "alloc"
+|       |   |   |   |   |   |-- futures-util v0.3.32_features=[alloc,futures-io,futures-sink,io,memchr,sink,slab,std] (*)
+|       |   |   |   |   |   |-- futures-core feature "alloc" (*)
+|       |   |   |   |   |   |-- futures-util feature "slab"
+|       |   |   |   |   |   |   `-- futures-util v0.3.32_features=[alloc,futures-io,futures-sink,io,memchr,sink,slab,std] (*)
+|       |   |   |   |   |   `-- futures-task feature "alloc"
+|       |   |   |   |   |       `-- futures-task v0.3.32_features=[alloc,std]
+|       |   |   |   |   |-- pin-project-lite feature "default" (*)
+|       |   |   |   |   |-- tokio feature "default" (*)
+|       |   |   |   |   |-- tower-service feature "default" (*)
+|       |   |   |   |   |-- sync_wrapper feature "default" (*)
+|       |   |   |   |   `-- tower-layer feature "default"
+|       |   |   |   |       `-- tower-layer v0.3.3_features=[]
+|       |   |   |   |-- tokio feature "time" (*)
+|       |   |   |   |-- tower feature "tokio"
+|       |   |   |   |   `-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util] (*)
+|       |   |   |   `-- tower feature "util"
+|       |   |   |       |-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util] (*)
+|       |   |   |       |-- tower feature "futures-core"
+|       |   |   |       |   `-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util] (*)
+|       |   |   |       |-- tower feature "futures-util"
+|       |   |   |       |   `-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util] (*)
+|       |   |   |       |-- tower feature "pin-project-lite"
+|       |   |   |       |   `-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util] (*)
+|       |   |   |       `-- tower feature "sync_wrapper"
+|       |   |   |           `-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util] (*)
+|       |   |   |-- tower feature "timeout"
+|       |   |   |   |-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util] (*)
+|       |   |   |   |-- tokio feature "time" (*)
+|       |   |   |   |-- tower feature "pin-project-lite" (*)
+|       |   |   |   `-- tower feature "tokio" (*)
+|       |   |   |-- tower feature "util" (*)
+|       |   |   |-- tower-http feature "follow-redirect"
+|       |   |   |   |-- tower-http v0.6.8_features=[follow-redirect,futures-util,iri-string,tower]
+|       |   |   |   |   |-- futures-util v0.3.32_features=[alloc,futures-io,futures-sink,io,memchr,sink,slab,std] (*)
+|       |   |   |   |   |-- bytes feature "default" (*)
+|       |   |   |   |   |-- http feature "default" (*)
+|       |   |   |   |   |-- bitflags feature "default" (*)
+|       |   |   |   |   |-- pin-project-lite feature "default" (*)
+|       |   |   |   |   |-- http-body feature "default" (*)
+|       |   |   |   |   |-- tower-service feature "default" (*)
+|       |   |   |   |   |-- tower feature "default"
+|       |   |   |   |   |   `-- tower v0.5.3_features=[futures-core,futures-util,pin-project-lite,retry,sync_wrapper,timeout,tokio,util] (*)
+|       |   |   |   |   |-- tower-layer feature "default" (*)
+|       |   |   |   |   `-- iri-string feature "default"
+|       |   |   |   |       |-- iri-string v0.7.12_features=[alloc,default,std]
+|       |   |   |   |       `-- iri-string feature "std"
+|       |   |   |   |           |-- iri-string v0.7.12_features=[alloc,default,std]
+|       |   |   |   |           `-- iri-string feature "alloc"
+|       |   |   |   |               `-- iri-string v0.7.12_features=[alloc,default,std]
+|       |   |   |   |-- tower feature "util" (*)
+|       |   |   |   |-- tower-http feature "futures-util"
+|       |   |   |   |   `-- tower-http v0.6.8_features=[follow-redirect,futures-util,iri-string,tower] (*)
+|       |   |   |   |-- tower-http feature "iri-string"
+|       |   |   |   |   `-- tower-http v0.6.8_features=[follow-redirect,futures-util,iri-string,tower] (*)
+|       |   |   |   `-- tower-http feature "tower"
+|       |   |   |       `-- tower-http v0.6.8_features=[follow-redirect,futures-util,iri-string,tower] (*)
+|       |   |   `-- url feature "default"
+|       |   |       |-- url v2.5.8_features=[default,std]
+|       |   |       |   |-- percent-encoding feature "alloc" (*)
+|       |   |       |   |-- form_urlencoded feature "alloc" (*)
+|       |   |       |   |-- idna feature "alloc"
+|       |   |       |   |   `-- idna v1.1.0_features=[alloc,compiled_data,std]
+|       |   |       |   |       |-- smallvec feature "const_generics" (*)
+|       |   |       |   |       |-- smallvec feature "default" (*)
+|       |   |       |   |       |-- idna_adapter feature "default"
+|       |   |       |   |       |   `-- idna_adapter v1.2.1_features=[compiled_data]
+|       |   |       |   |       |       |-- icu_normalizer v2.2.0_features=[compiled_data]
+|       |   |       |   |       |       |   |-- icu_collections v2.2.0_features=[]
+|       |   |       |   |       |       |   |   |-- displaydoc v0.2.5 (proc-macro)_features=[default,std] (*)
+|       |   |       |   |       |       |   |   |-- utf8_iter v1.0.4_features=[]
+|       |   |       |   |       |       |   |   |-- potential_utf feature "zerovec"
+|       |   |       |   |       |       |   |   |   `-- potential_utf v0.1.5_features=[zerovec]
+|       |   |       |   |       |       |   |   |       `-- zerovec v0.11.6_features=[derive,yoke]
+|       |   |       |   |       |       |   |   |           |-- yoke v0.8.2_features=[derive,zerofrom]
+|       |   |       |   |       |       |   |   |           |   |-- stable_deref_trait v1.2.1_features=[]
+|       |   |       |   |       |       |   |   |           |   |-- yoke-derive v0.8.2 (proc-macro)_features=[]
+|       |   |       |   |       |       |   |   |           |   |   |-- proc-macro2 feature "default" (*)
+|       |   |       |   |       |       |   |   |           |   |   |-- quote feature "default" (*)
+|       |   |       |   |       |       |   |   |           |   |   |-- syn feature "default" (*)
+|       |   |       |   |       |       |   |   |           |   |   |-- syn feature "fold"
+|       |   |       |   |       |       |   |   |           |   |   |   `-- syn v2.0.117_features=[clone-impls,default,derive,extra-traits,fold,full,parsing,printing,proc-macro,visit,visit-mut] (*)
+|       |   |       |   |       |       |   |   |           |   |   `-- synstructure feature "default" (*)
+|       |   |       |   |       |       |   |   |           |   `-- zerofrom v0.1.7_features=[derive]
+|       |   |       |   |       |       |   |   |           |       `-- zerofrom-derive v0.1.7 (proc-macro)_features=[]
+|       |   |       |   |       |       |   |   |           |           |-- proc-macro2 feature "default" (*)
+|       |   |       |   |       |       |   |   |           |           |-- quote feature "default" (*)
+|       |   |       |   |       |       |   |   |           |           |-- syn feature "default" (*)
+|       |   |       |   |       |       |   |   |           |           |-- syn feature "fold" (*)
+|       |   |       |   |       |       |   |   |           |           `-- synstructure feature "default" (*)
+|       |   |       |   |       |       |   |   |           |-- zerofrom v0.1.7_features=[derive] (*)
+|       |   |       |   |       |       |   |   |           `-- zerovec-derive v0.11.3 (proc-macro)_features=[]
+|       |   |       |   |       |       |   |   |               |-- proc-macro2 feature "default" (*)
+|       |   |       |   |       |       |   |   |               |-- quote feature "default" (*)
+|       |   |       |   |       |       |   |   |               |-- syn feature "default" (*)
+|       |   |       |   |       |       |   |   |               `-- syn feature "extra-traits" (*)
+|       |   |       |   |       |       |   |   |-- zerovec feature "derive"
+|       |   |       |   |       |       |   |   |   `-- zerovec v0.11.6_features=[derive,yoke] (*)
+|       |   |       |   |       |       |   |   |-- zerovec feature "yoke"
+|       |   |       |   |       |       |   |   |   `-- zerovec v0.11.6_features=[derive,yoke] (*)
+|       |   |       |   |       |       |   |   |-- yoke feature "derive"
+|       |   |       |   |       |       |   |   |   |-- yoke v0.8.2_features=[derive,zerofrom] (*)
+|       |   |       |   |       |       |   |   |   |-- yoke feature "zerofrom"
+|       |   |       |   |       |       |   |   |   |   `-- yoke v0.8.2_features=[derive,zerofrom] (*)
+|       |   |       |   |       |       |   |   |   `-- zerofrom feature "derive"
+|       |   |       |   |       |       |   |   |       `-- zerofrom v0.1.7_features=[derive] (*)
+|       |   |       |   |       |       |   |   `-- zerofrom feature "derive" (*)
+|       |   |       |   |       |       |   |-- icu_normalizer_data v2.2.0_features=[]
+|       |   |       |   |       |       |   |-- icu_provider v2.2.0_features=[baked]
+|       |   |       |   |       |       |   |   |-- displaydoc v0.2.5 (proc-macro)_features=[default,std] (*)
+|       |   |       |   |       |       |   |   |-- icu_locale_core v2.2.0_features=[zerovec]
+|       |   |       |   |       |       |   |   |   |-- displaydoc v0.2.5 (proc-macro)_features=[default,std] (*)
+|       |   |       |   |       |       |   |   |   |-- litemap v0.8.2_features=[]
+|       |   |       |   |       |       |   |   |   |-- tinystr v0.8.3_features=[zerovec]
+|       |   |       |   |       |       |   |   |   |   |-- displaydoc v0.2.5 (proc-macro)_features=[default,std] (*)
+|       |   |       |   |       |       |   |   |   |   `-- zerovec v0.11.6_features=[derive,yoke] (*)
+|       |   |       |   |       |       |   |   |   |-- writeable v0.6.3_features=[]
+|       |   |       |   |       |       |   |   |   `-- zerovec v0.11.6_features=[derive,yoke] (*)
+|       |   |       |   |       |       |   |   |-- writeable v0.6.3_features=[]
+|       |   |       |   |       |       |   |   |-- zerotrie v0.2.4_features=[yoke,zerofrom]
+|       |   |       |   |       |       |   |   |   |-- displaydoc v0.2.5 (proc-macro)_features=[default,std] (*)
+|       |   |       |   |       |       |   |   |   |-- zerofrom v0.1.7_features=[derive] (*)
+|       |   |       |   |       |       |   |   |   `-- yoke feature "derive" (*)
+|       |   |       |   |       |       |   |   |-- zerovec feature "derive" (*)
+|       |   |       |   |       |       |   |   |-- yoke feature "derive" (*)
+|       |   |       |   |       |       |   |   `-- zerofrom feature "derive" (*)
+|       |   |       |   |       |       |   |-- smallvec v1.15.1_features=[const_generics,const_new]
+|       |   |       |   |       |       |   `-- zerovec v0.11.6_features=[derive,yoke] (*)
+|       |   |       |   |       |       `-- icu_properties v2.2.0_features=[compiled_data]
+|       |   |       |   |       |           |-- icu_collections v2.2.0_features=[] (*)
+|       |   |       |   |       |           |-- icu_properties_data v2.2.0_features=[]
+|       |   |       |   |       |           |-- icu_provider v2.2.0_features=[baked] (*)
+|       |   |       |   |       |           |-- zerovec feature "derive" (*)
+|       |   |       |   |       |           |-- zerovec feature "yoke" (*)
+|       |   |       |   |       |           |-- icu_locale_core feature "zerovec"
+|       |   |       |   |       |           |   |-- icu_locale_core v2.2.0_features=[zerovec] (*)
+|       |   |       |   |       |           |   `-- tinystr feature "zerovec"
+|       |   |       |   |       |           |       `-- tinystr v0.8.3_features=[zerovec] (*)
+|       |   |       |   |       |           |-- zerotrie feature "yoke"
+|       |   |       |   |       |           |   `-- zerotrie v0.2.4_features=[yoke,zerofrom] (*)
+|       |   |       |   |       |           `-- zerotrie feature "zerofrom"
+|       |   |       |   |       |               `-- zerotrie v0.2.4_features=[yoke,zerofrom] (*)
+|       |   |       |   |       `-- utf8_iter feature "default"
+|       |   |       |   |           `-- utf8_iter v1.0.4_features=[]
+|       |   |       |   `-- idna feature "compiled_data"
+|       |   |       |       |-- idna v1.1.0_features=[alloc,compiled_data,std] (*)
+|       |   |       |       `-- idna_adapter feature "compiled_data"
+|       |   |       |           |-- idna_adapter v1.2.1_features=[compiled_data] (*)
+|       |   |       |           |-- icu_normalizer feature "compiled_data"
+|       |   |       |           |   |-- icu_normalizer v2.2.0_features=[compiled_data] (*)
+|       |   |       |           |   `-- icu_provider feature "baked"
+|       |   |       |           |       `-- icu_provider v2.2.0_features=[baked] (*)
+|       |   |       |           `-- icu_properties feature "compiled_data"
+|       |   |       |               |-- icu_properties v2.2.0_features=[compiled_data] (*)
+|       |   |       |               `-- icu_provider feature "baked" (*)
+|       |   |       `-- url feature "std"
+|       |   |           |-- url v2.5.8_features=[default,std] (*)
+|       |   |           |-- percent-encoding feature "std" (*)
+|       |   |           |-- form_urlencoded feature "std" (*)
+|       |   |           `-- idna feature "std"
+|       |   |               |-- idna v1.1.0_features=[alloc,compiled_data,std] (*)
+|       |   |               `-- idna feature "alloc" (*)
+|       |   |-- reqwest feature "h2"
+|       |   |   `-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy] (*)
+|       |   |-- hyper feature "http2"
+|       |   |   `-- hyper v1.9.0_features=[client,default,http1,http2] (*)
+|       |   |-- hyper-rustls feature "http2"
+|       |   |   |-- hyper-rustls v0.27.9_features=[http1,http2,ring,tls12,webpki-roots,webpki-tokio] (*)
+|       |   |   `-- hyper-util feature "http2"
+|       |   |       |-- hyper-util v0.1.20_features=[client,client-legacy,client-proxy,client-proxy-system,default,http1,http2,tokio] (*)
+|       |   |       `-- hyper feature "http2" (*)
+|       |   `-- hyper-util feature "http2" (*)
+|       |-- reqwest feature "rustls-tls"
+|       |   |-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy] (*)
+|       |   `-- reqwest feature "rustls-tls-webpki-roots"
+|       |       |-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy] (*)
+|       |       |-- reqwest feature "__rustls-ring"
+|       |       |   |-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy] (*)
+|       |       |   |-- hyper-rustls feature "ring"
+|       |       |   |   |-- hyper-rustls v0.27.9_features=[http1,http2,ring,tls12,webpki-roots,webpki-tokio] (*)
+|       |       |   |   `-- rustls feature "ring"
+|       |       |   |       |-- rustls v0.23.38_features=[ring,std,tls12] (*)
+|       |       |   |       `-- rustls-webpki feature "ring"
+|       |       |   |           `-- rustls-webpki v0.103.12_features=[alloc,ring,std] (*)
+|       |       |   |-- rustls feature "ring" (*)
+|       |       |   `-- tokio-rustls feature "ring"
+|       |       |       |-- tokio-rustls v0.26.4_features=[ring,tls12] (*)
+|       |       |       `-- rustls feature "ring" (*)
+|       |       `-- reqwest feature "rustls-tls-webpki-roots-no-provider"
+|       |           |-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy] (*)
+|       |           |-- reqwest feature "__rustls"
+|       |           |   |-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy] (*)
+|       |           |   `-- reqwest feature "__tls"
+|       |           |       |-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy] (*)
+|       |           |       `-- tokio feature "io-util" (*)
+|       |           `-- hyper-rustls feature "webpki-tokio"
+|       |               |-- hyper-rustls v0.27.9_features=[http1,http2,ring,tls12,webpki-roots,webpki-tokio] (*)
+|       |               `-- hyper-rustls feature "webpki-roots"
+|       |                   `-- hyper-rustls v0.27.9_features=[http1,http2,ring,tls12,webpki-roots,webpki-tokio] (*)
+|       |-- reqwest feature "system-proxy"
+|       |   |-- reqwest v0.12.28_features=[__rustls,__rustls-ring,__tls,blocking,h2,http2,rustls-tls,rustls-tls-webpki-roots,rustls-tls-webpki-roots-no-provider,system-proxy] (*)
+|       |   `-- hyper-util feature "client-proxy-system"
+|       |       `-- hyper-util v0.1.20_features=[client,client-legacy,client-proxy,client-proxy-system,default,http1,http2,tokio] (*)
+|       |-- url feature "default" (*)
+|       |-- riff feature "default"
+|       |   `-- riff v2.0.0_features=[]
+|       |-- serde-transcode feature "default"
+|       |   `-- serde-transcode v1.1.1_features=[]
+|       |       `-- serde feature "default" (*)
+|       |-- serde_with feature "default"
+|       |   |-- serde_with v3.18.0_features=[alloc,default,macros,std]
+|       |   |   |-- serde_core feature "result" (*)
+|       |   |   `-- serde_with_macros feature "default"
+|       |   |       `-- serde_with_macros v3.18.0 (proc-macro)_features=[]
+|       |   |           |-- proc-macro2 feature "default" (*)
+|       |   |           |-- quote feature "default" (*)
+|       |   |           |-- syn feature "default" (*)
+|       |   |           |-- syn feature "extra-traits" (*)
+|       |   |           |-- syn feature "full" (*)
+|       |   |           |-- syn feature "parsing" (*)
+|       |   |           `-- darling feature "default"
+|       |   |               |-- darling v0.23.0_features=[default,suggestions]
+|       |   |               |   |-- darling_core feature "default"
+|       |   |               |   |   `-- darling_core v0.23.0_features=[strsim,suggestions]
+|       |   |               |   |       |-- proc-macro2 feature "default" (*)
+|       |   |               |   |       |-- quote feature "default" (*)
+|       |   |               |   |       |-- syn feature "default" (*)
+|       |   |               |   |       |-- syn feature "extra-traits" (*)
+|       |   |               |   |       |-- syn feature "full" (*)
+|       |   |               |   |       |-- ident_case feature "default"
+|       |   |               |   |       |   `-- ident_case v1.0.1_features=[]
+|       |   |               |   |       `-- strsim feature "default"
+|       |   |               |   |           `-- strsim v0.11.1_features=[]
+|       |   |               |   `-- darling_macro feature "default"
+|       |   |               |       `-- darling_macro v0.23.0 (proc-macro)_features=[]
+|       |   |               |           |-- quote feature "default" (*)
+|       |   |               |           |-- syn feature "default" (*)
+|       |   |               |           `-- darling_core feature "default" (*)
+|       |   |               `-- darling feature "suggestions"
+|       |   |                   |-- darling v0.23.0_features=[default,suggestions] (*)
+|       |   |                   `-- darling_core feature "suggestions"
+|       |   |                       |-- darling_core v0.23.0_features=[strsim,suggestions] (*)
+|       |   |                       `-- darling_core feature "strsim"
+|       |   |                           `-- darling_core v0.23.0_features=[strsim,suggestions] (*)
+|       |   |-- serde_with feature "macros"
+|       |   |   `-- serde_with v3.18.0_features=[alloc,default,macros,std] (*)
+|       |   `-- serde_with feature "std"
+|       |       |-- serde_with v3.18.0_features=[alloc,default,macros,std] (*)
+|       |       |-- serde_core feature "std" (*)
+|       |       `-- serde_with feature "alloc"
+|       |           |-- serde_with v3.18.0_features=[alloc,default,macros,std] (*)
+|       |           `-- serde_core feature "alloc" (*)
+|       |-- sha1 feature "default"
+|       |   |-- sha1 v0.10.6_features=[default,std]
+|       |   |   |-- cfg-if feature "default" (*)
+|       |   |   |-- cpufeatures feature "default" (*)
+|       |   |   `-- digest feature "default" (*)
+|       |   `-- sha1 feature "std"
+|       |       |-- sha1 v0.10.6_features=[default,std] (*)
+|       |       `-- digest feature "std" (*)
+|       |-- static-iref feature "default"
+|       |   `-- static-iref v3.0.0 (proc-macro)_features=[]
+|       |       |-- quote feature "default" (*)
+|       |       |-- syn feature "default" (*)
+|       |       `-- iref feature "default"
+|       |           `-- iref v3.2.2_features=[default]
+|       |               `-- iref-core feature "default"
+|       |                   `-- iref-core v3.2.2_features=[default]
+|       |                       |-- static-regular-grammar feature "default" (*)
+|       |                       |-- smallvec feature "default" (*)
+|       |                       |-- thiserror feature "default" (*)
+|       |                       `-- pct-str feature "default"
+|       |                           `-- pct-str v2.0.0_features=[]
+|       |                               |-- thiserror feature "default" (*)
+|       |                               `-- utf8-decode feature "default"
+|       |                                   `-- utf8-decode v1.0.1_features=[]
+|       |-- tempfile feature "default"
+|       |   |-- tempfile v3.27.0_features=[default,getrandom]
+|       |   |   |-- getrandom v0.4.2_features=[]
+|       |   |   |   |-- libc v0.2.185_features=[default,std]
+|       |   |   |   `-- cfg-if feature "default" (*)
+|       |   |   |-- once_cell feature "std" (*)
+|       |   |   |-- fastrand feature "default"
+|       |   |   |   |-- fastrand v2.4.1_features=[alloc,default,std]
+|       |   |   |   `-- fastrand feature "std"
+|       |   |   |       |-- fastrand v2.4.1_features=[alloc,default,std]
+|       |   |   |       `-- fastrand feature "alloc"
+|       |   |   |           `-- fastrand v2.4.1_features=[alloc,default,std]
+|       |   |   |-- rustix feature "default"
+|       |   |   |   |-- rustix v1.1.4_features=[alloc,default,fs,std]
+|       |   |   |   |   |-- bitflags v2.11.1_features=[std]
+|       |   |   |   |   |-- linux-raw-sys feature "auxvec"
+|       |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+|       |   |   |   |   |-- linux-raw-sys feature "elf"
+|       |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+|       |   |   |   |   |-- linux-raw-sys feature "errno"
+|       |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+|       |   |   |   |   |-- linux-raw-sys feature "general"
+|       |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+|       |   |   |   |   |-- linux-raw-sys feature "ioctl"
+|       |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+|       |   |   |   |   `-- linux-raw-sys feature "no_std"
+|       |   |   |   |       `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+|       |   |   |   `-- rustix feature "std"
+|       |   |   |       |-- rustix v1.1.4_features=[alloc,default,fs,std] (*)
+|       |   |   |       |-- bitflags feature "std"
+|       |   |   |       |   `-- bitflags v2.11.1_features=[std]
+|       |   |   |       `-- rustix feature "alloc"
+|       |   |   |           `-- rustix v1.1.4_features=[alloc,default,fs,std] (*)
+|       |   |   `-- rustix feature "fs"
+|       |   |       `-- rustix v1.1.4_features=[alloc,default,fs,std] (*)
+|       |   `-- tempfile feature "getrandom"
+|       |       `-- tempfile v3.27.0_features=[default,getrandom] (*)
+|       |-- toml feature "default"
+|       |   |-- toml v1.1.2+spec-1.1.0_features=[default,display,parse,serde,std]
+|       |   |   |-- winnow v1.0.1_features=[]
+|       |   |   |-- serde_core feature "alloc" (*)
+|       |   |   |-- serde_spanned feature "alloc"
+|       |   |   |   |-- serde_spanned v1.1.1_features=[alloc,serde,std]
+|       |   |   |   |   `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |   |   |   `-- serde_core feature "alloc" (*)
+|       |   |   |-- toml_datetime feature "alloc"
+|       |   |   |   |-- toml_datetime v1.1.1+spec-1.1.0_features=[alloc,serde,std]
+|       |   |   |   |   `-- serde_core v1.0.228_features=[alloc,result,std]
+|       |   |   |   `-- serde_core feature "alloc" (*)
+|       |   |   |-- toml_parser feature "alloc"
+|       |   |   |   `-- toml_parser v1.1.2+spec-1.1.0_features=[alloc,std]
+|       |   |   |       `-- winnow v1.0.1_features=[]
+|       |   |   `-- toml_writer feature "alloc"
+|       |   |       `-- toml_writer v1.1.1+spec-1.1.0_features=[alloc,std]
+|       |   |-- toml feature "display"
+|       |   |   `-- toml v1.1.2+spec-1.1.0_features=[default,display,parse,serde,std] (*)
+|       |   |-- toml feature "parse"
+|       |   |   `-- toml v1.1.2+spec-1.1.0_features=[default,display,parse,serde,std] (*)
+|       |   |-- toml feature "serde"
+|       |   |   |-- toml v1.1.2+spec-1.1.0_features=[default,display,parse,serde,std] (*)
+|       |   |   |-- serde_spanned feature "serde"
+|       |   |   |   `-- serde_spanned v1.1.1_features=[alloc,serde,std] (*)
+|       |   |   `-- toml_datetime feature "serde"
+|       |   |       `-- toml_datetime v1.1.1+spec-1.1.0_features=[alloc,serde,std] (*)
+|       |   `-- toml feature "std"
+|       |       |-- toml v1.1.2+spec-1.1.0_features=[default,display,parse,serde,std] (*)
+|       |       |-- serde_core feature "std" (*)
+|       |       |-- serde_spanned feature "std"
+|       |       |   |-- serde_spanned v1.1.1_features=[alloc,serde,std] (*)
+|       |       |   |-- serde_core feature "std" (*)
+|       |       |   `-- serde_spanned feature "alloc" (*)
+|       |       |-- toml_datetime feature "std"
+|       |       |   |-- toml_datetime v1.1.1+spec-1.1.0_features=[alloc,serde,std] (*)
+|       |       |   |-- serde_core feature "std" (*)
+|       |       |   `-- toml_datetime feature "alloc" (*)
+|       |       |-- toml_parser feature "std"
+|       |       |   |-- toml_parser v1.1.2+spec-1.1.0_features=[alloc,std] (*)
+|       |       |   `-- toml_parser feature "alloc" (*)
+|       |       `-- toml_writer feature "std"
+|       |           |-- toml_writer v1.1.1+spec-1.1.0_features=[alloc,std]
+|       |           `-- toml_writer feature "alloc" (*)
+|       |-- uuid feature "default"
+|       |   |-- uuid v1.23.1_features=[default,rng,serde,std,v4]
+|       |   |   |-- serde_core v1.0.228_features=[alloc,result,std]
+|       |   |   `-- getrandom feature "default"
+|       |   |       `-- getrandom v0.4.2_features=[] (*)
+|       |   `-- uuid feature "std"
+|       |       `-- uuid v1.23.1_features=[default,rng,serde,std,v4] (*)
+|       |-- uuid feature "serde"
+|       |   `-- uuid v1.23.1_features=[default,rng,serde,std,v4] (*)
+|       |-- uuid feature "v4"
+|       |   |-- uuid v1.23.1_features=[default,rng,serde,std,v4] (*)
+|       |   `-- uuid feature "rng"
+|       |       `-- uuid v1.23.1_features=[default,rng,serde,std,v4] (*)
+|       |-- web-time feature "default"
+|       |   `-- web-time v1.1.0_features=[]
+|       `-- x509-parser feature "default"
+|           `-- x509-parser v0.18.1_features=[default]
+|               |-- asn1-rs feature "datetime"
+|               |   |-- asn1-rs v0.7.1_features=[datetime,default,std,time] (*)
+|               |   `-- asn1-rs feature "time"
+|               |       `-- asn1-rs v0.7.1_features=[datetime,default,std,time] (*)
+|               |-- asn1-rs feature "default" (*)
+|               |-- nom feature "default" (*)
+|               |-- rusticata-macros feature "default" (*)
+|               |-- thiserror feature "default" (*)
+|               |-- time feature "default" (*)
+|               |-- time feature "formatting" (*)
+|               |-- lazy_static feature "default" (*)
+|               |-- data-encoding feature "default"
+|               |   |-- data-encoding v2.10.0_features=[alloc,default,std]
+|               |   `-- data-encoding feature "std"
+|               |       |-- data-encoding v2.10.0_features=[alloc,default,std]
+|               |       `-- data-encoding feature "alloc"
+|               |           `-- data-encoding v2.10.0_features=[alloc,default,std]
+|               |-- der-parser feature "bigint"
+|               |   |-- der-parser v10.0.0_features=[bigint,default,num-bigint,std]
+|               |   |   |-- displaydoc v0.2.5 (proc-macro)_features=[default,std] (*)
+|               |   |   |-- asn1-rs feature "default" (*)
+|               |   |   |-- nom feature "default" (*)
+|               |   |   |-- num-traits feature "default" (*)
+|               |   |   |-- rusticata-macros feature "default" (*)
+|               |   |   `-- num-bigint feature "default"
+|               |   |       |-- num-bigint v0.4.6_features=[default,std] (*)
+|               |   |       `-- num-bigint feature "std" (*)
+|               |   `-- der-parser feature "num-bigint"
+|               |       `-- der-parser v10.0.0_features=[bigint,default,num-bigint,std] (*)
+|               |-- der-parser feature "default"
+|               |   |-- der-parser v10.0.0_features=[bigint,default,num-bigint,std] (*)
+|               |   `-- der-parser feature "std"
+|               |       `-- der-parser v10.0.0_features=[bigint,default,num-bigint,std] (*)
+|               |-- oid-registry feature "crypto"
+|               |   |-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962]
+|               |   |   `-- asn1-rs feature "default" (*)
+|               |   |-- oid-registry feature "kdf"
+|               |   |   `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |   |-- oid-registry feature "nist_algs"
+|               |   |   `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |   |-- oid-registry feature "pkcs1"
+|               |   |   `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |   |-- oid-registry feature "pkcs12"
+|               |   |   `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |   |-- oid-registry feature "pkcs7"
+|               |   |   `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |   |-- oid-registry feature "pkcs9"
+|               |   |   `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |   `-- oid-registry feature "x962"
+|               |       `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |-- oid-registry feature "default"
+|               |   |-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |   `-- oid-registry feature "registry"
+|               |       `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               |-- oid-registry feature "x509"
+|               |   `-- oid-registry v0.8.1_features=[crypto,default,kdf,nist_algs,pkcs1,pkcs12,pkcs7,pkcs9,registry,x509,x962] (*)
+|               `-- oid-registry feature "x962" (*)
+|-- c2pa feature "file_io"
+|   `-- c2pa v0.80.0 (/root/opencode-worktrees/c2pa-rs-stable-fmp4/sdk)_features=[add_thumbnails,fetch_remote_manifests,file_io,http_reqwest,http_reqwest_blocking,image,openssl,pdf] (*)
+|-- c2pa feature "pdf"
+|   `-- c2pa v0.80.0 (/root/opencode-worktrees/c2pa-rs-stable-fmp4/sdk)_features=[add_thumbnails,fetch_remote_manifests,file_io,http_reqwest,http_reqwest_blocking,image,openssl,pdf] (*)
+|-- thiserror feature "default" (*)
+|-- serde feature "default" (*)
+|-- serde feature "derive" (*)
+|-- serde_json feature "default" (*)
+|-- libc feature "default" (*)
+|-- tokio feature "default" (*)
+|-- tokio feature "rt" (*)
+|-- tokio feature "rt-multi-thread"
+|   |-- tokio v1.52.1_features=[bytes,default,io-util,libc,mio,net,rt,rt-multi-thread,socket2,sync,time] (*)
+|   `-- tokio feature "rt" (*)
+`-- scopeguard feature "default"
+    |-- scopeguard v1.2.0_features=[default,use_std]
+    `-- scopeguard feature "use_std"
+        `-- scopeguard v1.2.0_features=[default,use_std]
+[build-dependencies]
+`-- cbindgen feature "default"
+    |-- cbindgen v0.29.2_features=[clap,default]
+    |   |-- proc-macro2 feature "default" (*)
+    |   |-- quote feature "default" (*)
+    |   |-- syn feature "clone-impls" (*)
+    |   |-- syn feature "extra-traits" (*)
+    |   |-- syn feature "fold" (*)
+    |   |-- syn feature "full" (*)
+    |   |-- syn feature "parsing" (*)
+    |   |-- syn feature "printing" (*)
+    |   |-- serde feature "derive" (*)
+    |   |-- serde feature "std" (*)
+    |   |-- heck feature "default"
+    |   |   `-- heck v0.5.0_features=[]
+    |   |-- clap feature "default"
+    |   |   |-- clap v4.6.1_features=[color,default,error-context,help,std,suggestions,usage]
+    |   |   |   `-- clap_builder v4.6.0_features=[color,error-context,help,std,suggestions,usage]
+    |   |   |       |-- strsim feature "default" (*)
+    |   |   |       |-- anstream feature "default"
+    |   |   |       |   |-- anstream v1.0.0_features=[auto,default,wincon]
+    |   |   |       |   |   |-- anstyle feature "default"
+    |   |   |       |   |   |   |-- anstyle v1.0.14_features=[default,std]
+    |   |   |       |   |   |   `-- anstyle feature "std"
+    |   |   |       |   |   |       `-- anstyle v1.0.14_features=[default,std]
+    |   |   |       |   |   |-- anstyle-parse feature "default"
+    |   |   |       |   |   |   |-- anstyle-parse v1.0.0_features=[default,utf8]
+    |   |   |       |   |   |   |   `-- utf8parse feature "default"
+    |   |   |       |   |   |   |       `-- utf8parse v0.2.2_features=[default]
+    |   |   |       |   |   |   `-- anstyle-parse feature "utf8"
+    |   |   |       |   |   |       `-- anstyle-parse v1.0.0_features=[default,utf8] (*)
+    |   |   |       |   |   |-- utf8parse feature "default" (*)
+    |   |   |       |   |   |-- anstyle-query feature "default"
+    |   |   |       |   |   |   `-- anstyle-query v1.1.5_features=[]
+    |   |   |       |   |   |-- colorchoice feature "default"
+    |   |   |       |   |   |   `-- colorchoice v1.0.5_features=[]
+    |   |   |       |   |   `-- is_terminal_polyfill feature "default"
+    |   |   |       |   |       `-- is_terminal_polyfill v1.70.2_features=[default]
+    |   |   |       |   |-- anstream feature "auto"
+    |   |   |       |   |   `-- anstream v1.0.0_features=[auto,default,wincon] (*)
+    |   |   |       |   `-- anstream feature "wincon"
+    |   |   |       |       `-- anstream v1.0.0_features=[auto,default,wincon] (*)
+    |   |   |       |-- anstyle feature "default" (*)
+    |   |   |       `-- clap_lex feature "default"
+    |   |   |           `-- clap_lex v1.1.0_features=[]
+    |   |   |-- clap feature "color"
+    |   |   |   |-- clap v4.6.1_features=[color,default,error-context,help,std,suggestions,usage] (*)
+    |   |   |   `-- clap_builder feature "color"
+    |   |   |       `-- clap_builder v4.6.0_features=[color,error-context,help,std,suggestions,usage] (*)
+    |   |   |-- clap feature "error-context"
+    |   |   |   |-- clap v4.6.1_features=[color,default,error-context,help,std,suggestions,usage] (*)
+    |   |   |   `-- clap_builder feature "error-context"
+    |   |   |       `-- clap_builder v4.6.0_features=[color,error-context,help,std,suggestions,usage] (*)
+    |   |   |-- clap feature "help"
+    |   |   |   |-- clap v4.6.1_features=[color,default,error-context,help,std,suggestions,usage] (*)
+    |   |   |   `-- clap_builder feature "help"
+    |   |   |       `-- clap_builder v4.6.0_features=[color,error-context,help,std,suggestions,usage] (*)
+    |   |   |-- clap feature "std"
+    |   |   |   |-- clap v4.6.1_features=[color,default,error-context,help,std,suggestions,usage] (*)
+    |   |   |   `-- clap_builder feature "std"
+    |   |   |       |-- clap_builder v4.6.0_features=[color,error-context,help,std,suggestions,usage] (*)
+    |   |   |       `-- anstyle feature "std" (*)
+    |   |   |-- clap feature "suggestions"
+    |   |   |   |-- clap v4.6.1_features=[color,default,error-context,help,std,suggestions,usage] (*)
+    |   |   |   `-- clap_builder feature "suggestions"
+    |   |   |       |-- clap_builder v4.6.0_features=[color,error-context,help,std,suggestions,usage] (*)
+    |   |   |       `-- clap_builder feature "error-context" (*)
+    |   |   `-- clap feature "usage"
+    |   |       |-- clap v4.6.1_features=[color,default,error-context,help,std,suggestions,usage] (*)
+    |   |       `-- clap_builder feature "usage"
+    |   |           `-- clap_builder v4.6.0_features=[color,error-context,help,std,suggestions,usage] (*)
+    |   |-- indexmap feature "default"
+    |   |   |-- indexmap v2.14.0_features=[default,std]
+    |   |   |   |-- equivalent v1.0.2_features=[]
+    |   |   |   `-- hashbrown v0.17.0_features=[]
+    |   |   `-- indexmap feature "std"
+    |   |       `-- indexmap v2.14.0_features=[default,std] (*)
+    |   |-- log feature "default"
+    |   |   `-- log v0.4.29_features=[]
+    |   |-- serde_json feature "default"
+    |   |   |-- serde_json v1.0.149_features=[default,std]
+    |   |   |   |-- memchr v2.8.0_features=[alloc,std]
+    |   |   |   |-- serde_core v1.0.228_features=[alloc,result,std]
+    |   |   |   |-- itoa feature "default"
+    |   |   |   |   `-- itoa v1.0.18_features=[]
+    |   |   |   `-- zmij feature "default"
+    |   |   |       `-- zmij v1.0.21_features=[]
+    |   |   `-- serde_json feature "std"
+    |   |       |-- serde_json v1.0.149_features=[default,std] (*)
+    |   |       |-- memchr feature "std" (*)
+    |   |       `-- serde_core feature "std" (*)
+    |   |-- tempfile feature "default"
+    |   |   |-- tempfile v3.27.0_features=[default,getrandom]
+    |   |   |   |-- getrandom v0.4.2_features=[] (*)
+    |   |   |   |-- fastrand feature "default"
+    |   |   |   |   |-- fastrand v2.4.1_features=[alloc,default,std]
+    |   |   |   |   `-- fastrand feature "std"
+    |   |   |   |       |-- fastrand v2.4.1_features=[alloc,default,std]
+    |   |   |   |       `-- fastrand feature "alloc"
+    |   |   |   |           `-- fastrand v2.4.1_features=[alloc,default,std]
+    |   |   |   |-- once_cell feature "std"
+    |   |   |   |   |-- once_cell v1.21.4_features=[alloc,race,std]
+    |   |   |   |   `-- once_cell feature "alloc"
+    |   |   |   |       |-- once_cell v1.21.4_features=[alloc,race,std]
+    |   |   |   |       `-- once_cell feature "race"
+    |   |   |   |           `-- once_cell v1.21.4_features=[alloc,race,std]
+    |   |   |   |-- rustix feature "default"
+    |   |   |   |   |-- rustix v1.1.4_features=[alloc,default,fs,std]
+    |   |   |   |   |   |-- bitflags v2.11.1_features=[std]
+    |   |   |   |   |   |-- linux-raw-sys feature "auxvec"
+    |   |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+    |   |   |   |   |   |-- linux-raw-sys feature "elf"
+    |   |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+    |   |   |   |   |   |-- linux-raw-sys feature "errno"
+    |   |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+    |   |   |   |   |   |-- linux-raw-sys feature "general"
+    |   |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+    |   |   |   |   |   |-- linux-raw-sys feature "ioctl"
+    |   |   |   |   |   |   `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+    |   |   |   |   |   `-- linux-raw-sys feature "no_std"
+    |   |   |   |   |       `-- linux-raw-sys v0.12.1_features=[auxvec,elf,errno,general,ioctl,no_std]
+    |   |   |   |   `-- rustix feature "std"
+    |   |   |   |       |-- rustix v1.1.4_features=[alloc,default,fs,std] (*)
+    |   |   |   |       |-- rustix feature "alloc"
+    |   |   |   |       |   `-- rustix v1.1.4_features=[alloc,default,fs,std] (*)
+    |   |   |   |       `-- bitflags feature "std"
+    |   |   |   |           `-- bitflags v2.11.1_features=[std]
+    |   |   |   `-- rustix feature "fs"
+    |   |   |       `-- rustix v1.1.4_features=[alloc,default,fs,std] (*)
+    |   |   `-- tempfile feature "getrandom"
+    |   |       `-- tempfile v3.27.0_features=[default,getrandom] (*)
+    |   |-- toml feature "parse"
+    |   |   `-- toml v0.9.12+spec-1.1.0_features=[parse,serde,std]
+    |   |       |-- winnow v0.7.15_features=[]
+    |   |       |-- serde_core feature "alloc" (*)
+    |   |       |-- serde_spanned feature "alloc"
+    |   |       |   |-- serde_spanned v1.1.1_features=[alloc,serde,std]
+    |   |       |   |   `-- serde_core v1.0.228_features=[alloc,result,std]
+    |   |       |   `-- serde_core feature "alloc" (*)
+    |   |       |-- toml_datetime feature "alloc"
+    |   |       |   |-- toml_datetime v0.7.5+spec-1.1.0_features=[alloc,serde,std]
+    |   |       |   |   `-- serde_core v1.0.228_features=[alloc,result,std]
+    |   |       |   `-- serde_core feature "alloc" (*)
+    |   |       `-- toml_parser feature "alloc"
+    |   |           `-- toml_parser v1.1.2+spec-1.1.0_features=[alloc,std]
+    |   |               `-- winnow v1.0.1_features=[]
+    |   |-- toml feature "serde"
+    |   |   |-- toml v0.9.12+spec-1.1.0_features=[parse,serde,std] (*)
+    |   |   |-- serde_spanned feature "serde"
+    |   |   |   `-- serde_spanned v1.1.1_features=[alloc,serde,std] (*)
+    |   |   `-- toml_datetime feature "serde"
+    |   |       `-- toml_datetime v0.7.5+spec-1.1.0_features=[alloc,serde,std] (*)
+    |   `-- toml feature "std"
+    |       |-- toml v0.9.12+spec-1.1.0_features=[parse,serde,std] (*)
+    |       |-- serde_core feature "std" (*)
+    |       |-- serde_spanned feature "std"
+    |       |   |-- serde_spanned v1.1.1_features=[alloc,serde,std] (*)
+    |       |   |-- serde_core feature "std" (*)
+    |       |   `-- serde_spanned feature "alloc" (*)
+    |       |-- toml_datetime feature "std"
+    |       |   |-- toml_datetime v0.7.5+spec-1.1.0_features=[alloc,serde,std] (*)
+    |       |   |-- serde_core feature "std" (*)
+    |       |   `-- toml_datetime feature "alloc" (*)
+    |       `-- toml_parser feature "std"
+    |           |-- toml_parser v1.1.2+spec-1.1.0_features=[alloc,std] (*)
+    |           `-- toml_parser feature "alloc" (*)
+    `-- cbindgen feature "clap"
+        `-- cbindgen v0.29.2_features=[clap,default] (*)
+[dev-dependencies]
+`-- tempfile feature "default" (*)

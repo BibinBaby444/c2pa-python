@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/castlabs/c2pa-python/blob/fix/stable-single-file-fmp4/release/castlabs-release-evidence.schema.json",
+  "title": "Castlabs c2pa-python release evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "artifact", "sources", "builds", "runner", "workflow"],
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "package", "version", "file", "size", "sha256", "members"],
+      "properties": {
+        "type": {"enum": ["native-bundle", "wheel-bundle"]},
+        "package": {"const": "c2pa-python"},
+        "version": {"const": "0.31.0+stardustproof.3"},
+        "file": {"type": "string", "minLength": 1},
+        "size": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "members": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"$ref": "#/$defs/member"}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"type": {"const": "native-bundle"}}, "required": ["type"]},
+          "then": {"properties": {"members": {"minItems": 1, "maxItems": 1, "items": {"$ref": "#/$defs/nativeMember"}}}}
+        },
+        {
+          "if": {"properties": {"type": {"const": "wheel-bundle"}}, "required": ["type"]},
+          "then": {"properties": {"members": {"minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/wheelMember"}}}}
+        }
+      ]
+    },
+    "sources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["c2paPython", "c2paRs"],
+      "properties": {
+        "c2paPython": {
+          "type": "object", "additionalProperties": false,
+          "required": ["repository", "url", "commit"],
+          "properties": {
+            "repository": {"const": "castlabs/c2pa-python"},
+            "url": {"const": "https://github.com/castlabs/c2pa-python.git"},
+            "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+          }
+        },
+        "c2paRs": {
+          "type": "object", "additionalProperties": false,
+          "required": ["repository", "url", "commit", "version", "cargoLockSha256"],
+          "properties": {
+            "repository": {"const": "castlabs/c2pa-rs"},
+            "url": {"const": "https://github.com/castlabs/c2pa-rs.git"},
+            "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "version": {"const": "0.80.0"},
+            "cargoLockSha256": {"$ref": "#/$defs/sha256"}
+          }
+        }
+      }
+    },
+    "builds": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/build"}},
+    "runner": {"$ref": "#/$defs/runner"},
+    "workflow": {"$ref": "#/$defs/workflow"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "member": {
+      "oneOf": [
+        {"$ref": "#/$defs/nativeMember"},
+        {"$ref": "#/$defs/wheelMember"}
+      ]
+    },
+    "nativeMember": {
+      "type": "object", "additionalProperties": false,
+      "required": ["file", "size", "sha256", "target", "nativeMember", "nativeSha256", "interpreter"],
+      "properties": {
+        "file": {"type": "string", "minLength": 1}, "size": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"},
+        "target": {"enum": ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]}, "nativeMember": {"type": "string", "minLength": 1}, "nativeSha256": {"$ref": "#/$defs/sha256"},
+        "interpreter": {"type": "string", "minLength": 1}
+      }
+    },
+    "wheelMember": {
+      "type": "object", "additionalProperties": false,
+      "required": ["file", "size", "sha256", "target", "nativeMember", "nativeSha256", "interpreter", "pythonTag", "abiTag", "platformTag"],
+      "properties": {
+        "file": {"type": "string", "minLength": 1}, "size": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"},
+        "target": {"enum": ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]}, "nativeMember": {"type": "string", "minLength": 1}, "nativeSha256": {"$ref": "#/$defs/sha256"},
+        "pythonTag": {"const": "py3"}, "abiTag": {"const": "none"}, "platformTag": {"enum": ["manylinux_2_28_x86_64", "win_amd64"]}, "interpreter": {"type": "string", "minLength": 1}
+      }
+    },
+    "build": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "rustToolchain", "cargoCommand", "cargoTreeCommand", "noDefaultFeatures", "features", "resolvedFeatureReportSha256", "sourceDateEpoch", "cargoBuildJobs", "cargoIncremental", "pythonHashSeed", "container"],
+      "properties": {
+        "target": {"enum": ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]}, "rustToolchain": {"const": "1.88.0"},
+        "cargoCommand": {"type": "array", "minItems": 11, "items": {"type": "string"}}, "noDefaultFeatures": {"const": false},
+        "cargoTreeCommand": {"type": "array", "minItems": 16, "items": {"type": "string"}},
+        "features": {"const": ["file_io"]}, "resolvedFeatureReportSha256": {"$ref": "#/$defs/sha256"},
+        "sourceDateEpoch": {"type": "integer", "minimum": 315532800}, "cargoBuildJobs": {"const": "1"}, "cargoIncremental": {"const": "0"}, "pythonHashSeed": {"const": "0"},
+        "container": {"type": ["string", "null"]}
+      }
+    },
+    "runner": {
+      "type": "object", "additionalProperties": false,
+      "required": ["os", "arch", "name", "image"],
+      "properties": {
+        "os": {"type": "string", "minLength": 1}, "arch": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1}, "image": {"type": "string", "minLength": 1}
+      }
+    },
+    "workflow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "ref", "sha", "event", "runId", "runAttempt", "runNumber"],
+      "properties": {
+        "repository": {"type": "string", "minLength": 1}, "ref": {"type": "string", "minLength": 1},
+        "sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "event": {"type": "string", "minLength": 1},
+        "runId": {"type": "string", "minLength": 1}, "runAttempt": {"type": "string", "minLength": 1},
+        "runNumber": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

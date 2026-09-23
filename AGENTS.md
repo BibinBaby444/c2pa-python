@@ -1,5 +1,28 @@
 # AGENTS.md — Coding Agent Instructions
 
+## Stable fMP4 Release Lane
+
+This worktree's dedicated profile is `stable-fmp4-v1`, release context
+`castlabs-stable-fmp4`, Python `0.31.0+stardustproof.3`, native `0.80.0`.
+Use `.github/workflows/castlabs-stable-fmp4-release.yml`, the explicit lock at
+`release/castlabs-stable-fmp4-inputs.lock.json`, and `scripts/castlabs_release.py`.
+Native defaults (vendored OpenSSL + HTTP + thumbnails) and `file_io` must remain
+enabled. The exact requested/evidenced feature list is `["file_io"]`, with
+`noDefaultFeatures=false`; do not explicitly request HTTP or thumbnails. Actual
+SDK HTTP features are `http_reqwest,http_reqwest_blocking`, while `http` is the
+FFI feature. Do not import VSI runtime changes or substitute `rust_native_crypto`.
+The approved native source is `c1282d33a8fd1145c32d93c27b313a16523f1dbd`, with
+Cargo.lock SHA-256 `fc10bef635df091377d02cfa9f1597462aa016c3db3439d43451a3b93c37edcf`.
+Keep the lock, helper approval constants, and submodule gitlink aligned. Missing
+or changed approvals must still fail closed; negative tests explicitly remove
+approval in test memory only.
+`CASTLABS_STABLE_RELEASE_TARGET` makes wheel packaging staged-only, never a
+native rebuild or download fallback. The loader has no `C2PA_LIBRARY_PATH` seam.
+See `release/STABLE-FMP4.md` for the standard schema-2 consumer contract.
+Run pure-Python tooling tests with
+`python3 -m pytest -q tests/test_castlabs_release_tooling.py`. Real acceptance lives in
+`tests/test_castlabs_release_smoke.py` and must never gain skip switches.
+
 ## Project Overview
 
 **Fork of `contentauth/c2pa-python`** with patches for CAWG identity assertion support. This fork adds:
@@ -18,14 +41,14 @@ Used by the [stardustproof-c2pa-signer-vibe](https://github.com/mstattma/stardus
 c2pa-python (this repo)
 ├── src/c2pa/c2pa.py          ← Python bindings (patched)
 ├── src/c2pa/libs/libc2pa_c.so ← Native library (built from submodule)
-├── c2pa-rs/                   ← Git submodule: mstattma/c2pa-rs fork
+├── c2pa-rs/                   ← Git submodule: castlabs/c2pa-rs stable fork
 │   ├── c2pa_c_ffi/            ← C FFI layer (patched)
 │   └── sdk/                   ← Core c2pa-rs SDK (patched)
 ├── build_native.py            ← Build script for the native library
 └── setup.py                   ← Modified to build from source
 ```
 
-The native library (`libc2pa_c.so` / `.dylib` / `.dll`) is built from the `c2pa-rs` git submodule which contains our Rust patches. The submodule tracks `mstattma/c2pa-rs` branch `feat/dynamic-assertion-ffi`.
+The native library (`libc2pa_c.so` / `.dylib` / `.dll`) is built from the `c2pa-rs` git submodule which contains our Rust patches. The submodule uses `https://github.com/castlabs/c2pa-rs.git`, branch `fix/stable-single-file-fmp4`, at the approved immutable commit above.
 
 ## Patches Summary
 
@@ -123,7 +146,7 @@ The `stardustproof-cli` release script (`stardustproof-cli/scripts/build_release
 ## Rules
 
 - **Do not modify upstream c2pa-python files** unless necessary for the patches. Keep changes minimal and well-commented for future PR submission.
-- The `c2pa-rs` submodule is pinned to a specific commit on `feat/dynamic-assertion-ffi`. Update with `cd c2pa-rs && git pull origin feat/dynamic-assertion-ffi` then rebuild.
+- The `c2pa-rs` submodule is pinned to the approved stable commit. Do not pull a moving branch tip for release; update the gitlink, stable lock, and helper approval constants together only after review.
 - The `src/c2pa/libs/` directory is gitignored — the native library is built locally per platform.
 - The `DynamicAssertionCallback` GC prevention pattern (storing ctypes callback refs in `self._dynamic_assertion_cbs`) follows the same pattern as `Signer.from_callback()`.
 - `build_native.py` and the wheel build path try `cargo` on PATH, then `~/.cargo/bin/cargo`. They build with `--locked --features file_io`. Set `C2PA_CARGO_BUILD_TIMEOUT_SECONDS` to override the default 600-second cargo timeout.

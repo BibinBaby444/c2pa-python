@@ -74,6 +74,10 @@ jobs:
             exit 1
           fi
           release_version="${INPUT_RELEASE_VERSION#v}"
+          if [[ "$release_version" == "0.31.0+stardustproof.3" ]]; then
+            echo "::error::Use castlabs-stable-fmp4-release.yml for the schema-2 stable hotfix"
+            exit 1
+          fi
           if [[ ! "$release_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+\+stardustproof\.[0-9]+$ ]]; then
             echo "::error::release_version must match MAJOR.MINOR.PATCH+stardustproof.N, got: $release_version"
             exit 1

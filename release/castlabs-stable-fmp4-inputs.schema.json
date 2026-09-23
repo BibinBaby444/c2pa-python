@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/castlabs/c2pa-python/blob/fix/stable-single-file-fmp4/release/castlabs-stable-fmp4-inputs.schema.json",
+  "title": "Castlabs stable fMP4 c2pa-python release input lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "releaseContext", "profileId", "package", "pythonSource", "rustSource", "rustToolchain", "nativeBuild", "targets", "manylinux", "wheel"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "releaseContext": {"const": "castlabs-stable-fmp4"},
+    "profileId": {"const": "stable-fmp4-v1"},
+    "package": {"$ref": "#/$defs/package"},
+    "pythonSource": {"$ref": "#/$defs/pythonSource"},
+    "rustSource": {"$ref": "#/$defs/rustSource"},
+    "rustToolchain": {"$ref": "#/$defs/rustToolchain"},
+    "nativeBuild": {"$ref": "#/$defs/nativeBuild"},
+    "targets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"],
+      "properties": {
+        "x86_64-unknown-linux-gnu": {"const": {"runner": "ubuntu-24.04", "library": "libc2pa_c.so", "wheelPlatformTag": "manylinux_2_28_x86_64"}},
+        "x86_64-pc-windows-msvc": {"const": {"runner": "windows-2022", "library": "c2pa_c.dll", "wheelPlatformTag": "win_amd64"}}
+      }
+    },
+    "manylinux": {"$ref": "#/$defs/manylinux"},
+    "wheel": {"$ref": "#/$defs/wheel"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "sha256Digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "package": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {"name": {"const": "c2pa-python"}, "version": {"const": "0.31.0+stardustproof.3"}}
+    },
+    "pythonSource": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "url", "releaseBranch", "releaseTag"],
+      "properties": {
+        "repository": {"const": "castlabs/c2pa-python"},
+        "url": {"const": "https://github.com/castlabs/c2pa-python.git"},
+        "releaseBranch": {"const": "fix/stable-single-file-fmp4"},
+        "releaseTag": {"const": "castlabs-v0.31.0+stardustproof.3"}
+      }
+    },
+    "rustSource": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "url", "commit", "version", "cargoLockSha256"],
+      "properties": {
+        "repository": {"const": "castlabs/c2pa-rs"},
+        "url": {"const": "https://github.com/castlabs/c2pa-rs.git"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "version": {"const": "0.80.0"},
+        "cargoLockSha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "installer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["url", "sha256"],
+      "properties": {"url": {"type": "string", "pattern": "^https://"}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "rustToolchain": {
+      "type": "object", "additionalProperties": false,
+      "required": ["channel", "rustupVersion", "installers"],
+      "properties": {
+        "channel": {"const": "1.88.0"},
+        "rustupVersion": {"const": "1.28.2"},
+        "installers": {
+          "type": "object", "additionalProperties": false,
+          "required": ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"],
+          "properties": {
+            "x86_64-unknown-linux-gnu": {"const": {"url": "https://static.rust-lang.org/rustup/archive/1.28.2/x86_64-unknown-linux-gnu/rustup-init", "sha256": "20a06e644b0d9bd2fbdbfd52d42540bdde820ea7df86e92e533c073da0cdd43c"}},
+            "x86_64-pc-windows-msvc": {"const": {"url": "https://static.rust-lang.org/rustup/archive/1.28.2/x86_64-pc-windows-msvc/rustup-init.exe", "sha256": "88d8258dcf6ae4f7a80c7d1088e1f36fa7025a1cfd1343731b4ee6f385121fc0"}}
+          }
+        }
+      }
+    },
+    "nativeBuild": {
+      "type": "object", "additionalProperties": false,
+      "required": ["package", "profile", "noDefaultFeatures", "features"],
+      "properties": {
+        "package": {"const": "c2pa-c-ffi"},
+        "profile": {"const": "release"},
+        "noDefaultFeatures": {"const": false},
+        "features": {"const": ["file_io"]}
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["runner", "library", "wheelPlatformTag"],
+      "properties": {"runner": {"type": "string"}, "library": {"type": "string"}, "wheelPlatformTag": {"type": "string"}}
+    },
+    "manylinux": {
+      "type": "object", "additionalProperties": false,
+      "required": ["image", "digest", "python"],
+      "properties": {
+        "image": {"const": "quay.io/pypa/manylinux_2_28_x86_64"},
+        "digest": {"const": "sha256:0d9c2a66a745961947a8cecbe217ca0a7ee7a5849ba2517f20f9581d18444977"},
+        "python": {"const": "/opt/python/cp310-cp310/bin/python"}
+      }
+    },
+    "wheel": {
+      "type": "object", "additionalProperties": false,
+      "required": ["pythonTag", "abiTag", "testPythons"],
+      "properties": {
+        "pythonTag": {"const": "py3"}, "abiTag": {"const": "none"},
+        "testPythons": {"const": ["3.10", "3.11", "3.12", "3.13"]}
+      }
+    }
+  }
+}

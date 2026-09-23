@@ -67,6 +67,25 @@ def build_native_from_source() -> bool:
     ``PACKAGE_LIBS_DIR``, False otherwise (Rust not installed, submodule
     not present, build failed, etc.).
     """
+    release_target = os.environ.get('CASTLABS_STABLE_RELEASE_TARGET')
+    if release_target is not None:
+        # Release builds consume only the explicitly built and staged artifact.
+        # Never rebuild here with different flags or fall back to downloads.
+        from scripts.castlabs_release import load_lock, validate_lock, validate_native
+
+        lock = load_lock()
+        validate_lock(lock)
+        if release_target != get_platform_identifier():
+            raise RuntimeError('stable release target differs from build host')
+        library = lock['targets'][release_target]['library']
+        source = ARTIFACTS_DIR / release_target / library
+        if source.is_symlink() or not source.is_file():
+            raise RuntimeError('qualified stable native artifact is missing')
+        validate_native(source.read_bytes(), release_target)
+        PACKAGE_LIBS_DIR.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, PACKAGE_LIBS_DIR / library)
+        return True
+
     cargo_toml = C2PA_RS_SUBMODULE / 'c2pa_c_ffi' / 'Cargo.toml'
     if not cargo_toml.exists():
         return False

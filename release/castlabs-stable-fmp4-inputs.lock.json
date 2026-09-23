@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "releaseContext": "castlabs-stable-fmp4",
+  "profileId": "stable-fmp4-v1",
+  "package": {
+    "name": "c2pa-python",
+    "version": "0.31.0+stardustproof.3"
+  },
+  "pythonSource": {
+    "repository": "castlabs/c2pa-python",
+    "url": "https://github.com/castlabs/c2pa-python.git",
+    "releaseBranch": "fix/stable-single-file-fmp4",
+    "releaseTag": "castlabs-v0.31.0+stardustproof.3"
+  },
+  "rustSource": {
+    "repository": "castlabs/c2pa-rs",
+    "url": "https://github.com/castlabs/c2pa-rs.git",
+    "commit": "c1282d33a8fd1145c32d93c27b313a16523f1dbd",
+    "version": "0.80.0",
+    "cargoLockSha256": "fc10bef635df091377d02cfa9f1597462aa016c3db3439d43451a3b93c37edcf"
+  },
+  "rustToolchain": {
+    "channel": "1.88.0",
+    "rustupVersion": "1.28.2",
+    "installers": {
+      "x86_64-unknown-linux-gnu": {
+        "url": "https://static.rust-lang.org/rustup/archive/1.28.2/x86_64-unknown-linux-gnu/rustup-init",
+        "sha256": "20a06e644b0d9bd2fbdbfd52d42540bdde820ea7df86e92e533c073da0cdd43c"
+      },
+      "x86_64-pc-windows-msvc": {
+        "url": "https://static.rust-lang.org/rustup/archive/1.28.2/x86_64-pc-windows-msvc/rustup-init.exe",
+        "sha256": "88d8258dcf6ae4f7a80c7d1088e1f36fa7025a1cfd1343731b4ee6f385121fc0"
+      }
+    }
+  },
+  "nativeBuild": {
+    "package": "c2pa-c-ffi",
+    "profile": "release",
+    "noDefaultFeatures": false,
+    "features": ["file_io"]
+  },
+  "targets": {
+    "x86_64-unknown-linux-gnu": {
+      "runner": "ubuntu-24.04",
+      "library": "libc2pa_c.so",
+      "wheelPlatformTag": "manylinux_2_28_x86_64"
+    },
+    "x86_64-pc-windows-msvc": {
+      "runner": "windows-2022",
+      "library": "c2pa_c.dll",
+      "wheelPlatformTag": "win_amd64"
+    }
+  },
+  "manylinux": {
+    "image": "quay.io/pypa/manylinux_2_28_x86_64",
+    "digest": "sha256:0d9c2a66a745961947a8cecbe217ca0a7ee7a5849ba2517f20f9581d18444977",
+    "python": "/opt/python/cp310-cp310/bin/python"
+  },
+  "wheel": {
+    "pythonTag": "py3",
+    "abiTag": "none",
+    "testPythons": ["3.10", "3.11", "3.12", "3.13"]
+  }
+}

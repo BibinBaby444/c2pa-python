@@ -67,3 +67,14 @@ Contributions are welcome!  For more information, see [Contributing to the proje
 ## License
 
 This project is licensed under the Apache License 2.0 and the MIT License. See the [LICENSE-MIT](https://github.com/contentauth/c2pa-python/blob/main/LICENSE-MIT) and [LICENSE-APACHE](https://github.com/contentauth/c2pa-python/blob/main/LICENSE-APACHE) files for details.
+
+## Castlabs Stable fMP4 Hotfix
+
+The dedicated `stable-fmp4-v1` release profile targets
+`c2pa-python==0.31.0+stardustproof.3` and native `0.80.0`, preserving default
+OpenSSL crypto without importing the live-video VSI runtime. Release context:
+`castlabs-stable-fmp4`. The approved native source is
+`c1282d33a8fd1145c32d93c27b313a16523f1dbd`; its exact Cargo.lock digest is pinned
+in the stable schema-2 release lock. See
+[the stable release contract and runbook](release/STABLE-FMP4.md) for the exact
+approval gate, artifacts, mandatory real-native tests and publication safeguards.
