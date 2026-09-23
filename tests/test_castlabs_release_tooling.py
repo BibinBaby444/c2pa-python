@@ -804,6 +804,7 @@ def test_workflow_is_dedicated_pinned_all_platform_and_no_skip():
     [
         ("workflow_dispatch", "refs/heads/fix/stable-single-file-fmp4", SOURCE, True),
         ("push", f"refs/tags/{release.RELEASE_TAG}", "", True),
+        ("push", "refs/heads/fix/stable-single-file-fmp4", "", True),
         ("workflow_dispatch", "refs/heads/main", SOURCE, False),
         ("workflow_dispatch", f"refs/tags/{release.RELEASE_TAG}", SOURCE, False),
         (

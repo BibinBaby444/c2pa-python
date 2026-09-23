@@ -2,6 +2,8 @@ name: Castlabs stable fMP4 hotfix
 
 on:
   push:
+    branches:
+      - fix/stable-single-file-fmp4
     tags:
       - castlabs-v0.31.0+stardustproof.3
   workflow_dispatch:
@@ -40,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           case "${GITHUB_EVENT_NAME}:${GITHUB_REF}" in
-            workflow_dispatch:refs/heads/fix/stable-single-file-fmp4|push:refs/tags/castlabs-v0.31.0+stardustproof.3) ;;
+            workflow_dispatch:refs/heads/fix/stable-single-file-fmp4|push:refs/heads/fix/stable-single-file-fmp4|push:refs/tags/castlabs-v0.31.0+stardustproof.3) ;;
             *) echo "unsupported stable release event/ref" >&2; exit 1 ;;
           esac
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then

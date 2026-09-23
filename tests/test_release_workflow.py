@@ -81,7 +81,8 @@ def test_repository_carries_the_patched_submodule():
     presence and origin are release invariants, not implementation details.
     """
     gitmodules = (REPO_ROOT / ".gitmodules").read_text(encoding="utf-8")
-    assert "mstattma/c2pa-rs" in gitmodules
+    assert "url = https://github.com/castlabs/c2pa-rs.git" in gitmodules
+    assert "branch = fix/stable-single-file-fmp4" in gitmodules
     assert "path = c2pa-rs" in gitmodules
     assert (REPO_ROOT / "c2pa-rs").exists()
 

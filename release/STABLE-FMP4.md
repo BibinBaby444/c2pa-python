@@ -51,7 +51,9 @@ facts, not new ad-hoc fields in the artifact evidence.
 
 ## Build And Acceptance
 
-The workflow is `.github/workflows/castlabs-stable-fmp4-release.yml`. Manual
+The workflow is `.github/workflows/castlabs-stable-fmp4-release.yml`. Pushes to
+the exact `fix/stable-single-file-fmp4` branch run non-publishing candidate builds,
+so the lane can be qualified without registering it on the default branch. Manual
 dispatch from `fix/stable-single-file-fmp4` accepts that branch-tip `source_sha`,
 which must also match the workflow's `GITHUB_SHA`, and builds/tests candidates
 without publication. Dispatch from the default branch or a tag is rejected
