@@ -107,7 +107,7 @@ def test_committed_approval_matches_reviewed_native_pins():
     lock = release.load_lock()
     assert lock["releaseContext"] == "castlabs-stable-fmp4"
     assert lock["profileId"] == "stable-fmp4-v1"
-    assert lock["rustSource"]["commit"] == "c1282d33a8fd1145c32d93c27b313a16523f1dbd"
+    assert lock["rustSource"]["commit"] == "589174898eca4c2c42289d3251c0619420806f43"
     assert (
         lock["rustSource"]["cargoLockSha256"]
         == "fc10bef635df091377d02cfa9f1597462aa016c3db3439d43451a3b93c37edcf"
@@ -780,7 +780,7 @@ def test_workflow_is_dedicated_pinned_all_platform_and_no_skip():
     jobs = workflow["jobs"]
     assert (
         jobs["release"]["if"]
-        == "github.event_name == 'push' && github.ref == 'refs/tags/castlabs-v0.31.0+stardustproof.4'"
+        == "github.event_name == 'push' && github.ref == 'refs/tags/castlabs-v0.31.0+stardustproof.5'"
     )
     assert set(jobs["release"]["needs"]) == {
         "prepare",
@@ -854,6 +854,7 @@ def test_tag_filter_matches_literal_plus_under_actions_pattern_rules():
     patterns = workflow["on"]["push"]["tags"]
     assert len(patterns) == 1
     pattern = patterns[0]
+    assert pattern == r"castlabs-v0.31.0\+stardustproof.5"
     assert f"      - '{pattern}'" in text
     matcher = compile_filter(pattern)
     assert matcher.fullmatch(release.RELEASE_TAG)
@@ -862,6 +863,7 @@ def test_tag_filter_matches_literal_plus_under_actions_pattern_rules():
         release.RELEASE_TAG.replace("+", "0"),
         release.RELEASE_TAG.replace("castlabs-", ""),
         "castlabs-v0.31.0+stardustproof.3",
+        "castlabs-v0.31.0+stardustproof.4",
         release.RELEASE_TAG + "-extra",
     ):
         assert not matcher.fullmatch(invalid)
@@ -873,6 +875,78 @@ def test_tag_filter_matches_literal_plus_under_actions_pattern_rules():
     assert not compile_filter(release.RELEASE_TAG.replace("+", "\\\\+")).fullmatch(
         release.RELEASE_TAG
     )
+
+
+@pytest.mark.parametrize("target", [LINUX, WINDOWS])
+@pytest.mark.parametrize("mutation", [None, "zero", "missing", "ignored", "wrong", "failed"])
+def test_native_tfra_gate_requires_every_test(monkeypatch, tmp_path, target, mutation):
+    names = [
+        "versions_widths_and_large_headers_preserve_every_non_offset_byte",
+        "splice_boundaries_use_original_coordinates",
+        "checked_offset_arithmetic", "empty_tables_and_unknown_versions",
+        "short_headers_and_truncated_trailing_numbers",
+        "declared_bounds_do_not_consume_following_box",
+        "public_manifest_write_grow_shrink_and_remove",
+        "public_xmp_and_placeholder_adjust_tfra",
+        "bibin_fragmented_fixture_preserves_intended_moofs",
+        "full_signing_preserves_tfra_targets",
+    ]
+    output = "\n".join(
+        f"test asset_handlers::bmff_io::tfra_tests::{name} ... ok" for name in names
+    ) + "\ntest result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 781 filtered out;"
+    if mutation == "zero":
+        output = "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 791 filtered out;"
+    elif mutation == "missing":
+        output = output.split("\n", 1)[1]
+    elif mutation == "ignored":
+        output = output.replace("0 ignored", "1 ignored")
+    elif mutation == "wrong":
+        output = output.replace("public_xmp_and_placeholder_adjust_tfra", "merkle_smoke")
+
+    def run(command, **kwargs):
+        assert command == [
+            "cargo", "+1.88.0", "test", "--release", "--locked", "--target",
+            target, "--package", "c2pa", "--lib", "--features", "file_io",
+            "asset_handlers::bmff_io::tfra_tests::", "--", "--include-ignored",
+            "--format", "pretty", "--color", "never",
+        ]
+        assert kwargs == {
+            "cwd": tmp_path.resolve(), "check": True,
+            "stdout": subprocess.PIPE, "text": True,
+        }
+        if mutation == "failed":
+            raise subprocess.CalledProcessError(1, command)
+        return SimpleNamespace(stdout=output)
+
+    monkeypatch.setattr(release.subprocess, "run", run)
+    args = release.parser().parse_args([
+        "cargo-tfra-tests", "--rust-root", str(tmp_path), "--target", target,
+    ])
+    if mutation is None:
+        args.func(args)
+    else:
+        with pytest.raises((SystemExit, subprocess.CalledProcessError)):
+            args.func(args)
+
+
+def test_both_platform_builds_require_native_tfra_before_wheel_staging():
+    workflow = yaml.safe_load(
+        (ROOT / ".github/workflows/castlabs-stable-fmp4-release.yml").read_text()
+    )
+    for platform, target in (("linux", LINUX), ("windows", WINDOWS)):
+        steps = workflow["jobs"][platform]["steps"]
+        gate = [step for step in steps if "cargo-tfra-tests" in step.get("run", "")]
+        assert len(gate) == 1
+        step = gate[0]
+        assert "if" not in step and "continue-on-error" not in step
+        script = step["run"]
+        assert f"--target {target}" in script
+        assert script.index("cargo-build") < script.index("cargo-tfra-tests") < script.index("stage-native")
+        if platform == "windows":
+            after_gate = script[script.index("cargo-tfra-tests"):script.index("stage-native")]
+            assert "if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }" in after_gate
+        else:
+            assert "bash -euxo pipefail" in script
 
 
 @pytest.mark.parametrize(
@@ -892,7 +966,9 @@ def test_tag_filter_matches_literal_plus_under_actions_pattern_rules():
         ("push", "refs/heads/main", "", False),
         ("push", "refs/tags/castlabs-v0.31.0+stardustproof.2", "", False),
         ("push", "refs/tags/castlabs-v0.31.0+stardustproof.3", "", False),
+        ("push", "refs/tags/castlabs-v0.31.0+stardustproof.4", "", False),
         ("push", "refs/tags/v0.31.0+stardustproof.4", "", False),
+        ("push", "refs/tags/v0.31.0+stardustproof.5", "", False),
         ("pull_request", "refs/pull/1/merge", SOURCE, False),
     ],
 )

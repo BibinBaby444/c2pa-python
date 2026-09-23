@@ -3,7 +3,7 @@
 ## Stable fMP4 Release Lane
 
 This worktree's dedicated profile is `stable-fmp4-v1`, release context
-`castlabs-stable-fmp4`, Python `0.31.0+stardustproof.4`, native `0.80.0`.
+`castlabs-stable-fmp4`, Python `0.31.0+stardustproof.5`, native `0.80.0`.
 Use `.github/workflows/castlabs-stable-fmp4-release.yml`, the explicit lock at
 `release/castlabs-stable-fmp4-inputs.lock.json`, and `scripts/castlabs_release.py`.
 Native defaults (vendored OpenSSL + HTTP + thumbnails) and `file_io` must remain
@@ -11,7 +11,7 @@ enabled. The exact requested/evidenced feature list is `["file_io"]`, with
 `noDefaultFeatures=false`; do not explicitly request HTTP or thumbnails. Actual
 SDK HTTP features are `http_reqwest,http_reqwest_blocking`, while `http` is the
 FFI feature. Do not import VSI runtime changes or substitute `rust_native_crypto`.
-The approved native source is `c1282d33a8fd1145c32d93c27b313a16523f1dbd`, with
+The approved native source is `589174898eca4c2c42289d3251c0619420806f43`, with
 Cargo.lock SHA-256 `fc10bef635df091377d02cfa9f1597462aa016c3db3439d43451a3b93c37edcf`.
 Keep the lock, helper approval constants, and submodule gitlink aligned. Missing
 or changed approvals must still fail closed; negative tests explicitly remove
@@ -22,6 +22,10 @@ See `release/STABLE-FMP4.md` for the standard schema-2 consumer contract.
 Run pure-Python tooling tests with
 `python3 -m pytest -q tests/test_castlabs_release_tooling.py`. Real acceptance lives in
 `tests/test_castlabs_release_smoke.py` and must never gain skip switches.
+Both platform builds also run all 10 `asset_handlers::bmff_io::tfra_tests` through
+the strict `cargo-tfra-tests` helper. Wheel Merkle smokes bypass legacy TFRA and
+cannot substitute for this native gate. Previously corrupted assets must be
+regenerated from the unsigned master.
 
 ## Project Overview
 
@@ -48,7 +52,7 @@ c2pa-python (this repo)
 └── setup.py                   ← Modified to build from source
 ```
 
-The native library (`libc2pa_c.so` / `.dylib` / `.dll`) is built from the `c2pa-rs` git submodule which contains our Rust patches. The submodule uses `https://github.com/castlabs/c2pa-rs.git`, branch `fix/stable-single-file-fmp4`, at the approved immutable commit above.
+The native library (`libc2pa_c.so` / `.dylib` / `.dll`) is built from the `c2pa-rs` git submodule which contains our Rust patches. The submodule uses `https://github.com/castlabs/c2pa-rs.git`, branch `fix/stable-tfra-offsets`, at the approved immutable commit above.
 
 ## Patches Summary
 

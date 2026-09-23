@@ -28,9 +28,9 @@ ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "release" / "castlabs-stable-fmp4-inputs.lock.json"
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
-RELEASE_VERSION = "0.31.0+stardustproof.4"
+RELEASE_VERSION = "0.31.0+stardustproof.5"
 # Reviewed stable native source; update these AND the lock/gitlink together.
-RUST_COMMIT: str | None = "c1282d33a8fd1145c32d93c27b313a16523f1dbd"
+RUST_COMMIT: str | None = "589174898eca4c2c42289d3251c0619420806f43"
 CARGO_LOCK_SHA256: str | None = (
     "fc10bef635df091377d02cfa9f1597462aa016c3db3439d43451a3b93c37edcf"
 )
@@ -41,7 +41,7 @@ MANYLINUX_IMAGE = "quay.io/pypa/manylinux_2_28_x86_64"
 MANYLINUX_DIGEST = (
     "sha256:0d9c2a66a745961947a8cecbe217ca0a7ee7a5849ba2517f20f9581d18444977"
 )
-RELEASE_TAG = "castlabs-v0.31.0+stardustproof.4"
+RELEASE_TAG = "castlabs-v0.31.0+stardustproof.5"
 RELEASE_NAME = f"Castlabs c2pa-python {RELEASE_VERSION} (stable fMP4)"
 RELEASE_BODY_MARKER = f"castlabs-stable-fmp4-release:{RELEASE_VERSION}"
 RELEASE_IDENTITY_TEXT = (
@@ -50,7 +50,9 @@ RELEASE_IDENTITY_TEXT = (
 RELEASE_BODY = (
     f"{RELEASE_BODY_MARKER}\n\n"
     f"{RELEASE_IDENTITY_TEXT}. Profile {PROFILE_ID}; context {RELEASE_CONTEXT}. "
-    "Single-file fragmented MP4 fix on native 0.80.0, default OpenSSL crypto. "
+    "Single-file fragmented MP4 and legacy TFRA fixes on native 0.80.0, default OpenSSL crypto. "
+    "TFRA diagnosis, original per-entry fix and fixture contributed by BibinBaby444. "
+    "Regenerate previously corrupted assets from the unsigned master. "
     "No live-video VSI runtime. See the attached "
     "schema-2 evidence and SHA-256 sidecars."
 )
@@ -246,12 +248,12 @@ def validate_lock(lock: dict[str, Any]) -> None:
     ):
         fail("missing approved stable Cargo.lock pin; release is blocked")
     if lock["package"] != {"name": "c2pa-python", "version": RELEASE_VERSION}:
-        fail("release lock package identity is not 0.31.0+stardustproof.4")
+        fail("release lock package identity is not 0.31.0+stardustproof.5")
     if lock["pythonSource"] != {
         "repository": "castlabs/c2pa-python",
         "url": "https://github.com/castlabs/c2pa-python.git",
         "releaseBranch": "fix/stable-single-file-fmp4",
-        "releaseTag": "castlabs-v0.31.0+stardustproof.4",
+        "releaseTag": "castlabs-v0.31.0+stardustproof.5",
     }:
         fail("unexpected c2pa-python release source policy")
     rust = lock["rustSource"]
@@ -425,6 +427,46 @@ def command_cargo_build(args: argparse.Namespace) -> None:
     command = cargo_command(lock, target)
     subprocess.run(command, cwd=rust_root, check=True)
     print(json.dumps(command, separators=(",", ":")))
+
+
+def command_cargo_tfra_tests(args: argparse.Namespace) -> None:
+    """Run the legacy path explicitly; Merkle wheel smokes cannot cover it."""
+    lock = load_lock()
+    validate_lock(lock)
+    if args.target not in lock["targets"]:
+        fail(f"unknown target: {args.target}")
+    command = [
+        "cargo", f"+{lock['rustToolchain']['channel']}", "test", "--release",
+        "--locked", "--target", args.target, "--package", "c2pa", "--lib",
+        "--features", "file_io", "asset_handlers::bmff_io::tfra_tests::",
+        "--", "--include-ignored", "--format", "pretty", "--color", "never",
+    ]
+    result = subprocess.run(
+        command, cwd=Path(args.rust_root).resolve(), check=True,
+        stdout=subprocess.PIPE, text=True,
+    )
+    print(result.stdout, flush=True)
+    expected = {
+        "versions_widths_and_large_headers_preserve_every_non_offset_byte",
+        "splice_boundaries_use_original_coordinates",
+        "checked_offset_arithmetic", "empty_tables_and_unknown_versions",
+        "short_headers_and_truncated_trailing_numbers",
+        "declared_bounds_do_not_consume_following_box",
+        "public_manifest_write_grow_shrink_and_remove",
+        "public_xmp_and_placeholder_adjust_tfra",
+        "bibin_fragmented_fixture_preserves_intended_moofs",
+        "full_signing_preserves_tfra_targets",
+    }
+    passed = re.findall(
+        r"^test asset_handlers::bmff_io::tfra_tests::(\w+) \.\.\. ok$",
+        result.stdout, re.MULTILINE,
+    )
+    if len(passed) != len(expected) or set(passed) != expected or not re.search(
+        r"^test result: ok\. 10 passed; 0 failed; 0 ignored; 0 measured; \d+ filtered out;",
+        result.stdout, re.MULTILINE,
+    ):
+        fail("legacy TFRA gate requires all 10 named tests, zero failures and zero ignores")
+    print(f"legacy TFRA gate passed: {args.target}: 10 passed, 0 ignored", flush=True)
 
 
 def validate_feature_report(text: str) -> None:
@@ -1682,6 +1724,11 @@ def parser() -> argparse.ArgumentParser:
     cargo.add_argument("--target", required=True)
     cargo.add_argument("--feature-report", required=True)
     cargo.set_defaults(func=command_cargo_build)
+
+    tfra = commands.add_parser("cargo-tfra-tests")
+    tfra.add_argument("--rust-root", required=True, type=Path)
+    tfra.add_argument("--target", required=True)
+    tfra.set_defaults(func=command_cargo_tfra_tests)
 
     pack = commands.add_parser("pack")
     pack.add_argument("--output", required=True)

@@ -36,7 +36,7 @@ jobs:
       - name: Reserve stable hotfix for the schema-2 lane
         if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true')
         run: |
-          python3 -c 'import pathlib; assert "0.31.0+stardustproof.4" not in pathlib.Path("pyproject.toml").read_text(), "Use castlabs-stable-fmp4-release.yml for this version"'
+          python3 -c 'import pathlib; text = pathlib.Path("pyproject.toml").read_text(); assert not any(v in text for v in ("0.31.0+stardustproof.3", "0.31.0+stardustproof.4", "0.31.0+stardustproof.5")), "Use castlabs-stable-fmp4-release.yml for this version"'
       - name: Read version from file
         id: read-version
         run: echo "version=$(cat c2pa-native-version.txt | tr -d '\r\n')" >> $GITHUB_OUTPUT

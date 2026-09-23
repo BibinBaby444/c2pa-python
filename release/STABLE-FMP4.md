@@ -1,13 +1,14 @@
 # Stable fMP4 Hotfix Release
 
 This lane is independent of the live-video VSI lane. It keeps the Python stable
-runtime from `e00831db`, with one separately reviewed native single-file fMP4 fix
-on the `84208af` baseline. It does not merge VSI APIs or change crypto providers.
+runtime from `e00831db`, with separately reviewed native single-file fMP4 and
+legacy TFRA fixes on the `84208af` baseline. It does not merge VSI APIs or change
+crypto providers.
 
 | Contract | Value |
 | --- | --- |
-| Python package | `c2pa-python==0.31.0+stardustproof.4` |
-| Castlabs tag | `castlabs-v0.31.0+stardustproof.4` |
+| Python package | `c2pa-python==0.31.0+stardustproof.5` |
+| Castlabs tag | `castlabs-v0.31.0+stardustproof.5` |
 | Release context | `castlabs-stable-fmp4` |
 | Profile ID | `stable-fmp4-v1` |
 | Native SDK/FFI | `0.80.0` |
@@ -29,11 +30,14 @@ published as a release**. The unescaped `+` in its Actions tag filter prevented
 the release run from starting. Do not delete, move, reuse, or publish that tag.
 The `.4` repair uses a single-quoted filter with one literal backslash before
 `+`; exact event refs, evidence and asset names retain the unescaped `+`.
+The published `.4` source is `c916e8a82df97f740dd05ec58911dd02ea58325d`;
+its tag and release remain immutable. The `.5` TFRA hotfix retains the corrected
+literal tag filter and advances only the reviewed stable native pin and gates.
 
 The native audit is cleared and the approved source is committed and pushed in
-`castlabs/c2pa-rs`, branch `fix/stable-single-file-fmp4`:
+`castlabs/c2pa-rs`, branch `fix/stable-tfra-offsets`:
 
-- Commit: `c1282d33a8fd1145c32d93c27b313a16523f1dbd`.
+- Commit: `589174898eca4c2c42289d3251c0619420806f43`.
 - Cargo.lock SHA-256: `fc10bef635df091377d02cfa9f1597462aa016c3db3439d43451a3b93c37edcf`.
 - Native runtime version: `0.80.0`.
 
@@ -60,6 +64,17 @@ The context/profile identifiers live in the approved lock and downstream release
 facts, not new ad-hoc fields in the artifact evidence.
 
 ## Build And Acceptance
+
+Both platform builds must execute all 10 focused Rust
+`asset_handlers::bmff_io::tfra_tests` with Rust 1.88.0, `--locked`, defaults and
+`file_io`. The `cargo-tfra-tests` helper requires the exact test names to pass
+with zero failures or ignored tests, not merely Cargo exit status. These include
+the no-`moov` legacy writer/XMP/placeholder synthetics; the existing single-file
+Merkle wheel smokes bypass that legacy path and are not TFRA qualification.
+The diagnosis, original per-entry fix and unchanged fixture are credited to
+BibinBaby444. The focused backport leaves the single-file Merkle implementation
+unchanged and does not repair already corrupted TFRA tables: regenerate affected
+assets from the unsigned master.
 
 The workflow is `.github/workflows/castlabs-stable-fmp4-release.yml`. Pushes to
 the exact `fix/stable-single-file-fmp4` branch run non-publishing candidate builds,
