@@ -70,7 +70,6 @@ _REQUIRED_FUNCTIONS = [
     'c2pa_builder_sign',
     'c2pa_builder_sign_context',
     'c2pa_builder_sign_fragmented',
-    'c2pa_builder_sign_ladder',
     'c2pa_builder_from_context',
     'c2pa_builder_with_definition',
     'c2pa_builder_with_archive',
@@ -790,16 +789,21 @@ _setup_function(
      ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte))],
     ctypes.c_int64
 )
-_setup_function(
-    _lib.c2pa_builder_sign_ladder,
-    [ctypes.POINTER(C2paBuilder),
-     ctypes.POINTER(C2paSigner),
-     ctypes.POINTER(ctypes.c_char_p),  # sources
-     ctypes.POINTER(ctypes.c_char_p),  # dests
-     ctypes.c_size_t,                  # count
-     ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte))],
-    ctypes.c_int64
-)
+# Optional: present only in native builds carrying castlabs/c2pa-rs#9. Not
+# listed in _REQUIRED_FUNCTIONS, so older libraries still import; sign_ladder
+# reports the missing capability itself.
+_HAS_SIGN_LADDER = hasattr(_lib, "c2pa_builder_sign_ladder")
+if _HAS_SIGN_LADDER:
+    _setup_function(
+        _lib.c2pa_builder_sign_ladder,
+        [ctypes.POINTER(C2paBuilder),
+         ctypes.POINTER(C2paSigner),
+         ctypes.POINTER(ctypes.c_char_p),  # sources
+         ctypes.POINTER(ctypes.c_char_p),  # dests
+         ctypes.c_size_t,                  # count
+         ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte))],
+        ctypes.c_int64
+    )
 
 
 class C2paError(Exception):
@@ -3997,6 +4001,12 @@ class Builder(ManagedResource):
                 single-file fragmented, or overlapping paths).
         """
         self._ensure_valid_state()
+        if not _HAS_SIGN_LADDER:
+            raise C2paError(
+                "this native library cannot sign a ladder: "
+                "c2pa_builder_sign_ladder is absent. It needs a build "
+                "carrying castlabs/c2pa-rs#9."
+            )
         if not hasattr(signer, "_handle") or not signer._handle:
             raise C2paError("Invalid or closed signer")
         if len(sources) != len(dests):
@@ -4025,12 +4035,11 @@ class Builder(ManagedResource):
                 count,
                 ctypes.byref(manifest_bytes_ptr),
             )
-            # The Rust FFI consumes the builder pointer on sign; mark
-            # ours consumed too so subsequent methods raise clearly.
-            self._mark_consumed()
         except Exception as e:
-            self._mark_consumed()
             raise C2paError(f"Error during ladder signing: {e}")
+        # The FFI borrows the builder and does not free it, so the handle is
+        # kept: it is released by close() or on collection, on success and on
+        # failure alike. Discarding it here would leak the native object.
 
         _check_ffi_operation_result(
             result,
