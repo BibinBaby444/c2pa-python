@@ -70,6 +70,7 @@ _REQUIRED_FUNCTIONS = [
     'c2pa_builder_sign',
     'c2pa_builder_sign_context',
     'c2pa_builder_sign_fragmented',
+    'c2pa_builder_sign_ladder',
     'c2pa_builder_from_context',
     'c2pa_builder_with_definition',
     'c2pa_builder_with_archive',
@@ -786,6 +787,16 @@ _setup_function(
      ctypes.c_char_p,  # asset_path
      ctypes.c_char_p,  # fragments_glob
      ctypes.c_char_p,  # output_dir
+     ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte))],
+    ctypes.c_int64
+)
+_setup_function(
+    _lib.c2pa_builder_sign_ladder,
+    [ctypes.POINTER(C2paBuilder),
+     ctypes.POINTER(C2paSigner),
+     ctypes.POINTER(ctypes.c_char_p),  # sources
+     ctypes.POINTER(ctypes.c_char_p),  # dests
+     ctypes.c_size_t,                  # count
      ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte))],
     ctypes.c_int64
 )
@@ -3927,6 +3938,103 @@ class Builder(ManagedResource):
         _check_ffi_operation_result(
             result,
             "Error during fragmented signing",
+            check=lambda r: r < 0,
+        )
+
+        manifest_bytes = b""
+        if manifest_bytes_ptr and result > 0:
+            try:
+                temp_buffer = (ctypes.c_ubyte * result)()
+                ctypes.memmove(temp_buffer, manifest_bytes_ptr, result)
+                manifest_bytes = bytes(temp_buffer)
+            except Exception:
+                manifest_bytes = b""
+            finally:
+                try:
+                    _lib.c2pa_manifest_bytes_free(manifest_bytes_ptr)
+                except Exception:
+                    logger.error(
+                        "Failed to release native manifest bytes memory"
+                    )
+
+        return manifest_bytes
+
+    def sign_ladder(
+        self,
+        signer: Signer,
+        sources: list[Union[str, Path]],
+        dests: list[Union[str, Path]],
+    ) -> bytes:
+        """Sign an ABR ladder of single-file fragmented MP4s into ONE manifest.
+
+        Wraps ``c2pa::Builder::sign_ladder_files`` via the
+        ``c2pa_builder_sign_ladder`` FFI. Every rendition of the ladder is
+        covered by a single claim: the BMFF hash assertion carries one Merkle
+        tree per rendition, and the identical manifest is embedded into each
+        output file, so the set validates together and a watermark that
+        resolves to the session resolves to one manifest rather than one per
+        rendition.
+
+        Each source must be a *single-file* fragmented MP4 -- its own ``moov``
+        and ``moof`` boxes. A multiplexed asset (several tracks in one file) is
+        rejected; demux it into one file per rendition first. For the
+        init-segment-plus-fragments layout use
+        :py:meth:`sign_fragmented` instead.
+
+        Args:
+            signer: The signer to use. Either kind works -- one built from
+                ``C2paSignerInfo`` or one with an explicit callback.
+            sources: One path per rendition.
+            dests: Output paths, positionally matched to ``sources``. Must be
+                distinct and must not alias a source.
+
+        Returns:
+            The manifest bytes embedded in every rendition.
+
+        Raises:
+            C2paError: If signing fails, or if the inputs are not a valid
+                ladder (empty, mismatched lengths, a rendition that is not
+                single-file fragmented, or overlapping paths).
+        """
+        self._ensure_valid_state()
+        if not hasattr(signer, "_handle") or not signer._handle:
+            raise C2paError("Invalid or closed signer")
+        if len(sources) != len(dests):
+            raise C2paError(
+                f"sources and dests must have the same length; "
+                f"got {len(sources)} and {len(dests)}"
+            )
+        if not sources:
+            raise C2paError("a ladder needs at least one rendition")
+
+        count = len(sources)
+        source_bytes = [os.fspath(p).encode("utf-8") for p in sources]
+        dest_bytes = [os.fspath(p).encode("utf-8") for p in dests]
+        # Keep the Python bytes objects alive for the duration of the call --
+        # the arrays below hold borrowed pointers into them.
+        source_array = (ctypes.c_char_p * count)(*source_bytes)
+        dest_array = (ctypes.c_char_p * count)(*dest_bytes)
+
+        manifest_bytes_ptr = ctypes.POINTER(ctypes.c_ubyte)()
+        try:
+            result = _lib.c2pa_builder_sign_ladder(
+                self._handle,
+                signer._handle,
+                source_array,
+                dest_array,
+                count,
+                ctypes.byref(manifest_bytes_ptr),
+            )
+            # The Rust FFI consumes the builder pointer on sign; mark
+            # ours consumed too so subsequent methods raise clearly.
+            self._mark_consumed()
+        except Exception as e:
+            self._mark_consumed()
+            raise C2paError(f"Error during ladder signing: {e}")
+
+        _check_ffi_operation_result(
+            result,
+            "Error during ladder signing",
             check=lambda r: r < 0,
         )
 
