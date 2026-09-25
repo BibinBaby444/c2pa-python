@@ -3193,6 +3193,28 @@ class Signer(ManagedResource):
             _parse_operation_result_for_error(None)
 
 
+def _ladder_path_bytes(path, name: str, index: int) -> bytes:
+    """Encode one ladder path for the C API.
+
+    ``c_char_p`` hands C a NUL-terminated string, so a path with an embedded
+    NUL would silently become its prefix -- a different file read or written
+    instead of an error. Refuse it here, and turn an unencodable path into the
+    same error type rather than a bare UnicodeEncodeError.
+    """
+    try:
+        raw = os.fspath(path)
+        encoded = raw if isinstance(raw, bytes) else raw.encode("utf-8")
+    except TypeError as e:
+        raise C2paError(f"{name}[{index}] is not a path: {path!r}") from e
+    except UnicodeEncodeError as e:
+        raise C2paError(
+            f"{name}[{index}] cannot be encoded as UTF-8: {path!r}"
+        ) from e
+    if b"\0" in encoded:
+        raise C2paError(f"{name}[{index}] contains a NUL byte: {path!r}")
+    return encoded
+
+
 class Builder(ManagedResource):
     """High-level wrapper for C2PA Builder operations."""
 
@@ -3996,13 +4018,16 @@ class Builder(ManagedResource):
             The manifest bytes embedded in every rendition.
 
         Raises:
+            C2paError.NotSupported: If the loaded native library has no
+                ``c2pa_builder_sign_ladder`` (see ``_HAS_SIGN_LADDER``).
             C2paError: If signing fails, or if the inputs are not a valid
-                ladder (empty, mismatched lengths, a rendition that is not
-                single-file fragmented, or overlapping paths).
+                ladder (empty, mismatched lengths, a path that cannot be
+                handed to C, a rendition that is not single-file fragmented,
+                or overlapping paths).
         """
         self._ensure_valid_state()
         if not _HAS_SIGN_LADDER:
-            raise C2paError(
+            raise C2paError.NotSupported(
                 "this native library cannot sign a ladder: "
                 "c2pa_builder_sign_ladder is absent. It needs a build "
                 "carrying castlabs/c2pa-rs#9."
@@ -4018,8 +4043,12 @@ class Builder(ManagedResource):
             raise C2paError("a ladder needs at least one rendition")
 
         count = len(sources)
-        source_bytes = [os.fspath(p).encode("utf-8") for p in sources]
-        dest_bytes = [os.fspath(p).encode("utf-8") for p in dests]
+        source_bytes = [
+            _ladder_path_bytes(p, "sources", i) for i, p in enumerate(sources)
+        ]
+        dest_bytes = [
+            _ladder_path_bytes(p, "dests", i) for i, p in enumerate(dests)
+        ]
         # Keep the Python bytes objects alive for the duration of the call --
         # the arrays below hold borrowed pointers into them.
         source_array = (ctypes.c_char_p * count)(*source_bytes)
@@ -4047,23 +4076,23 @@ class Builder(ManagedResource):
             check=lambda r: r < 0,
         )
 
-        manifest_bytes = b""
-        if manifest_bytes_ptr and result > 0:
+        if result == 0:
+            return b""
+        if not manifest_bytes_ptr:
+            raise C2paError(
+                f"native ladder signing reported {result} manifest bytes but "
+                "returned no buffer"
+            )
+        # A failed copy is a failed call: the manifest was not delivered, so
+        # it must not come back as successful empty bytes. The native buffer
+        # is released exactly once either way.
+        try:
+            return ctypes.string_at(manifest_bytes_ptr, result)
+        finally:
             try:
-                temp_buffer = (ctypes.c_ubyte * result)()
-                ctypes.memmove(temp_buffer, manifest_bytes_ptr, result)
-                manifest_bytes = bytes(temp_buffer)
+                _lib.c2pa_manifest_bytes_free(manifest_bytes_ptr)
             except Exception:
-                manifest_bytes = b""
-            finally:
-                try:
-                    _lib.c2pa_manifest_bytes_free(manifest_bytes_ptr)
-                except Exception:
-                    logger.error(
-                        "Failed to release native manifest bytes memory"
-                    )
-
-        return manifest_bytes
+                logger.error("Failed to release native manifest bytes memory")
 
     @overload
     def sign_file(
