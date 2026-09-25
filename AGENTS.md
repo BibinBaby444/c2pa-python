@@ -64,6 +64,7 @@ The native library (`libc2pa_c.so` / `.dylib` / `.dll`) is built from the `c2pa-
 | `Signer.add_dynamic_assertion()` | ~line 3045 | Python API: register a callback, invokes C FFI `c2pa_signer_add_dynamic_assertion` |
 | `has_signer` fix | ~line 3700 | `_sign_common` tries context-based signing when `self._context is not None` |
 | `Builder.sign_fragmented()` | ~line 3782 | Python API for fragmented BMFF signing; invokes C FFI `c2pa_builder_sign_fragmented` |
+| `Builder.sign_ladder()` | ~line 3990 | Python API for signing an ABR ladder of single-file fragmented MP4s into one manifest; invokes C FFI `c2pa_builder_sign_ladder` (castlabs/c2pa-rs#9). The symbol is OPTIONAL: not in `_REQUIRED_FUNCTIONS`, presence recorded in `_HAS_SIGN_LADDER`, `C2paError.NotSupported` when absent. Borrows the builder (no `_mark_consumed`). Paths are validated (NUL, encoding) before the FFI; manifest copy failures propagate. Tests: `tests/test_builder_sign_ladder.py` (`C2PA_REQUIRE_SIGN_LADDER=1` makes the real roundtrip mandatory). |
 | `Reader.from_fragmented_files()` | ~line 2270 | Python classmethod for fragmented BMFF read; invokes C FFI `c2pa_reader_from_fragmented_files`. Read-side counterpart to `Builder.sign_fragmented` — takes the init segment path plus an explicit list of fragment paths and returns a `Reader` whose `json()` / `detailed_json()` describe the signed segmented asset. |
 
 ### Rust — C FFI (`c2pa-rs/c2pa_c_ffi/src/c_api.rs`)
