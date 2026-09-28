@@ -95,8 +95,11 @@ native source that includes castlabs/c2pa-rs#9 does. The builder is borrowed
 by the call and stays usable afterwards; release it with `close()` as usual.
 
 Outputs must not exist yet -- the native writer creates each one and never
-overwrites -- and every output it created is removed again if the call fails.
-Sources that already carry a C2PA manifest are refused.
+overwrites. If the native call fails it removes the outputs it created, best
+effort; and a Python-side failure while copying the returned manifest happens
+*after* native signing has succeeded, so the signed outputs are then in place.
+Do not infer from an exception that no output exists: inspect or discard the
+destinations. Sources that already carry a C2PA manifest are refused.
 
 `tests/test_builder_sign_ladder.py` covers the binding against a stand-in for
 the native function on any library, and signs a real two-rendition ladder when

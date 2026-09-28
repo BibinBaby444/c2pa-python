@@ -22,6 +22,7 @@ the symbol proves it does.
 from __future__ import annotations
 
 import ctypes
+import json
 import os
 import shutil
 from pathlib import Path
@@ -283,12 +284,28 @@ def test_a_real_ladder_signs_and_validates(signer, tmp_path):
         builder.close()
 
     assert [s.read_bytes() for s in sources] == before, "a source was modified"
+    manifests = []
     for dest in dests:
         with open(dest, "rb") as stream:
             reader = Reader("video/mp4", stream)
             try:
-                report = reader.json()
-                assert '"active_manifest"' in report
-                assert "assertion.bmffHash.mismatch" not in report
+                report = json.loads(reader.json())
             finally:
                 reader.close()
+        active = report["active_manifest"]
+        assert active, f"{dest.name}: no active manifest: {report}"
+        # The test certificate is untrusted, which is informational; the
+        # manifest itself must validate, and its binding must match.
+        assert report["validation_state"] in ("Valid", "Trusted"), report["validation_state"]
+        results = report["validation_results"]["activeManifest"]
+        codes = {entry["code"] for entry in results.get("success", [])}
+        assert "assertion.bmffHash.match" in codes, f"{dest.name}: {codes}"
+        assert "claimSignature.validated" in codes, f"{dest.name}: {codes}"
+        failures = {entry["code"] for entry in results.get("failure", [])}
+        assert failures <= {"signingCredential.untrusted"}, f"{dest.name}: {failures}"
+        manifest = report["manifests"][active]
+        bmff = [a for a in manifest["assertions"] if a["label"].startswith("c2pa.hash.bmff")]
+        assert len(bmff) == 1, [a["label"] for a in manifest["assertions"]]
+        assert len(bmff[0]["data"]["merkle"]) == 2, "one Merkle map per rendition"
+        manifests.append((active, json.dumps(report["manifests"], sort_keys=True)))
+    assert manifests[0] == manifests[1], "the renditions do not carry the identical manifest"
