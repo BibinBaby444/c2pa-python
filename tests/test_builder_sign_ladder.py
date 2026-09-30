@@ -35,6 +35,72 @@ from c2pa import Builder, C2paError, C2paSignerInfo, Reader, Signer
 
 FIXTURES = Path(__file__).parent / "fixtures"
 RENDITION = FIXTURES / "single-file-fragmented" / "single_file_fragments.mp4"
+C2PA_UUID = bytes.fromhex("d8fec3d61b0e483c92975828877ec481")
+
+
+def _boxes(data: bytes):
+    """Yield ``(kind, payload)`` for each BMFF box in ``data``, in order."""
+    offset = 0
+    while offset < len(data):
+        assert len(data) - offset >= 8, "truncated box header"
+        size = int.from_bytes(data[offset : offset + 4], "big")
+        kind = data[offset + 4 : offset + 8]
+        header = 8
+        if size == 1:
+            size = int.from_bytes(data[offset + 8 : offset + 16], "big")
+            header = 16
+        elif size == 0:
+            size = len(data) - offset
+        assert header <= size <= len(data) - offset, "invalid box bounds"
+        yield kind, data[offset + header : offset + size]
+        offset += size
+
+
+def _embedded_manifest(data: bytes) -> bytes:
+    """The JUMBF bytes c2pa embedded in a BMFF file, read straight from the
+    boxes rather than through any Reader presentation: the top-level ``uuid``
+    box carrying the C2PA UUID, purpose ``manifest``. Its payload is the
+    16-byte UUID, a 4-byte version, the NUL-terminated purpose, then -- for
+    ``manifest`` only -- an 8-byte big-endian ``merkle_offset`` to the first
+    ``merkle`` box, and only then the manifest itself."""
+    found = []
+    for kind, payload in _boxes(data):
+        if kind == b"uuid" and payload[:16] == C2PA_UUID:
+            purpose, separator, content = payload[20:].partition(b"\0")
+            assert separator, "malformed C2PA uuid box"
+            if purpose == b"manifest":
+                merkle_offset = int.from_bytes(content[:8], "big")
+                assert 0 < merkle_offset < len(data), f"implausible merkle_offset {merkle_offset}"
+                found.append(content[8:])
+    assert len(found) == 1, f"expected exactly one embedded manifest, found {len(found)}"
+    return found[0]
+
+
+def _merkle_maps(manifest: bytes) -> list:
+    """The ``merkle`` array of the one ``c2pa.hash.bmff*`` assertion, decoded
+    from the manifest's own CBOR so the check does not depend on how a given
+    Reader version renders hash assertions as JSON. Only the real-library test
+    needs ``cbor2``, so it is imported here rather than at module level: the
+    stand-in tests must keep running in a lane without it."""
+    import cbor2  # noqa: PLC0415 -- see the docstring
+
+    maps = []
+
+    def walk(data: bytes) -> None:
+        for kind, payload in _boxes(data):
+            if kind != b"jumb":
+                continue
+            children = list(_boxes(payload))
+            labels = [c[17:].split(b"\0", 1)[0] for k, c in children if k == b"jumd" and c[16] & 1]
+            if labels and labels[0].startswith(b"c2pa.hash.bmff"):
+                cbors = [c for k, c in children if k == b"cbor"]
+                assert len(cbors) == 1, "hash assertion without exactly one cbor box"
+                maps.append(cbor2.loads(cbors[0])["merkle"])
+            walk(payload)
+
+    walk(manifest)
+    assert len(maps) == 1, f"expected one bmff hash assertion, found {len(maps)}"
+    return maps[0]
 
 _NATIVE_SIGNATURE = ctypes.CFUNCTYPE(
     ctypes.c_int64,
@@ -284,6 +350,17 @@ def test_a_real_ladder_signs_and_validates(signer, tmp_path):
         builder.close()
 
     assert [s.read_bytes() for s in sources] == before, "a source was modified"
+
+    # The strong check first, straight from the bytes: what came back is what
+    # was embedded, byte for byte, in every rendition -- and the assertion in
+    # it carries one Merkle map per rendition. Neither depends on how Reader
+    # happens to render the manifest as JSON.
+    for dest in dests:
+        assert _embedded_manifest(dest.read_bytes()) == manifest, (
+            f"{dest.name}: the embedded manifest differs from the returned bytes"
+        )
+    assert len(_merkle_maps(manifest)) == 2, "one Merkle map per rendition"
+
     manifests = []
     for dest in dests:
         with open(dest, "rb") as stream:
@@ -303,9 +380,5 @@ def test_a_real_ladder_signs_and_validates(signer, tmp_path):
         assert "claimSignature.validated" in codes, f"{dest.name}: {codes}"
         failures = {entry["code"] for entry in results.get("failure", [])}
         assert failures <= {"signingCredential.untrusted"}, f"{dest.name}: {failures}"
-        manifest = report["manifests"][active]
-        bmff = [a for a in manifest["assertions"] if a["label"].startswith("c2pa.hash.bmff")]
-        assert len(bmff) == 1, [a["label"] for a in manifest["assertions"]]
-        assert len(bmff[0]["data"]["merkle"]) == 2, "one Merkle map per rendition"
         manifests.append((active, json.dumps(report["manifests"], sort_keys=True)))
     assert manifests[0] == manifests[1], "the renditions do not carry the identical manifest"
