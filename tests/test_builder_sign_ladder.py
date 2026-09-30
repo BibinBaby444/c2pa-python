@@ -70,9 +70,13 @@ def _embedded_manifest(data: bytes) -> bytes:
             assert separator, "malformed C2PA uuid box"
             if purpose == b"manifest":
                 merkle_offset = int.from_bytes(content[:8], "big")
-                assert 0 < merkle_offset < len(data), f"implausible merkle_offset {merkle_offset}"
+                assert 0 < merkle_offset < len(data), (
+                    f"implausible merkle_offset {merkle_offset}"
+                )
                 found.append(content[8:])
-    assert len(found) == 1, f"expected exactly one embedded manifest, found {len(found)}"
+    assert len(found) == 1, (
+        f"expected exactly one embedded manifest, found {len(found)}"
+    )
     return found[0]
 
 
@@ -91,7 +95,14 @@ def _merkle_maps(manifest: bytes) -> list:
             if kind != b"jumb":
                 continue
             children = list(_boxes(payload))
-            labels = [c[17:].split(b"\0", 1)[0] for k, c in children if k == b"jumd" and c[16] & 1]
+            labels = []
+            for child_kind, child in children:
+                # jumd: 16-byte type, one toggles byte, then the label when
+                # toggle bit 0x02 (Label Present) is set. Bit 0x01 is
+                # Requestable, which c2pa also sets, so testing it would pass
+                # by accident.
+                if child_kind == b"jumd" and child[16] & 0x02:
+                    labels.append(child[17:].split(b"\0", 1)[0])
             if labels and labels[0].startswith(b"c2pa.hash.bmff"):
                 cbors = [c for k, c in children if k == b"cbor"]
                 assert len(cbors) == 1, "hash assertion without exactly one cbor box"
@@ -101,6 +112,7 @@ def _merkle_maps(manifest: bytes) -> list:
     walk(manifest)
     assert len(maps) == 1, f"expected one bmff hash assertion, found {len(maps)}"
     return maps[0]
+
 
 _NATIVE_SIGNATURE = ctypes.CFUNCTYPE(
     ctypes.c_int64,
